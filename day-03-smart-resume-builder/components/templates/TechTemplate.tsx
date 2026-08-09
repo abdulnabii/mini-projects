@@ -136,7 +136,7 @@ export default function TechTemplate({ data }: TemplateProps) {
       </div>
 
       <div className="pt-6 text-[10px] text-slate-500 font-mono text-center border-t border-slate-900">
-        Tech Developer Monospace Resume • resume-builder.aiwithab.site
+        Tech Developer Monospace Resume • 30 Days 30 AI Projects
       </div>
     </div>
   );

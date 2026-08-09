@@ -36,7 +36,7 @@ export default function Navbar() {
                 <span className="text-emerald-400">&gt;_</span> CodeReview<span className="text-purple-400">.AI</span>
               </span>
               <span className="block text-[10px] text-zinc-400 font-mono tracking-wider">
-                aiwithab.site • Day 02 IDE
+                30 Days 30 AI Projects • Day 02 IDE
               </span>
             </div>
           </Link>

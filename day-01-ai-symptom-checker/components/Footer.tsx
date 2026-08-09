@@ -28,12 +28,12 @@ export default function Footer() {
             <Link href="/chat" className="hover:text-cyan-400 transition-colors">Symptom Checker</Link>
             <Link href="/history" className="hover:text-cyan-400 transition-colors">History Log</Link>
             <a
-              href="https://aiwithab.site"
+              href="https://github.com/abdulnabii/mini-projects"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 text-cyan-400 hover:underline"
             >
-              <span>aiwithab.site</span>
+              <span>GitHub Repo</span>
               <ExternalLink className="w-3 h-3" />
             </a>
           </div>

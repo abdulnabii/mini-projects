@@ -28,7 +28,7 @@ export default function Navbar() {
                 MediTriage <span className="text-cyan-400">AI</span>
               </span>
               <span className="block text-[10px] text-slate-400 font-mono tracking-wider">
-                aiwithab.site • Day 01
+                30 Days 30 AI Projects • Day 01
               </span>
             </div>
           </Link>

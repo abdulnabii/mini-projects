@@ -189,7 +189,7 @@ export default function ModernTemplate({ data }: TemplateProps) {
 
       {/* Footer Branding */}
       <div className="pt-6 text-[10px] text-slate-400 font-mono text-center border-t border-slate-100">
-        Generated via Smart Resume Builder • resume-builder.aiwithab.site
+        Generated via Smart Resume Builder • 30 Days 30 AI Projects
       </div>
     </div>
   );

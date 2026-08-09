@@ -2,7 +2,7 @@
 
 A conversational AI medical triage assistant built with **Next.js 14**, **Tailwind CSS**, **Framer Motion**, and **Google Gemini API**. It provides initial WHO 4-level risk assessment (Low, Medium, High, Emergency), patient intake profile handling, printable PDF/TXT health reports, and local session history.
 
-🌐 **Live Production URL**: [symptom-checker.aiwithab.site](https://symptom-checker.aiwithab.site)  
+🌐 **Production Vercel URL**: [day-01-ai-symptom-checker.vercel.app](https://day-01-ai-symptom-checker.vercel.app)  
 🐙 **Monorepo Directory**: `day-01-ai-symptom-checker/`
 
 ---
@@ -22,7 +22,7 @@ A conversational AI medical triage assistant built with **Next.js 14**, **Tailwi
 - **Framework**: Next.js 14 (App Router), React 18, TypeScript
 - **Styling**: Tailwind CSS, Framer Motion, Lucide React icons
 - **AI Model**: Google Gemini API (`@google/generative-ai`)
-- **Deployment**: Vercel & custom subdomain `symptom-checker.aiwithab.site`
+- **Deployment**: Vercel Production
 
 ---
 

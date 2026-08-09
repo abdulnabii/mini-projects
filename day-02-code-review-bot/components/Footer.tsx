@@ -27,12 +27,12 @@ export default function Footer() {
             <Link href="/" className="hover:text-emerald-400 transition-colors">Workspace</Link>
             <Link href="/history" className="hover:text-emerald-400 transition-colors">Review Logs</Link>
             <a
-              href="https://aiwithab.site"
+              href="https://github.com/abdulnabii/mini-projects"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 text-purple-400 hover:underline"
             >
-              <span>aiwithab.site</span>
+              <span>GitHub Repo</span>
               <ExternalLink className="w-3 h-3" />
             </a>
           </div>
