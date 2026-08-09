@@ -9,14 +9,14 @@ import ScoreGauge from '@/components/ScoreGauge';
 import ReviewPanel from '@/components/ReviewPanel';
 import DiffViewer from '@/components/DiffViewer';
 import {
-  Code2,
+  Terminal,
   Sparkles,
   Copy,
   Check,
   ShieldAlert,
   Zap,
-  Terminal,
   FileCheck,
+  Cpu,
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -87,24 +87,25 @@ export default function HomePage() {
   return (
     <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-emerald-500/20 pb-6 font-mono">
         <div>
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-semibold uppercase tracking-wider mb-2">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>AI Static Analysis & Vulnerability Scanner</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-semibold uppercase tracking-wider mb-2">
+            <Terminal className="w-3.5 h-3.5" />
+            <span>Developer IDE • AI Static Code Reviewer</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
-            Real-Time Code Review Bot
+          <h1 className="text-3xl font-extrabold text-white tracking-tight flex items-center gap-2">
+            <span>Real-Time Code Review Bot</span>
+            <span className="text-purple-400 font-mono text-sm">v2.0</span>
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Paste code in 13+ languages for senior-level security, performance, and bug analysis.
+          <p className="text-xs sm:text-sm text-zinc-400 mt-1 font-sans">
+            Paste code in 13+ languages for instant senior engineer security, performance, and O(n²) analysis.
           </p>
         </div>
 
         {reviewResult && (
           <button
             onClick={handleCopyMarkdown}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-cyan-400 text-xs font-mono font-bold border border-slate-800 transition-all self-start md:self-auto shadow-lg"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0d1117] hover:bg-zinc-900 text-emerald-400 text-xs font-mono font-bold border border-emerald-500/30 transition-all self-start md:self-auto shadow-lg"
           >
             {copiedMd ? (
               <>
@@ -113,7 +114,7 @@ export default function HomePage() {
               </>
             ) : (
               <>
-                <Copy className="w-4 h-4" />
+                <Copy className="w-4 h-4 text-emerald-400" />
                 <span>Copy PR Review Markdown</span>
               </>
             )}
@@ -121,9 +122,9 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* Main Grid: Code Editor on Left, Review Results on Right */}
+      {/* Main Workspace */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left 6 Columns: Editor */}
+        {/* Left 6 Columns: Code Editor */}
         <div className="lg:col-span-6 space-y-4">
           <CodeEditor
             code={code}
@@ -135,7 +136,7 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Right 6 Columns: Results Workspace */}
+        {/* Right 6 Columns: Inspection Dashboard */}
         <div className="lg:col-span-6 space-y-6">
           {reviewResult ? (
             <div className="space-y-6 animate-in fade-in zoom-in duration-300">
@@ -143,25 +144,25 @@ export default function HomePage() {
               <ScoreGauge score={reviewResult.score} />
 
               {/* View Switcher Tabs */}
-              <div className="flex bg-slate-900 p-1 rounded-2xl border border-slate-800 text-xs font-mono">
+              <div className="flex bg-[#0d1117] p-1 rounded-2xl border border-zinc-800 text-xs font-mono">
                 <button
                   onClick={() => setActiveTab('review')}
                   className={`flex-1 py-2 rounded-xl transition-all flex items-center justify-center gap-2 ${
                     activeTab === 'review'
-                      ? 'bg-slate-800 text-cyan-400 font-bold shadow-md'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-zinc-800 text-emerald-400 font-bold shadow-md'
+                      : 'text-zinc-400 hover:text-zinc-200'
                   }`}
                 >
                   <FileCheck className="w-4 h-4" />
-                  <span>Issues Breakdown ({reviewResult.issues.length})</span>
+                  <span>Issues ({reviewResult.issues.length})</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTab('diff')}
                   className={`flex-1 py-2 rounded-xl transition-all flex items-center justify-center gap-2 ${
                     activeTab === 'diff'
-                      ? 'bg-slate-800 text-emerald-400 font-bold shadow-md'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-zinc-800 text-purple-400 font-bold shadow-md'
+                      : 'text-zinc-400 hover:text-zinc-200'
                   }`}
                 >
                   <Terminal className="w-4 h-4" />
@@ -181,25 +182,25 @@ export default function HomePage() {
               )}
             </div>
           ) : (
-            <div className="bg-slate-900/60 border border-slate-800/80 rounded-3xl p-8 text-center space-y-5 backdrop-blur-xl min-h-[450px] flex flex-col items-center justify-center">
-              <div className="w-16 h-16 rounded-3xl bg-slate-950 border border-slate-800 flex items-center justify-center text-cyan-400 shadow-xl">
-                <Code2 className="w-8 h-8" />
+            <div className="bg-[#0d1117] border border-emerald-500/20 rounded-3xl p-8 text-center space-y-5 backdrop-blur-xl min-h-[450px] flex flex-col items-center justify-center font-mono terminal-glow">
+              <div className="w-16 h-16 rounded-3xl bg-[#080c14] border border-zinc-800 flex items-center justify-center text-emerald-400 shadow-xl">
+                <Terminal className="w-8 h-8" />
               </div>
               <div className="max-w-sm space-y-2">
-                <h3 className="text-lg font-bold text-white">Ready for Code Analysis</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Paste your code on the left or select one of the pre-configured vulnerability presets, then click <strong className="text-cyan-400">Run AI Code Review</strong>.
+                <h3 className="text-base font-bold text-white">Cyber-IDE Code Inspector Active</h3>
+                <p className="text-xs text-zinc-400 leading-relaxed font-sans">
+                  Paste code on the left or select a preset to launch static AST analysis, vulnerability scans, and line-by-line fixes.
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 max-w-sm w-full text-[11px] font-mono text-slate-400 pt-2">
-                <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" />
-                  <span>SQLi & XSS Scanner</span>
+              <div className="grid grid-cols-2 gap-3 max-w-sm w-full text-[11px] font-mono text-zinc-400 pt-2">
+                <div className="bg-[#080c14] p-2.5 rounded-xl border border-zinc-800 flex items-center gap-2">
+                  <ShieldAlert className="w-4 h-4 text-purple-400 shrink-0" />
+                  <span>SQLi & Memory Leaks</span>
                 </div>
-                <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>O(n²) Loop Analyzer</span>
+                <div className="bg-[#080c14] p-2.5 rounded-xl border border-zinc-800 flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>O(n²) Loop Detection</span>
                 </div>
               </div>
             </div>

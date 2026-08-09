@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Copy, Check, Sparkles, FileCode } from 'lucide-react';
+import { Copy, Check, Sparkles, Terminal } from 'lucide-react';
 
 interface DiffViewerProps {
   originalCode: string;
@@ -20,23 +20,23 @@ export default function DiffViewer({ originalCode, fixedCode, language }: DiffVi
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl space-y-0">
+    <div className="bg-[#0d1117] border border-emerald-500/20 rounded-2xl overflow-hidden shadow-2xl space-y-0 font-mono">
       {/* Header Bar */}
-      <div className="bg-slate-950 border-b border-slate-800 px-5 py-3.5 flex items-center justify-between gap-4">
+      <div className="bg-[#080c14] border-b border-zinc-800 px-5 py-3.5 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Sparkles className="w-4 h-4 text-cyan-400" />
+          <Terminal className="w-4 h-4 text-emerald-400" />
           <h3 className="text-sm font-bold text-white">AI Refactored Code Comparison</h3>
-          <span className="text-[10px] font-mono uppercase bg-slate-800 text-cyan-300 px-2 py-0.5 rounded border border-slate-700">
+          <span className="text-[10px] font-mono uppercase bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded border border-emerald-800">
             {language}
           </span>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs font-mono">
+          <div className="flex bg-[#0b0f17] p-1 rounded-xl border border-zinc-800 text-xs font-mono">
             <button
               onClick={() => setActiveTab('split')}
               className={`px-3 py-1 rounded-lg transition-colors ${
-                activeTab === 'split' ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
+                activeTab === 'split' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-400 hover:text-zinc-200'
               }`}
             >
               Side-by-Side
@@ -44,7 +44,7 @@ export default function DiffViewer({ originalCode, fixedCode, language }: DiffVi
             <button
               onClick={() => setActiveTab('fixed')}
               className={`px-3 py-1 rounded-lg transition-colors ${
-                activeTab === 'fixed' ? 'bg-emerald-950 text-emerald-300 font-bold' : 'text-slate-400 hover:text-slate-200'
+                activeTab === 'fixed' ? 'bg-emerald-950 text-emerald-300 font-bold' : 'text-zinc-400 hover:text-zinc-200'
               }`}
             >
               Fixed Code Only
@@ -53,7 +53,7 @@ export default function DiffViewer({ originalCode, fixedCode, language }: DiffVi
 
           <button
             onClick={handleCopyFixed}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 text-xs font-bold shadow-lg shadow-emerald-500/20 hover:scale-[1.02] transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-purple-600 text-zinc-950 text-xs font-mono font-bold shadow-lg shadow-emerald-500/20 hover:scale-[1.02] transition-all"
           >
             {copied ? (
               <>
@@ -72,12 +72,12 @@ export default function DiffViewer({ originalCode, fixedCode, language }: DiffVi
 
       {/* Code Display */}
       {activeTab === 'split' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-slate-800 bg-slate-950 text-xs font-mono min-h-[350px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-zinc-800 bg-[#0b0f17] text-xs font-mono min-h-[380px]">
           {/* Left: Original */}
-          <div className="p-4 space-y-2 bg-red-950/10">
+          <div className="p-4 space-y-2 bg-red-950/15">
             <div className="flex items-center justify-between text-[11px] font-bold text-red-400 border-b border-red-900/40 pb-2">
               <span className="flex items-center gap-1.5">
-                <FileCode className="w-3.5 h-3.5" /> Original Code (With Issues)
+                <span className="w-2 h-2 rounded-full bg-red-500" /> Original Code (With Issues)
               </span>
             </div>
             <pre className="overflow-x-auto text-red-200/80 leading-relaxed whitespace-pre-wrap">
@@ -86,10 +86,10 @@ export default function DiffViewer({ originalCode, fixedCode, language }: DiffVi
           </div>
 
           {/* Right: AI Fixed Code */}
-          <div className="p-4 space-y-2 bg-emerald-950/10">
+          <div className="p-4 space-y-2 bg-emerald-950/15">
             <div className="flex items-center justify-between text-[11px] font-bold text-emerald-400 border-b border-emerald-900/40 pb-2">
               <span className="flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" /> AI Clean Refactored Code
+                <Sparkles className="w-3.5 h-3.5 text-emerald-400" /> AI Clean Refactored Code
               </span>
             </div>
             <pre className="overflow-x-auto text-emerald-200/90 leading-relaxed whitespace-pre-wrap">
@@ -98,7 +98,7 @@ export default function DiffViewer({ originalCode, fixedCode, language }: DiffVi
           </div>
         </div>
       ) : (
-        <div className="p-4 bg-slate-950 text-xs font-mono min-h-[350px]">
+        <div className="p-4 bg-[#0b0f17] text-xs font-mono min-h-[380px]">
           <pre className="overflow-x-auto text-emerald-300 leading-relaxed whitespace-pre-wrap">
             {fixedCode}
           </pre>
