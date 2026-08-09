@@ -2,7 +2,7 @@
 
 A real-time static code review bot and security vulnerability scanner built with **Next.js 14**, **Monaco Editor**, **Tailwind CSS**, and **Google Gemini API**. Features a **Cyberpunk Developer IDE Theme**, AST quality score index (0–100), categorized issue breakdown, side-by-side code diff, and 1-click GitHub PR Markdown export.
 
-🌐 **Production Vercel URL**: [day-02-code-review-bot.vercel.app](https://day-02-code-review-bot.vercel.app)  
+🌐 **Production Vercel URL**: [code-review-bot.vercel.app](https://code-review-bot.vercel.app)  
 🐙 **Monorepo Directory**: `day-02-code-review-bot/`
 
 ---

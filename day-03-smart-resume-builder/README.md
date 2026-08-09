@@ -2,7 +2,7 @@
 
 An executive resume builder and real-time ATS match optimizer built with **Next.js 14**, **Tailwind CSS**, **Framer Motion**, and **Google Gemini API**. Features a **Deep Indigo & Champagne Gold Executive Theme**, real-time A4 live document canvas, 3 switchable templates, AI STAR-bullet point rewriter, and 1-click PDF download.
 
-🌐 **Production Vercel URL**: [day-03-smart-resume-builder.vercel.app](https://day-03-smart-resume-builder.vercel.app)  
+🌐 **Production Vercel URL**: [smart-resume-builder.vercel.app](https://smart-resume-builder.vercel.app)  
 🐙 **Monorepo Directory**: `day-03-smart-resume-builder/`
 
 ---

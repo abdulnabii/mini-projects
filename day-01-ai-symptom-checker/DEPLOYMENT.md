@@ -25,4 +25,4 @@ cd "c:\Users\nabi4\OneDrive\Desktop\New folder\30-days-30-projects\day-01-ai-sym
 npx vercel --token <VERCEL_TOKEN> --prod --yes
 ```
 
-Production URL: `https://day-01-ai-symptom-checker.vercel.app`
+Production URL: `https://ai-symptom-checker.vercel.app`

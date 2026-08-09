@@ -25,4 +25,4 @@ cd "c:\Users\nabi4\OneDrive\Desktop\New folder\30-days-30-projects\day-03-smart-
 npx vercel --token <VERCEL_TOKEN> --prod --yes
 ```
 
-Production URL: `https://day-03-smart-resume-builder.vercel.app`
+Production URL: `https://smart-resume-builder.vercel.app`

@@ -2,7 +2,7 @@
 
 A conversational AI medical triage assistant built with **Next.js 14**, **Tailwind CSS**, **Framer Motion**, and **Google Gemini API**. It provides initial WHO 4-level risk assessment (Low, Medium, High, Emergency), patient intake profile handling, printable PDF/TXT health reports, and local session history.
 
-🌐 **Production Vercel URL**: [day-01-ai-symptom-checker.vercel.app](https://day-01-ai-symptom-checker.vercel.app)  
+🌐 **Production Vercel URL**: [ai-symptom-checker.vercel.app](https://ai-symptom-checker.vercel.app)  
 🐙 **Monorepo Directory**: `day-01-ai-symptom-checker/`
 
 ---
