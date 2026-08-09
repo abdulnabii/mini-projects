@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📄 Day 03 — Smart Resume Builder & ATS Optimizer (SmartResume.AI)
 
-## Getting Started
+An executive resume builder and real-time ATS match optimizer built with **Next.js 14**, **Tailwind CSS**, **Framer Motion**, and **Google Gemini API**. Features a **Deep Indigo & Champagne Gold Executive Theme**, real-time A4 live document canvas, 3 switchable templates, AI STAR-bullet point rewriter, and 1-click PDF download.
 
-First, run the development server:
+🌐 **Live Production URL**: [resume-builder.aiwithab.site](https://resume-builder.aiwithab.site)  
+🐙 **Monorepo Directory**: `day-03-smart-resume-builder/`
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Executive HR Tech Theme**: Deep Indigo & Gold Canvas design system.
+- **3 Professional Templates**: Modern Accent (colored header), Minimalist Clean (typography), and Tech Monospace (developer matrix).
+- **Real-Time A4 Live Document Canvas**: Split-screen live preview that updates instantly as you edit form fields.
+- **AI STAR-Method Bullet Optimizer**: Rewrites raw bullets into high-impact action-verb statements with quantified metrics (%, $, scale).
+- **Real-Time ATS Keyword Match Engine**: Computes 0–100% compatibility match score, letter grade (A/B/C/D/F), matched keywords, and missing high-value terms against target job descriptions.
+- **1-Click PDF Export & Saved History**: Native print CSS rules for clean PDF output + local draft version control.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🛠️ Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework**: Next.js 14 (App Router), React 18, TypeScript
+- **Styling**: Tailwind CSS, Framer Motion, Lucide React icons
+- **AI Model**: Google Gemini API (`@google/generative-ai`)
+- **Deployment**: Vercel & custom subdomain `resume-builder.aiwithab.site`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 💻 Local Setup
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Navigate to directory:
+   ```bash
+   cd day-03-smart-resume-builder
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Set environment variable in `.env.local`:
+   ```env
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+4. Run dev server:
+   ```bash
+   npm run dev
+   ```
+5. Open `http://localhost:3000` in browser.

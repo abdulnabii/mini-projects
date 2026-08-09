@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🤖 Day 02 — Real-Time Code Review Bot (CodeReview.AI)
 
-## Getting Started
+A real-time static code review bot and security vulnerability scanner built with **Next.js 14**, **Monaco Editor**, **Tailwind CSS**, and **Google Gemini API**. Features a **Cyberpunk Developer IDE Theme**, AST quality score index (0–100), categorized issue breakdown, side-by-side code diff, and 1-click GitHub PR Markdown export.
 
-First, run the development server:
+🌐 **Live Production URL**: [code-review.aiwithab.site](https://code-review.aiwithab.site)  
+🐙 **Monorepo Directory**: `day-02-code-review-bot/`
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Cyberpunk Developer IDE Theme**: Deep obsidian black, matrix emerald green, and security violet UI.
+- **13+ Language Support**: Automatic heuristic language detection & sample vulnerability presets (SQL Injection Python, React memory leak, C++ buffer overflow).
+- **0–100 AST Quality Score Gauge**: Animated circular quality index ring.
+- **Categorized Issue Badges**: 🔴 Critical, 🟠 Major, 🟡 Minor, 🟢 Info feedback with line numbers and 1-click copyable fixes.
+- **Side-by-Side Code Diff**: Interactive split view comparing original code vs AI clean refactored code.
+- **GitHub PR Markdown Exporter**: 1-click button to copy formatted PR review comments.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🛠️ Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework**: Next.js 14 (App Router), React 18, TypeScript
+- **Editor**: Line-numbered developer editor with language auto-detector
+- **Styling**: Tailwind CSS, Framer Motion, Lucide React icons
+- **AI Model**: Google Gemini API (`@google/generative-ai`)
+- **Deployment**: Vercel & custom subdomain `code-review.aiwithab.site`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 💻 Local Setup
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Navigate to directory:
+   ```bash
+   cd day-02-code-review-bot
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Set environment variable in `.env.local`:
+   ```env
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+4. Run dev server:
+   ```bash
+   npm run dev
+   ```
+5. Open `http://localhost:3000` in browser.

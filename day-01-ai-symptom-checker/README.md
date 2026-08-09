@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🩺 Day 01 — AI Symptom Checker & Triage Assistant
 
-## Getting Started
+A conversational AI medical triage assistant built with **Next.js 14**, **Tailwind CSS**, **Framer Motion**, and **Google Gemini API**. It provides initial WHO 4-level risk assessment (Low, Medium, High, Emergency), patient intake profile handling, printable PDF/TXT health reports, and local session history.
 
-First, run the development server:
+🌐 **Live Production URL**: [symptom-checker.aiwithab.site](https://symptom-checker.aiwithab.site)  
+🐙 **Monorepo Directory**: `day-01-ai-symptom-checker/`
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **WHO 4-Level Risk Classifier**: Instant risk categorization (🟢 Low Risk, 🟡 Moderate, 🟠 High, 🔴 Emergency / Call 911).
+- **Patient Profile Intake**: Intake form collecting age, gender, pre-existing conditions, allergies, and symptom timeline.
+- **Health Report Exporter**: Downloadable PDF & TXT clinical summary reports.
+- **Healthcare Slate Design System**: Clean medical slate UI with dark mode ergonomics.
+- **Local Storage History**: Save and inspect past medical triage sessions.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🛠️ Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework**: Next.js 14 (App Router), React 18, TypeScript
+- **Styling**: Tailwind CSS, Framer Motion, Lucide React icons
+- **AI Model**: Google Gemini API (`@google/generative-ai`)
+- **Deployment**: Vercel & custom subdomain `symptom-checker.aiwithab.site`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 💻 Local Setup
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Navigate to directory:
+   ```bash
+   cd day-01-ai-symptom-checker
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Set your environment variable in `.env.local`:
+   ```env
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+4. Run development server:
+   ```bash
+   npm run dev
+   ```
+5. Open `http://localhost:3000` in your browser.
