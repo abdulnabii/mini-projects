@@ -356,7 +356,7 @@ export default function HomePage() {
           <SHAPChart factors={prediction.shapFactors} />
 
           {/* AI Personalized Recommendations */}
-          <RecommendationCard recommendations={recommendations} />
+          <RecommendationCard recommendations={recommendations} isLoading={isLoadingRecs} />
         </div>
       </div>
 

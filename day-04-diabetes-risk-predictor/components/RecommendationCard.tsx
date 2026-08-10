@@ -6,9 +6,10 @@ import { HeartPulse, CheckCircle2, AlertCircle } from 'lucide-react';
 
 interface RecommendationCardProps {
   recommendations: RecommendationItem[];
+  isLoading?: boolean;
 }
 
-export default function RecommendationCard({ recommendations }: RecommendationCardProps) {
+export default function RecommendationCard({ recommendations, isLoading }: RecommendationCardProps) {
   const getBadgeStyle = (priority: 'HIGH' | 'MEDIUM' | 'LOW') => {
     if (priority === 'HIGH') return 'bg-rose-950/80 text-rose-300 border-rose-800';
     if (priority === 'MEDIUM') return 'bg-amber-950/80 text-amber-300 border-amber-800';
