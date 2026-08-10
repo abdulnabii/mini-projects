@@ -12,8 +12,9 @@ Welcome to the **30 AI Projects in 30 Days** repository by **Abdul Nabi**. This 
 | **02** | [Real-Time Code Review Bot](./day-02-code-review-bot) | DevTools / Cyber-IDE | 🌐 [code-review-bot.vercel.app](https://code-review-bot.vercel.app) | Next.js 14, Monaco, Gemini API | ✅ Deployed |
 | **03** | [Smart Resume Builder & ATS Optimizer](./day-03-smart-resume-builder) | HR Tech / Productivity | 🌐 [smart-resume-builder.vercel.app](https://smart-resume-builder.vercel.app) | Next.js 14, Gemini API, Print CSS | ✅ Deployed |
 | **04** | [Diabetes Risk Predictor & SHAP Analyzer](./day-04-diabetes-risk-predictor) | Healthcare ML / AI | 🌐 [diabetes-risk-predictor.vercel.app](https://diabetes-risk-predictor.vercel.app) | Next.js 14, Scikit-Learn ML, Gemini API | ✅ Deployed |
-| **05** | *Upcoming Project* | - | - | - | ⏳ Pending |
-| ... | *Days 06–30* | - | - | - | ⏳ Pending |
+| **05** | [AI Meeting Summarizer & Intelligence Extractor](./day-05-ai-meeting-summarizer) | AI / Productivity | 🌐 [day-05-ai-meeting-summarizer.vercel.app](https://day-05-ai-meeting-summarizer.vercel.app) | Next.js 14, Tailwind CSS, Gemini API | ✅ Deployed |
+| **06** | [Real-Time Stock Dashboard & AI Sentiment Terminal](./day-06-stock-dashboard) | Real-Time Systems / FinTech | 🌐 [day-06-stock-dashboard.vercel.app](https://day-06-stock-dashboard.vercel.app) | Next.js 14, Tailwind CSS, Gemini API, SVG Charts | ✅ Deployed |
+| ... | *Days 07–30* | - | - | - | ⏳ Pending |
 
 ---
 
