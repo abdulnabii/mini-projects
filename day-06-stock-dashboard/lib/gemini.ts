@@ -1,12 +1,12 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { SentimentResult } from '@/types';
 
-const apiKey = process.env.GEMINI_API_KEY || '';
-
 export async function analyzeNewsSentiment(
   ticker: string,
   headlines: string[]
 ): Promise<SentimentResult> {
+  const apiKey = process.env.GEMINI_API_KEY;
+
   if (apiKey) {
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
