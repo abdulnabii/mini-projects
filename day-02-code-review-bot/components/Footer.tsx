@@ -18,7 +18,7 @@ export default function Footer() {
                 CodeReview.AI — Cyber-Security Static Analyzer
               </p>
               <p className="text-[11px] text-zinc-500">
-                Part of 30 AI Projects in 30 Days by Abdul Nabi
+                Built by Abdul Nabi
               </p>
             </div>
           </div>

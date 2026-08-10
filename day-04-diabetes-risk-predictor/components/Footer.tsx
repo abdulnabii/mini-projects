@@ -18,7 +18,7 @@ export default function Footer() {
                 DiabetesRisk.AI — Clinical ML Diagnostic Risk Calculator
               </p>
               <p className="text-[11px] text-slate-400 font-sans">
-                Part of 30 AI Projects in 30 Days by Abdul Nabi
+                Built by Abdul Nabi
               </p>
             </div>
           </div>

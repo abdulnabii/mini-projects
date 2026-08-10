@@ -126,7 +126,7 @@ export default function MinimalTemplate({ data }: TemplateProps) {
       </div>
 
       <div className="pt-6 text-[10px] text-slate-400 font-sans text-center border-t border-slate-100">
-        Minimalist Resume • 30 Days 30 AI Projects
+        Minimalist Resume Canvas
       </div>
     </div>
   );

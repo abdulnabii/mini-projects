@@ -29,7 +29,7 @@ export default function Navbar() {
                 SmartResume<span className="text-amber-400">.AI</span>
               </span>
               <span className="block text-[10px] text-slate-400 font-mono tracking-wider">
-                30 Days 30 AI Projects • Day 03
+                Executive ATS Resume Optimizer
               </span>
             </div>
           </Link>
