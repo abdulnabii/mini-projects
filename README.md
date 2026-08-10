@@ -11,8 +11,9 @@ Welcome to the **30 AI Projects in 30 Days** repository by **Abdul Nabi**. This 
 | **01** | [AI Symptom Checker & Triage Assistant](./day-01-ai-symptom-checker) | Healthcare / AI | 🌐 [ai-symptom-checker.vercel.app](https://ai-symptom-checker.vercel.app) | Next.js 14, Tailwind CSS, Gemini API | ✅ Deployed |
 | **02** | [Real-Time Code Review Bot](./day-02-code-review-bot) | DevTools / Cyber-IDE | 🌐 [code-review-bot.vercel.app](https://code-review-bot.vercel.app) | Next.js 14, Monaco, Gemini API | ✅ Deployed |
 | **03** | [Smart Resume Builder & ATS Optimizer](./day-03-smart-resume-builder) | HR Tech / Productivity | 🌐 [smart-resume-builder.vercel.app](https://smart-resume-builder.vercel.app) | Next.js 14, Gemini API, Print CSS | ✅ Deployed |
-| **04** | *Upcoming Project* | - | - | - | ⏳ Pending |
-| ... | *Days 05–30* | - | - | - | ⏳ Pending |
+| **04** | [Diabetes Risk Predictor & SHAP Analyzer](./day-04-diabetes-risk-predictor) | Healthcare ML / AI | 🌐 [diabetes-risk-predictor.vercel.app](https://diabetes-risk-predictor.vercel.app) | Next.js 14, Scikit-Learn ML, Gemini API | ✅ Deployed |
+| **05** | *Upcoming Project* | - | - | - | ⏳ Pending |
+| ... | *Days 06–30* | - | - | - | ⏳ Pending |
 
 ---
 
@@ -32,7 +33,7 @@ Clone the repository and run any project locally:
 
 ```bash
 git clone https://github.com/abdulnabii/mini-projects.git
-cd mini-projects/day-01-ai-symptom-checker # Or day-02-..., day-03-...
+cd mini-projects/day-01-ai-symptom-checker # Or day-02-..., day-03-..., day-04-...
 
 npm install
 npm run dev
