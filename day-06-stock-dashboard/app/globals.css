@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-[#080c10] text-slate-200 antialiased min-h-screen flex flex-col;
+    font-family: 'Inter', sans-serif;
+    background-image:
+      radial-gradient(at 0% 0%, rgba(0, 208, 132, 0.06) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.04) 0px, transparent 50%);
+  }
+}
+
+/* Terminal monospace numbers */
+.tabular-nums { font-variant-numeric: tabular-nums; }
+
+/* Thin terminal scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #0d1117; }
+::-webkit-scrollbar-thumb { background: rgba(0, 208, 132, 0.25); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 208, 132, 0.5); }
+
+/* Pulse animation for live prices */
+@keyframes price-flash {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+.price-flash { animation: price-flash 0.4s ease; }
+
+/* Green gain / Red loss */
+.gain { color: #00d084; }
+.loss { color: #ef4444; }
+.neutral-price { color: #94a3b8; }
