@@ -14,7 +14,9 @@ Welcome to the **30 AI Projects in 30 Days** repository by **Abdul Nabi**. This 
 | **04** | [Diabetes Risk Predictor & SHAP Analyzer](./day-04-diabetes-risk-predictor) | Healthcare ML / AI | 🌐 [diabetes-risk-predictor.vercel.app](https://diabetes-risk-predictor.vercel.app) | Next.js 14, Scikit-Learn ML, Gemini API | ✅ Deployed |
 | **05** | [AI Meeting Summarizer & Intelligence Extractor](./day-05-ai-meeting-summarizer) | AI / Productivity | 🌐 [day-05-ai-meeting-summarizer.vercel.app](https://day-05-ai-meeting-summarizer.vercel.app) | Next.js 14, Tailwind CSS, Gemini API | ✅ Deployed |
 | **06** | [Real-Time Stock Dashboard & AI Sentiment Terminal](./day-06-stock-dashboard) | Real-Time Systems / FinTech | 🌐 [day-06-stock-dashboard.vercel.app](https://day-06-stock-dashboard.vercel.app) | Next.js 14, Tailwind CSS, Gemini API, SVG Charts | ✅ Deployed |
-| ... | *Days 07–30* | - | - | - | ⏳ Pending |
+| **07** | [AI Logo Generator & Brand Identity System](./day-07-ai-logo-generator) | AI / Creative Tools | 🌐 [day-07-ai-logo-generator.vercel.app](https://day-07-ai-logo-generator.vercel.app) | Next.js 14, Tailwind CSS, Gemini API | ✅ Deployed |
+| **08** | [Smart Expense Tracker & AI Financial Coach](./day-08-smart-expense-tracker) | AI / Personal Finance | 🌐 [day-08-smart-expense-tracker.vercel.app](https://day-08-smart-expense-tracker.vercel.app) | Next.js 14, Tailwind CSS, Gemini API | ✅ Deployed |
+| ... | *Days 09–30* | - | - | - | ⏳ Pending |
 
 ---
 
