@@ -1,7 +1,7 @@
 'use client';
 
 import { LogoConcept } from '@/types';
-import { Download, Sparkles, Check, Moon, Sun, Layers, Image as ImageIcon, LayoutGrid } from 'lucide-react';
+import { Download, Sparkles, Check, Moon, Sun, Layers, Image as ImageIcon } from 'lucide-react';
 import { useState } from 'react';
 
 interface Props {
@@ -17,7 +17,8 @@ export default function LogoGallery({ logos, companyName, tagline }: Props) {
   const [downloadingPngId, setDownloadingPngId] = useState<string | null>(null);
   const [bgThemes, setBgThemes] = useState<Record<string, CardBgTheme>>({});
 
-  const initial = (companyName.trim().charAt(0) || 'K').toUpperCase();
+  const L = (companyName.trim().charAt(0) || 'A').toUpperCase();
+  const tg = (tagline || 'THE FUTURE IS NOW').toUpperCase();
 
   const toggleBgTheme = (logoId: string, theme: CardBgTheme) => {
     setBgThemes((prev) => ({ ...prev, [logoId]: theme }));
@@ -26,437 +27,348 @@ export default function LogoGallery({ logos, companyName, tagline }: Props) {
   const handleDownloadSvg = (logo: LogoConcept) => {
     setDownloadedId(logo.id);
     setTimeout(() => setDownloadedId(null), 2000);
-
-    const svgElement = document.getElementById(`svg-${logo.id}`);
-    if (svgElement) {
-      const svgData = new XMLSerializer().serializeToString(svgElement);
-      const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${companyName.toLowerCase().replace(/\s+/g, '-')}-${logo.id}.svg`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+    const svgEl = document.getElementById(`svg-${logo.id}`);
+    if (!svgEl) return;
+    const blob = new Blob([new XMLSerializer().serializeToString(svgEl)], { type: 'image/svg+xml' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${companyName.toLowerCase().replace(/\s+/g, '-')}-${logo.id}.svg`;
+    a.click();
   };
 
   const handleDownloadPng = (logo: LogoConcept) => {
     setDownloadingPngId(logo.id);
-    const svgElement = document.getElementById(`svg-${logo.id}`) as SVGElement | null;
-    if (!svgElement) return;
-
-    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const svgEl = document.getElementById(`svg-${logo.id}`) as SVGElement | null;
+    if (!svgEl) return;
+    const svgData = new XMLSerializer().serializeToString(svgEl);
     const canvas = document.createElement('canvas');
-    canvas.width = 1600;
-    canvas.height = 1600;
+    canvas.width = 1600; canvas.height = 1600;
     const ctx = canvas.getContext('2d');
     const img = new Image();
-
-    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(svgBlob);
-
+    const url = URL.createObjectURL(new Blob([svgData], { type: 'image/svg+xml' }));
     img.onload = () => {
       if (ctx) {
-        ctx.fillStyle = '#0a0d14';
-        ctx.fillRect(0, 0, 1600, 1600);
-        ctx.drawImage(img, 200, 200, 1200, 1200);
-
-        const pngUrl = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.href = pngUrl;
-        link.download = `${companyName.toLowerCase().replace(/\s+/g, '-')}-${logo.id}-2K.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        ctx.fillStyle = '#0a0d14'; ctx.fillRect(0, 0, 1600, 1600);
+        ctx.drawImage(img, 100, 100, 1400, 1400);
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = `${companyName.toLowerCase().replace(/\s+/g, '-')}-${logo.id}-2K.png`;
+        a.click();
         URL.revokeObjectURL(url);
       }
       setDownloadingPngId(null);
     };
-
     img.src = url;
   };
 
-  const renderAgencyLogoMark = (logo: LogoConcept, index: number) => {
-    const p = logo.primaryColor;
-    const s = logo.secondaryColor;
-    const a = logo.accentColor;
-    const id = logo.id;
+  // ─── DESIGN 0: SHIELD / HERALDIC CREST ───────────────────────────────────
+  const renderDesign0 = (p: string, s: string, a: string, id: string) => (
+    <g>
+      <defs>
+        <linearGradient id={`g0a-${id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={p} /><stop offset="100%" stopColor={s} />
+        </linearGradient>
+        <linearGradient id={`g0b-${id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor={a} /><stop offset="100%" stopColor={p} />
+        </linearGradient>
+        <filter id={`glow0-${id}`}><feGaussianBlur stdDeviation="2.5" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+      </defs>
 
-    // Determine layout mode based on index (0: Stacked Badge, 1: Monogram Lockup, 2: Horizontal Pro, 3: Seal Crest)
-    const layoutMode = index % 4;
+      {/* Outer glow ring */}
+      <ellipse cx="50" cy="46" rx="38" ry="40" fill="none" stroke={p} strokeWidth="0.8" opacity="0.3" />
 
-    switch (logo.svgShape) {
-      // =========================================================
-      // 🎌 ANIME / MASCOT HIGH-FIDELITY INITIAL MONOGRAM EMBLEMS
-      // =========================================================
-      case 'anime-kitsune-mask':
-      case 'anime-mecha-star':
-      case 'anime-cyber-ninja':
-      case 'anime-flame-crest':
-        return (
-          <g>
-            <defs>
-              <linearGradient id={`anim-grad1-${id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor={p} />
-                <stop offset="50%" stopColor={s} />
-                <stop offset="100%" stopColor={a} />
-              </linearGradient>
-              <linearGradient id={`anim-grad2-${id}`} x1="0%" y1="100%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor={a} />
-                <stop offset="100%" stopColor="#FFFFFF" />
-              </linearGradient>
-              <filter id={`anim-glow-${id}`} x="-30%" y="-30%" width="160%" height="160%">
-                <feGaussianBlur stdDeviation="4" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-              </filter>
-            </defs>
+      {/* Shield body */}
+      <path d="M 50 8 L 82 20 L 82 50 C 82 68 66 78 50 84 C 34 78 18 68 18 50 L 18 20 Z"
+        fill="#0d1118" stroke={`url(#g0a-${id})`} strokeWidth="2.5" />
 
-            {layoutMode === 2 ? (
-              /* HORIZONTAL ANIME LOCKUP */
-              <g>
-                <circle cx="35" cy="50" r="28" fill={`url(#anim-grad1-${id})`} opacity="0.2" />
-                <polygon points="35,18 42,34 58,34 46,44 50,60 35,50 20,60 24,44 12,34 28,34" fill={`url(#anim-grad1-${id})`} />
-                <circle cx="35" cy="50" r="16" fill="#0d1118" stroke={a} strokeWidth="2.5" />
-                <text x="35" y="56" textAnchor="middle" fill={a} fontSize="20" fontWeight="900" fontFamily="var(--font-outfit), sans-serif">
-                  {initial}
-                </text>
-                <text x="75" y="46" fill="#FFFFFF" fontSize="18" fontWeight="800" fontFamily="var(--font-outfit), sans-serif">
-                  {companyName}
-                </text>
-                <text x="75" y="60" fill={a} fontSize="8" fontWeight="700" letterSpacing="3" fontFamily="var(--font-mono), monospace">
-                  {(tagline || 'ANIME GAMING UNIVERSE').toUpperCase()}
-                </text>
-              </g>
-            ) : (
-              /* STACKED ANIME EMBLEM LOCKUP */
-              <g>
-                {/* Sun Disk Background */}
-                <circle cx="50" cy="38" r="32" fill={`url(#anim-grad1-${id})`} opacity="0.18" />
-                <circle cx="50" cy="38" r="28" fill="none" stroke={a} strokeWidth="2" strokeDasharray="8 4" filter={`url(#anim-glow-${id})`} />
+      {/* Shield inner inset */}
+      <path d="M 50 14 L 76 24 L 76 50 C 76 65 62 74 50 79 C 38 74 24 65 24 50 L 24 24 Z"
+        fill="none" stroke={a} strokeWidth="1" opacity="0.5" />
 
-                {/* Fox Ears / Mecha Horns */}
-                <path d="M 24 30 L 34 8 L 44 26 Z" fill={p} />
-                <path d="M 76 30 L 66 8 L 56 26 Z" fill={p} />
-                <path d="M 27 28 L 34 14 L 40 25 Z" fill={a} />
-                <path d="M 73 28 L 66 14 L 60 25 Z" fill={a} />
+      {/* Top crown spikes */}
+      <path d="M 32 20 L 36 10 L 40 18" fill={p} opacity="0.9" />
+      <path d="M 50 14 L 50 5 L 54 14" fill={a} opacity="0.9" />
+      <path d="M 68 20 L 64 10 L 60 18" fill={p} opacity="0.9" />
+      <circle cx="36" cy="10" r="2" fill={a} />
+      <circle cx="50" cy="5" r="2.5" fill="#FFFFFF" />
+      <circle cx="64" cy="10" r="2" fill={a} />
 
-                {/* Main Crest Mask Container */}
-                <path
-                  d="M 26 28 C 26 54 38 70 50 72 C 62 70 74 54 74 28 C 74 24 62 26 50 26 C 38 26 26 24 26 28 Z"
-                  fill="#0d1118"
-                  stroke={`url(#grad1-${id})`}
-                  strokeWidth="3.5"
-                />
+      {/* Center letter monogram */}
+      <text x="50" y="58" textAnchor="middle" fill={`url(#g0b-${id})`}
+        fontSize="36" fontWeight="900" fontFamily="var(--font-outfit), sans-serif"
+        filter={`url(#glow0-${id})`}>{L}</text>
 
-                {/* Initial Letter Monogram */}
-                <text
-                  x="50"
-                  y="53"
-                  textAnchor="middle"
-                  fill={`url(#anim-grad2-${id})`}
-                  fontSize="28"
-                  fontWeight="900"
-                  fontFamily="var(--font-outfit), sans-serif"
-                  filter={`url(#anim-glow-${id})`}
-                >
-                  {initial}
-                </text>
+      {/* Horizontal rule below letter */}
+      <line x1="32" y1="64" x2="68" y2="64" stroke={a} strokeWidth="1.5" opacity="0.7" />
 
-                {/* Forehead Orb & Whiskers */}
-                <circle cx="50" cy="32" r="3.5" fill={a} />
-                <path d="M 30 48 Q 37 50 42 48 M 28 54 Q 36 56 40 53" stroke={p} strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 70 48 Q 63 50 58 48 M 72 54 Q 64 56 60 53" stroke={p} strokeWidth="2.5" strokeLinecap="round" />
+      {/* Brand name */}
+      <text x="50" y="91" textAnchor="middle" fill="#FFFFFF" fontSize="11" fontWeight="800"
+        letterSpacing="1.5" fontFamily="var(--font-outfit), sans-serif">{companyName}</text>
+      <text x="50" y="98" textAnchor="middle" fill={a} fontSize="6" fontWeight="700"
+        letterSpacing="2.5" fontFamily="var(--font-mono), monospace">{tg.slice(0, 22)}</text>
+    </g>
+  );
 
-                {/* Integrated Typography */}
-                <text x="50" y="82" textAnchor="middle" fill="#FFFFFF" fontSize="14" fontWeight="800" fontFamily="var(--font-outfit), sans-serif">
-                  {companyName}
-                </text>
-                <text x="50" y="92" textAnchor="middle" fill={a} fontSize="7" fontWeight="700" letterSpacing="2.5" fontFamily="var(--font-mono), monospace">
-                  {(tagline || 'ANIME GAMING STUDIO').toUpperCase()}
-                </text>
-              </g>
-            )}
-          </g>
-        );
+  // ─── DESIGN 1: HEXAGONAL PRISM BADGE ─────────────────────────────────────
+  const renderDesign1 = (p: string, s: string, a: string, id: string) => (
+    <g>
+      <defs>
+        <linearGradient id={`g1a-${id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={p} /><stop offset="100%" stopColor={s} />
+        </linearGradient>
+        <linearGradient id={`g1b-${id}`} x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor={s} /><stop offset="100%" stopColor={a} />
+        </linearGradient>
+      </defs>
 
-      // =========================================================
-      // 💼 CORPORATE / PROFESSIONAL 3D MONOGRAMS
-      // =========================================================
-      case 'pro-interlocking-m':
-      case 'pro-prism-diamond':
-      case 'pro-corporate-crest':
-      case 'pro-infinity-node':
-        return (
-          <g>
-            <defs>
-              <linearGradient id={`pro-grad1-${id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor={p} />
-                <stop offset="100%" stopColor={s} />
-              </linearGradient>
-              <linearGradient id={`pro-grad2-${id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor={s} />
-                <stop offset="100%" stopColor={a} />
-              </linearGradient>
-            </defs>
+      {/* Outer hex */}
+      <polygon points="50,4 84,22 84,58 50,76 16,58 16,22"
+        fill={`url(#g1a-${id})`} opacity="0.9" />
+      {/* Middle hex */}
+      <polygon points="50,10 78,26 78,54 50,70 22,54 22,26"
+        fill="#080b11" stroke={a} strokeWidth="1.2" />
+      {/* Inner hex */}
+      <polygon points="50,17 72,29 72,51 50,63 28,51 28,29"
+        fill="none" stroke={p} strokeWidth="0.8" opacity="0.5" />
 
-            {layoutMode === 2 ? (
-              /* HORIZONTAL CORPORATE EXECUTIVE LOCKUP */
-              <g>
-                <polygon points="12,22 42,22 52,50 42,78 12,78" fill={`url(#pro-grad1-${id})`} />
-                <polygon points="26,30 48,30 58,50 48,70 26,70" fill="#0d1118" />
-                <text x="35" y="58" textAnchor="middle" fill={`url(#pro-grad2-${id})`} fontSize="24" fontWeight="900" fontFamily="var(--font-outfit), sans-serif">
-                  {initial}
-                </text>
-                {/* Vertical Divider */}
-                <line x1="62" y1="24" x2="62" y2="76" stroke="#334155" strokeWidth="2" />
-                <text x="70" y="46" fill="#FFFFFF" fontSize="16" fontWeight="800" fontFamily="var(--font-outfit), sans-serif">
-                  {companyName}
-                </text>
-                <text x="70" y="60" fill={a} fontSize="7.5" fontWeight="700" letterSpacing="2.5" fontFamily="var(--font-mono), monospace">
-                  {(tagline || 'ENTERPRISE SOLUTIONS').toUpperCase()}
-                </text>
-              </g>
-            ) : (
-              /* STACKED CORPORATE PRISM EMBLEM */
-              <g>
-                <polygon points="50,6 82,24 82,58 50,76 18,58 18,24" fill={`url(#pro-grad1-${id})`} opacity="0.9" />
-                <polygon points="50,14 74,28 74,54 50,68 26,54 26,28" fill="#0d1118" stroke={a} strokeWidth="1.5" />
+      {/* 3D facet top */}
+      <polygon points="50,4 84,22 78,26 50,10 22,26 16,22"
+        fill={a} opacity="0.25" />
+      {/* 3D facet right */}
+      <polygon points="84,22 84,58 78,54 78,26"
+        fill="#FFFFFF" opacity="0.06" />
 
-                <text x="50" y="49" textAnchor="middle" fill={`url(#pro-grad2-${id})`} fontSize="28" fontWeight="900" fontFamily="var(--font-outfit), sans-serif">
-                  {initial}
-                </text>
+      {/* Connector lines */}
+      <line x1="50" y1="4" x2="50" y2="10" stroke="#FFFFFF" strokeWidth="2" />
+      <line x1="84" y1="22" x2="78" y2="26" stroke="#FFFFFF" strokeWidth="2" />
+      <line x1="16" y1="58" x2="22" y2="54" stroke="#FFFFFF" strokeWidth="2" />
 
-                {/* Facet Lines */}
-                <line x1="50" y1="6" x2="50" y2="14" stroke="#FFFFFF" strokeWidth="2" />
-                <line x1="18" y1="58" x2="26" y2="54" stroke="#FFFFFF" strokeWidth="2" />
-                <line x1="82" y1="58" x2="74" y2="54" stroke="#FFFFFF" strokeWidth="2" />
+      {/* Center monogram */}
+      <text x="50" y="50" textAnchor="middle" fill={a}
+        fontSize="30" fontWeight="900" fontFamily="var(--font-outfit), sans-serif">{L}</text>
 
-                {/* Integrated Typography */}
-                <text x="50" y="84" textAnchor="middle" fill="#FFFFFF" fontSize="14" fontWeight="800" fontFamily="var(--font-outfit), sans-serif">
-                  {companyName}
-                </text>
-                <text x="50" y="93" textAnchor="middle" fill={a} fontSize="7" fontWeight="700" letterSpacing="2" fontFamily="var(--font-mono), monospace">
-                  {(tagline || 'GLOBAL BRAND IDENTITY').toUpperCase()}
-                </text>
-              </g>
-            )}
-          </g>
-        );
+      {/* Brand footer */}
+      <text x="50" y="84" textAnchor="middle" fill="#FFFFFF" fontSize="10.5" fontWeight="800"
+        letterSpacing="1.5" fontFamily="var(--font-outfit), sans-serif">{companyName}</text>
+      <text x="50" y="92" textAnchor="middle" fill={a} fontSize="6" fontWeight="700"
+        letterSpacing="2.5" fontFamily="var(--font-mono), monospace">{tg.slice(0, 22)}</text>
+    </g>
+  );
 
-      // =========================================================
-      // ⚡ TECH / CYBERPUNK FUTURISTIC HUD MARKS
-      // =========================================================
-      case 'tech-circuit-matrix':
-      case 'tech-quantum-cube':
-      case 'tech-neon-shield':
-      case 'tech-orbital-node':
-        return (
-          <g>
-            <defs>
-              <linearGradient id={`tech-grad-${id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor={p} />
-                <stop offset="100%" stopColor={a} />
-              </linearGradient>
-              <filter id={`tech-glow-${id}`} x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="3" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-              </filter>
-            </defs>
+  // ─── DESIGN 2: CIRCULAR SEAL / STAMP ─────────────────────────────────────
+  const renderDesign2 = (p: string, s: string, a: string, id: string) => (
+    <g>
+      <defs>
+        <linearGradient id={`g2a-${id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={p} /><stop offset="100%" stopColor={s} />
+        </linearGradient>
+        <linearGradient id={`g2b-${id}`} x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor={a} /><stop offset="100%" stopColor="#FFFFFF" />
+        </linearGradient>
+        <filter id={`glow2-${id}`}><feGaussianBlur stdDeviation="3" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+      </defs>
 
-            {/* Cyber Ring */}
-            <circle cx="50" cy="38" r="32" fill="none" stroke={p} strokeWidth="3" strokeDasharray="14 6" />
-            <polygon points="50,6 84,25 84,62 50,81 16,62 16,25" fill="none" stroke={a} strokeWidth="1.5" opacity="0.6" />
+      {/* Outer dashed orbit ring */}
+      <circle cx="50" cy="46" r="40" fill="none" stroke={p} strokeWidth="1.5" strokeDasharray="5 3" opacity="0.8" />
+      {/* Solid ring */}
+      <circle cx="50" cy="46" r="34" fill="none" stroke={`url(#g2a-${id})`} strokeWidth="3.5" />
+      {/* Inner fill circle */}
+      <circle cx="50" cy="46" r="27" fill="#080b11" />
+      {/* Innermost accent ring */}
+      <circle cx="50" cy="46" r="20" fill="none" stroke={a} strokeWidth="1" opacity="0.5" />
 
-            {/* Glowing Monogram Center */}
-            <circle cx="50" cy="38" r="22" fill="#060911" stroke={`url(#tech-grad-${id})`} strokeWidth="3" filter={`url(#tech-glow-${id})`} />
+      {/* 8 compass tick marks */}
+      {[0,45,90,135,180,225,270,315].map((deg, i) => {
+        const r = 34, angle = (deg - 90) * Math.PI / 180;
+        const x1 = 50 + (r - 5) * Math.cos(angle), y1 = 46 + (r - 5) * Math.sin(angle);
+        const x2 = 50 + r * Math.cos(angle), y2 = 46 + r * Math.sin(angle);
+        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={a} strokeWidth={i % 2 === 0 ? "2.5" : "1.5"} />;
+      })}
 
-            <text x="50" y="47" textAnchor="middle" fill={a} fontSize="26" fontWeight="900" fontFamily="var(--font-outfit), sans-serif">
-              {initial}
-            </text>
+      {/* Center monogram */}
+      <text x="50" y="55" textAnchor="middle" fill={`url(#g2b-${id})`}
+        fontSize="28" fontWeight="900" fontFamily="var(--font-outfit), sans-serif"
+        filter={`url(#glow2-${id})`}>{L}</text>
 
-            {/* Circuit Nodes */}
-            <circle cx="50" cy="6" r="3.5" fill={a} />
-            <circle cx="84" cy="25" r="3.5" fill={a} />
-            <circle cx="16" cy="25" r="3.5" fill={a} />
+      {/* Arched company name along top of circle */}
+      <path id={`arc2-${id}`} d="M 16,46 A 34,34 0 0,1 84,46" fill="none" />
+      <text fontSize="7" fontWeight="800" letterSpacing="3.5"
+        fontFamily="var(--font-mono), monospace" fill={a}>
+        <textPath href={`#arc2-${id}`} startOffset="10%">{companyName.toUpperCase()}</textPath>
+      </text>
 
-            {/* Integrated Typography */}
-            <text x="50" y="86" textAnchor="middle" fill="#FFFFFF" fontSize="14" fontWeight="800" fontFamily="var(--font-outfit), sans-serif">
-              {companyName}
-            </text>
-            <text x="50" y="95" textAnchor="middle" fill={a} fontSize="7" fontWeight="700" letterSpacing="3" fontFamily="var(--font-mono), monospace">
-              {(tagline || 'QUANTUM AI SYSTEMS').toUpperCase()}
-            </text>
-          </g>
-        );
+      {/* Bottom brand tagline straight */}
+      <text x="50" y="91" textAnchor="middle" fill="#FFFFFF" fontSize="10" fontWeight="700"
+        letterSpacing="2" fontFamily="var(--font-outfit), sans-serif">{companyName}</text>
+      <text x="50" y="98" textAnchor="middle" fill={a} fontSize="5.5" fontWeight="700"
+        letterSpacing="2" fontFamily="var(--font-mono), monospace">{tg.slice(0, 22)}</text>
+    </g>
+  );
 
-      // =========================================================
-      // 🏛️ LUXURY / VINTAGE GOLDEN ROYAL SEALS
-      // =========================================================
-      case 'luxury-crown-laurel':
-      case 'luxury-monogram-seal':
-      case 'luxury-shield-lion':
-      case 'luxury-royal-crest':
-      default:
-        return (
-          <g>
-            <defs>
-              <linearGradient id={`gold-grad-${id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#FDE047" />
-                <stop offset="50%" stopColor="#F59E0B" />
-                <stop offset="100%" stopColor="#B45309" />
-              </linearGradient>
-            </defs>
+  // ─── DESIGN 3: WORDMARK + GEOMETRIC STACKING ──────────────────────────────
+  const renderDesign3 = (p: string, s: string, a: string, id: string) => (
+    <g>
+      <defs>
+        <linearGradient id={`g3a-${id}`} x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor={p} /><stop offset="50%" stopColor={s} /><stop offset="100%" stopColor={a} />
+        </linearGradient>
+        <linearGradient id={`g3b-${id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={a} /><stop offset="100%" stopColor={p} />
+        </linearGradient>
+        <clipPath id={`clip3-${id}`}>
+          <rect x="10" y="25" width="40" height="52" rx="4" />
+        </clipPath>
+      </defs>
 
-            {/* 24k Gold Crown */}
-            <path d="M 28 22 L 34 8 L 44 18 L 50 4 L 56 18 L 66 8 L 72 22 Z" fill={`url(#gold-grad-${id})`} />
-            <circle cx="34" cy="6" r="2.5" fill="#FFFFFF" />
-            <circle cx="50" cy="2" r="3.5" fill="#FFFFFF" />
-            <circle cx="66" cy="6" r="2.5" fill="#FFFFFF" />
+      {/* Left: Tall Monogram Block */}
+      <rect x="8" y="20" width="42" height="58" rx="5" fill={`url(#g3a-${id})`} />
+      <rect x="12" y="24" width="34" height="50" rx="3" fill="#080b11" />
 
-            {/* Imperial Laurel Leaf Wreath */}
-            <path d="M 20 44 C 20 68 34 76 50 76 C 66 76 80 68 80 44" fill="none" stroke={`url(#gold-grad-${id})`} strokeWidth="3.5" strokeLinecap="round" />
+      {/* Decorative bracket lines on left block */}
+      <path d="M 14 26 L 14 32 M 14 68 L 14 74" stroke={p} strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M 44 26 L 44 32 M 44 68 L 44 74" stroke={p} strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="14" y1="26" x2="20" y2="26" stroke={p} strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="38" y1="26" x2="44" y2="26" stroke={p} strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="14" y1="74" x2="20" y2="74" stroke={p} strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="38" y1="74" x2="44" y2="74" stroke={p} strokeWidth="2.5" strokeLinecap="round" />
 
-            {/* Royal Monogram Shield */}
-            <path d="M 32 24 L 50 14 L 68 24 V 52 C 68 64 58 72 50 75 C 42 72 32 64 32 52 Z" fill="#0d1118" stroke={`url(#gold-grad-${id})`} strokeWidth="2.5" />
+      {/* Large letter in left block */}
+      <text x="29" y="58" textAnchor="middle" fill={`url(#g3b-${id})`}
+        fontSize="38" fontWeight="900" fontFamily="var(--font-outfit), sans-serif">{L}</text>
 
-            <text x="50" y="52" textAnchor="middle" fill={`url(#gold-grad-${id})`} fontSize="26" fontWeight="900" fontFamily="var(--font-outfit), sans-serif">
-              {initial}
-            </text>
+      {/* Vertical divider */}
+      <line x1="56" y1="24" x2="56" y2="74" stroke="#334155" strokeWidth="1.5" />
 
-            {/* Integrated Typography */}
-            <text x="50" y="85" textAnchor="middle" fill="#FFFFFF" fontSize="13" fontWeight="800" letterSpacing="1" fontFamily="var(--font-outfit), sans-serif">
-              {companyName}
-            </text>
-            <text x="50" y="93" textAnchor="middle" fill="#F59E0B" fontSize="6.5" fontWeight="700" letterSpacing="2.5" fontFamily="var(--font-mono), monospace">
-              {(tagline || 'HAUTE COUTURE LUXURY').toUpperCase()}
-            </text>
-          </g>
-        );
-    }
-  };
+      {/* Right: Stacked wordmark */}
+      <text x="60" y="42" fill="#FFFFFF" fontSize="15" fontWeight="800"
+        fontFamily="var(--font-outfit), sans-serif" dominantBaseline="auto">{companyName.length > 8 ? companyName.slice(0,8) : companyName}</text>
+      {companyName.length > 8 && (
+        <text x="60" y="56" fill="#FFFFFF" fontSize="15" fontWeight="800"
+          fontFamily="var(--font-outfit), sans-serif">{companyName.slice(8, 16)}</text>
+      )}
 
-  const getThemeBgStyle = (theme: CardBgTheme) => {
+      {/* Accent underline stripe */}
+      <rect x="60" y="60" width="28" height="3" rx="1.5" fill={`url(#g3a-${id})`} />
+
+      {/* Tagline below stripe */}
+      <text x="60" y="71" fill={a} fontSize="6.5" fontWeight="700"
+        letterSpacing="1.5" fontFamily="var(--font-mono), monospace">{tg.slice(0, 14)}</text>
+
+      {/* Bottom rule full width */}
+      <line x1="8" y1="82" x2="92" y2="82" stroke={p} strokeWidth="1" opacity="0.4" />
+      <text x="50" y="92" textAnchor="middle" fill="#64748B" fontSize="5.5" fontWeight="700"
+        letterSpacing="2.5" fontFamily="var(--font-mono), monospace">
+        {tg.slice(0,22)}
+      </text>
+    </g>
+  );
+
+  const DESIGNS = [renderDesign0, renderDesign1, renderDesign2, renderDesign3];
+
+  const getThemeBg = (theme: CardBgTheme) => {
     switch (theme) {
-      case 'light':
-        return 'bg-slate-100 border-slate-300 text-slate-900';
-      case 'gold':
-        return 'bg-gradient-to-br from-amber-950 via-[#1c1409] to-[#0a0703] border-amber-500/40 text-amber-100';
-      case 'cyber':
-        return 'bg-gradient-to-br from-slate-950 via-[#06101c] to-[#08182b] border-cyan-500/40 text-cyan-100';
-      case 'dark':
-      default:
-        return 'bg-[#090c13] border-slate-800 text-white';
+      case 'light': return 'bg-slate-100 border-slate-300';
+      case 'gold': return 'bg-gradient-to-br from-amber-950 via-[#1c1409] to-[#0a0703] border-amber-500/40';
+      case 'cyber': return 'bg-gradient-to-br from-slate-950 via-[#06101c] to-[#08182b] border-cyan-500/40';
+      default: return 'bg-[#090c13] border-slate-800';
     }
   };
+
+  const DESIGN_LABELS = ['Shield Crest', 'Hex Prism Badge', 'Circular Seal', 'Wordmark Block'];
 
   return (
-    <div className="space-y-6 font-mono">
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h3 className="text-2xl font-bold text-white flex items-center gap-2 font-outfit">
             <Sparkles className="w-6 h-6 text-amber-400" />
-            Agency-Grade Monogram &amp; Emblem Suite
+            4 Structurally Distinct Logo Designs
           </h3>
           <p className="text-xs text-slate-400 mt-1">
-            Custom sculpted monogram initial <strong className="text-amber-400 font-bold">&quot;{initial}&quot;</strong> with integrated agency typography &amp; 2K PNG export.
+            Each card is a different <strong className="text-amber-400">SVG architecture</strong> — shield, hex prism, circular seal &amp; wordmark block — not just color swaps.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-amber-400 font-bold px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30">
-            Initial &quot;{initial}&quot; Monogram Lockups
-          </span>
-        </div>
+        <span className="text-xs text-amber-400 font-bold px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30">
+          Initial &quot;{L}&quot; Monogram Suite
+        </span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
         {logos.map((logo, idx) => {
           const currentTheme = bgThemes[logo.id] || 'dark';
+          const renderFn = DESIGNS[idx % 4];
+          const designLabel = DESIGN_LABELS[idx % 4];
 
           return (
             <div
               key={logo.id}
-              className="bg-[#111827] border border-amber-500/20 rounded-3xl p-6 sm:p-7 flex flex-col items-center justify-between gap-6 group hover:border-amber-500/50 transition-all hover:shadow-2xl hover:shadow-amber-500/10"
+              className="bg-[#111827] border border-amber-500/20 rounded-3xl p-6 flex flex-col items-center gap-5 group hover:border-amber-500/50 transition-all hover:shadow-2xl hover:shadow-amber-500/10"
             >
-              {/* Card Header Controls */}
+              {/* Card Header */}
               <div className="w-full flex items-center justify-between text-xs">
-                <span className="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-amber-400 font-bold">
-                  {logo.styleTag}
-                </span>
+                <div className="flex flex-col gap-0.5">
+                  <span className="px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-amber-400 font-bold w-fit">
+                    {logo.styleTag}
+                  </span>
+                  <span className="text-slate-500 font-mono pl-1 text-[10px]">#{idx + 1} · {designLabel}</span>
+                </div>
 
+                {/* Theme switcher */}
                 <div className="flex items-center gap-1 bg-[#0a0d14] p-1 rounded-xl border border-slate-800">
-                  <button
-                    onClick={() => toggleBgTheme(logo.id, 'dark')}
-                    title="Dark Studio"
-                    className={`p-1.5 rounded-lg transition-all ${currentTheme === 'dark' ? 'bg-slate-800 text-white' : 'text-slate-500 hover:text-slate-300'}`}
-                  >
-                    <Moon className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => toggleBgTheme(logo.id, 'light')}
-                    title="Light Minimalist Studio"
-                    className={`p-1.5 rounded-lg transition-all ${currentTheme === 'light' ? 'bg-amber-400 text-black font-bold' : 'text-slate-500 hover:text-slate-300'}`}
-                  >
-                    <Sun className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => toggleBgTheme(logo.id, 'gold')}
-                    title="Luxury Gold Studio"
-                    className={`p-1.5 rounded-lg transition-all ${currentTheme === 'gold' ? 'bg-amber-500 text-black font-bold' : 'text-slate-500 hover:text-slate-300'}`}
-                  >
-                    <Sparkles className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => toggleBgTheme(logo.id, 'cyber')}
-                    title="Cyberpunk Neon Studio"
-                    className={`p-1.5 rounded-lg transition-all ${currentTheme === 'cyber' ? 'bg-cyan-500 text-black font-bold' : 'text-slate-500 hover:text-slate-300'}`}
-                  >
-                    <Layers className="w-3.5 h-3.5" />
-                  </button>
+                  {(['dark', 'light', 'gold', 'cyber'] as CardBgTheme[]).map((theme, ti) => (
+                    <button
+                      key={theme}
+                      onClick={() => toggleBgTheme(logo.id, theme)}
+                      title={theme.charAt(0).toUpperCase() + theme.slice(1)}
+                      className={`p-1.5 rounded-lg transition-all ${currentTheme === theme ? 'bg-amber-500 text-black font-bold' : 'text-slate-500 hover:text-slate-300'}`}
+                    >
+                      {ti === 0 && <Moon className="w-3.5 h-3.5" />}
+                      {ti === 1 && <Sun className="w-3.5 h-3.5" />}
+                      {ti === 2 && <Sparkles className="w-3.5 h-3.5" />}
+                      {ti === 3 && <Layers className="w-3.5 h-3.5" />}
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              {/* Logo Presentation Studio Canvas */}
-              <div
-                className={`w-full min-h-[280px] rounded-2xl p-6 sm:p-8 flex items-center justify-center border transition-all duration-300 shadow-xl ${getThemeBgStyle(
-                  currentTheme
-                )}`}
-              >
+              {/* SVG Canvas */}
+              <div className={`w-full min-h-[280px] rounded-2xl p-6 flex items-center justify-center border transition-all duration-300 shadow-xl ${getThemeBg(currentTheme)}`}>
                 <svg
                   id={`svg-${logo.id}`}
                   viewBox="0 0 100 100"
-                  className="w-full max-w-[280px] h-auto drop-shadow-2xl transition-transform group-hover:scale-105"
+                  className="w-full max-w-[280px] h-auto drop-shadow-2xl transition-transform duration-300 group-hover:scale-105"
                 >
-                  {renderAgencyLogoMark(logo, idx)}
+                  {renderFn(logo.primaryColor, logo.secondaryColor, logo.accentColor, logo.id)}
                 </svg>
               </div>
 
-              {/* Actions: SVG & 2K PNG Download */}
+              {/* Color palette preview dots */}
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full border-2 border-white/20 shadow-lg" style={{ backgroundColor: logo.primaryColor }} title="Primary" />
+                <div className="w-5 h-5 rounded-full border-2 border-white/20 shadow-lg" style={{ backgroundColor: logo.secondaryColor }} title="Secondary" />
+                <div className="w-5 h-5 rounded-full border-2 border-white/20 shadow-lg" style={{ backgroundColor: logo.accentColor }} title="Accent" />
+                <span className="text-[10px] text-slate-500 font-mono ml-1">{logo.variantName}</span>
+              </div>
+
+              {/* Download buttons */}
               <div className="w-full flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={() => handleDownloadSvg(logo)}
                   className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 text-xs font-bold transition-all"
                 >
                   {downloadedId === logo.id ? (
-                    <>
-                      <Check className="w-4 h-4 text-emerald-400" />
-                      <span className="text-emerald-400">Vector SVG Downloaded</span>
-                    </>
+                    <><Check className="w-4 h-4 text-emerald-400" /><span className="text-emerald-400">Downloaded!</span></>
                   ) : (
-                    <>
-                      <Download className="w-4 h-4" />
-                      <span>Download Vector SVG</span>
-                    </>
+                    <><Download className="w-4 h-4" /><span>Download SVG</span></>
                   )}
                 </button>
-
                 <button
                   onClick={() => handleDownloadPng(logo)}
                   disabled={downloadingPngId === logo.id}
                   className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-amber-500/50 text-xs font-bold transition-all disabled:opacity-50"
                 >
                   <ImageIcon className="w-4 h-4 text-amber-400" />
-                  <span>{downloadingPngId === logo.id ? 'Exporting...' : 'Export 2K PNG'}</span>
+                  <span>{downloadingPngId === logo.id ? 'Exporting…' : 'Export 2K PNG'}</span>
                 </button>
               </div>
             </div>
