@@ -16,7 +16,9 @@ Welcome to the **30 AI Projects in 30 Days** repository by **Abdul Nabi**. This 
 | **06** | [Real-Time Stock Dashboard & AI Sentiment Terminal](./day-06-stock-dashboard) | Real-Time Systems / FinTech | 🌐 [day-06-stock-dashboard.vercel.app](https://day-06-stock-dashboard.vercel.app) | Next.js 14, Tailwind CSS, Gemini API, SVG Charts | ✅ Deployed |
 | **07** | [AI Logo Generator & Brand Identity System](./day-07-ai-logo-generator) | AI / Creative Tools | 🌐 [day-07-ai-logo-generator.vercel.app](https://day-07-ai-logo-generator.vercel.app) | Next.js 14, Tailwind CSS, Gemini API | ✅ Deployed |
 | **08** | [Smart Expense Tracker & AI Financial Coach](./day-08-smart-expense-tracker) | AI / Personal Finance | 🌐 [day-08-smart-expense-tracker.vercel.app](https://day-08-smart-expense-tracker.vercel.app) | Next.js 14, Tailwind CSS, Gemini API | ✅ Deployed |
-| ... | *Days 09–30* | - | - | - | ⏳ Pending |
+| **09** | [AI GitHub Developer Portfolio & Impact Analyzer](./day-09-github-profile-analyzer) | DevTools / Data Viz | 🌐 [day-09-github-profile-analyzer.vercel.app](https://day-09-github-profile-analyzer.vercel.app) | Next.js 14, Tailwind CSS, Gemini API | ✅ Deployed |
+| **10** | [AI Email Composer & Subject Line Optimizer](./day-10-ai-email-composer) | AI / Productivity | 🌐 [day-10-ai-email-composer.vercel.app](https://day-10-ai-email-composer.vercel.app) | Next.js 14, Tailwind CSS, Gemini API | ✅ Deployed |
+| ... | *Days 11–30* | - | - | - | ⏳ Pending |
 
 ---
 
