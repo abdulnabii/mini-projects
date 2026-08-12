@@ -18,14 +18,15 @@ Welcome to the **30 AI Projects in 30 Days** repository by **Abdul Nabi**. This 
 | **08** | [Smart Expense Tracker & AI Financial Coach](./day-08-smart-expense-tracker) | AI / Personal Finance | 🌐 [day-08-smart-expense-tracker.vercel.app](https://day-08-smart-expense-tracker.vercel.app) | Next.js 14, Tailwind CSS, Gemini API | ✅ Deployed |
 | **09** | [AI GitHub Developer Portfolio & Impact Analyzer](./day-09-github-profile-analyzer) | DevTools / Data Viz | 🌐 [day-09-github-profile-analyzer.vercel.app](https://day-09-github-profile-analyzer.vercel.app) | Next.js 14, Tailwind CSS, Gemini API | ✅ Deployed |
 | **10** | [AI Email Composer & Subject Line Optimizer](./day-10-ai-email-composer) | AI / Productivity | 🌐 [day-10-ai-email-composer.vercel.app](https://day-10-ai-email-composer.vercel.app) | Next.js 14, Tailwind CSS, Gemini API | ✅ Deployed |
-| ... | *Days 11–30* | - | - | - | ⏳ Pending |
+| **11** | [AI Prompt Engineer & Optimizer Terminal](./day-11-ai-prompt-optimizer) | DevTools / AI Prompting | 🌐 [day-11-ai-prompt-optimizer.vercel.app](https://day-11-ai-prompt-optimizer.vercel.app) | Next.js 16, Tailwind CSS, Gemini API | ✅ Deployed |
+| ... | *Days 12–30* | - | - | - | ⏳ Pending |
 
 ---
 
 ## 🛠️ Monorepo Architecture
 
 Each project is self-contained in its respective `day-XX-` directory:
-- **Framework**: Next.js 14 (App Router) & TypeScript
+- **Framework**: Next.js 14/16 (App Router) & TypeScript
 - **Styling**: Tailwind CSS & Framer Motion with tailored project design themes
 - **AI Engine**: Google Gemini API (`@google/generative-ai`)
 - **Deployment**: Vercel Production
@@ -38,7 +39,7 @@ Clone the repository and run any project locally:
 
 ```bash
 git clone https://github.com/abdulnabii/mini-projects.git
-cd mini-projects/day-01-ai-symptom-checker # Or day-02-..., day-03-..., day-04-...
+cd mini-projects/day-11-ai-prompt-optimizer
 
 npm install
 npm run dev
