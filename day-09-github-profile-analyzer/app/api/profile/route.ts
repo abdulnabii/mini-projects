@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { generateGenericProfile } from '@/lib/mock-profiles';
+import { fetchRealGitHubProfile } from '@/lib/github';
 import { generatePersonaWithGemini } from '@/lib/gemini';
+import { generateGenericProfile } from '@/lib/mock-profiles';
 
 export async function POST(req: Request) {
   try {
@@ -10,7 +11,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Username is required' }, { status: 400 });
     }
 
-    const baseProfile = generateGenericProfile(username);
+    const cleanUsername = username.trim();
+
+    // 1. Fetch real live GitHub profile data from GitHub API
+    let baseProfile = await fetchRealGitHubProfile(cleanUsername);
+
+    // 2. Fallback to generic structure if rate-limited or offline
+    if (!baseProfile) {
+      baseProfile = generateGenericProfile(cleanUsername);
+    }
+
+    // 3. Generate dynamic AI persona using Gemini based on real live data
     const dynamicPersona = await generatePersonaWithGemini(baseProfile);
 
     return NextResponse.json({
@@ -19,6 +30,6 @@ export async function POST(req: Request) {
     });
   } catch (err) {
     console.error('Profile API error:', err);
-    return NextResponse.json({ error: 'Failed to fetch GitHub profile' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to analyze GitHub profile' }, { status: 500 });
   }
 }
