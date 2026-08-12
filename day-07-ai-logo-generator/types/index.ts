@@ -6,14 +6,16 @@ export type IndustryType =
   | 'Food & Beverage'
   | 'Fitness & Wellness'
   | 'Education'
-  | 'Creative & Media';
+  | 'Creative & Media'
+  | 'Gaming & Entertainment';
 
 export type StylePreference =
+  | 'anime'
+  | 'professional'
+  | 'tech'
+  | 'luxury'
   | 'minimalist'
-  | 'bold'
-  | 'playful'
-  | 'corporate'
-  | 'tech';
+  | 'bold';
 
 export interface BrandConfig {
   companyName: string;
@@ -50,11 +52,38 @@ export interface TypographyPairing {
   rationale: string;
 }
 
+export type LogoShapeType =
+  // Anime / Mascot
+  | 'anime-kitsune-mask'
+  | 'anime-mecha-star'
+  | 'anime-cyber-ninja'
+  | 'anime-flame-crest'
+  // Corporate / Professional
+  | 'pro-interlocking-m'
+  | 'pro-prism-diamond'
+  | 'pro-corporate-crest'
+  | 'pro-infinity-node'
+  // Tech / Cyberpunk
+  | 'tech-circuit-matrix'
+  | 'tech-quantum-cube'
+  | 'tech-neon-shield'
+  | 'tech-orbital-node'
+  // Luxury / Vintage
+  | 'luxury-crown-laurel'
+  | 'luxury-monogram-seal'
+  | 'luxury-shield-lion'
+  | 'luxury-royal-crest'
+  // Minimalist / Base
+  | 'circle-cross'
+  | 'shield-bolt'
+  | 'leaf-node'
+  | 'hexagon-wave';
+
 export interface LogoConcept {
   id: string;
   variantName: string;
   styleTag: string;
-  svgShape: 'circle-cross' | 'shield-bolt' | 'leaf-node' | 'hexagon-wave' | 'abstract-loop' | 'cube-core';
+  svgShape: LogoShapeType;
   primaryColor: string;
   secondaryColor: string;
   accentColor: string;

@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { BrandConfig, BrandKit, LogoConcept, BrandPalette, TypographyPairing } from "@/types";
+import { BrandConfig, BrandKit, LogoConcept, BrandPalette, LogoShapeType, StylePreference } from "@/types";
 
 export async function generateBrandKit(config: BrandConfig): Promise<BrandKit> {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -74,12 +74,177 @@ Return ONLY valid JSON matching this schema exactly (no markdown formatting or w
   return generateFallbackBrandKit(config);
 }
 
-function createLogoConcepts(primaryHex: string, secondaryHex: string, accentHex: string, style: string): LogoConcept[] {
+function createLogoConcepts(primaryHex: string, secondaryHex: string, accentHex: string, style: StylePreference): LogoConcept[] {
+  if (style === 'anime') {
+    return [
+      {
+        id: 'logo-anime-1',
+        variantName: 'Kitsune Spirit Mask',
+        styleTag: 'ANIME • MASCOT EMBLEM',
+        svgShape: 'anime-kitsune-mask',
+        primaryColor: primaryHex,
+        secondaryColor: secondaryHex,
+        accentColor: accentHex,
+      },
+      {
+        id: 'logo-anime-2',
+        variantName: 'Mecha Samurai Crest',
+        styleTag: 'ANIME • MECHA VECTOR',
+        svgShape: 'anime-mecha-star',
+        primaryColor: secondaryHex,
+        secondaryColor: primaryHex,
+        accentColor: accentHex,
+      },
+      {
+        id: 'logo-anime-3',
+        variantName: 'Cyber Ninja Shuriken',
+        styleTag: 'ANIME • CYBER STRIKE',
+        svgShape: 'anime-cyber-ninja',
+        primaryColor: accentHex,
+        secondaryColor: primaryHex,
+        accentColor: secondaryHex,
+      },
+      {
+        id: 'logo-anime-4',
+        variantName: 'Astral Flame Emblem',
+        styleTag: 'ANIME • POWER AURA',
+        svgShape: 'anime-flame-crest',
+        primaryColor: primaryHex,
+        secondaryColor: accentHex,
+        accentColor: secondaryHex,
+      },
+    ];
+  }
+
+  if (style === 'professional') {
+    return [
+      {
+        id: 'logo-pro-1',
+        variantName: 'Interlocking Monogram',
+        styleTag: 'CORPORATE • GEOMETRIC',
+        svgShape: 'pro-interlocking-m',
+        primaryColor: primaryHex,
+        secondaryColor: secondaryHex,
+        accentColor: accentHex,
+      },
+      {
+        id: 'logo-pro-2',
+        variantName: 'Gradient Prism Diamond',
+        styleTag: 'CORPORATE • PRISM LUXURY',
+        svgShape: 'pro-prism-diamond',
+        primaryColor: secondaryHex,
+        secondaryColor: primaryHex,
+        accentColor: accentHex,
+      },
+      {
+        id: 'logo-pro-3',
+        variantName: 'Enterprise Crest',
+        styleTag: 'CORPORATE • AUTHORITY',
+        svgShape: 'pro-corporate-crest',
+        primaryColor: accentHex,
+        secondaryColor: primaryHex,
+        accentColor: secondaryHex,
+      },
+      {
+        id: 'logo-pro-4',
+        variantName: 'Infinity Nexus Node',
+        styleTag: 'CORPORATE • EXPANSION',
+        svgShape: 'pro-infinity-node',
+        primaryColor: primaryHex,
+        secondaryColor: accentHex,
+        accentColor: secondaryHex,
+      },
+    ];
+  }
+
+  if (style === 'tech') {
+    return [
+      {
+        id: 'logo-tech-1',
+        variantName: 'Quantum Circuit Matrix',
+        styleTag: 'TECH • CYBER MATRIX',
+        svgShape: 'tech-circuit-matrix',
+        primaryColor: primaryHex,
+        secondaryColor: secondaryHex,
+        accentColor: accentHex,
+      },
+      {
+        id: 'logo-tech-2',
+        variantName: 'Hyper-Cube Node',
+        styleTag: 'TECH • HYPER SPACE',
+        svgShape: 'tech-quantum-cube',
+        primaryColor: secondaryHex,
+        secondaryColor: primaryHex,
+        accentColor: accentHex,
+      },
+      {
+        id: 'logo-tech-3',
+        variantName: 'Neon Cyber Shield',
+        styleTag: 'TECH • CYBER DEFENSE',
+        svgShape: 'tech-neon-shield',
+        primaryColor: accentHex,
+        secondaryColor: primaryHex,
+        accentColor: secondaryHex,
+      },
+      {
+        id: 'logo-tech-4',
+        variantName: 'Orbital Data Ring',
+        styleTag: 'TECH • SYSTEM NODE',
+        svgShape: 'tech-orbital-node',
+        primaryColor: primaryHex,
+        secondaryColor: accentHex,
+        accentColor: secondaryHex,
+      },
+    ];
+  }
+
+  if (style === 'luxury') {
+    return [
+      {
+        id: 'logo-lux-1',
+        variantName: 'Crown Laurel Crest',
+        styleTag: 'LUXURY • ROYAL HERITAGE',
+        svgShape: 'luxury-crown-laurel',
+        primaryColor: primaryHex,
+        secondaryColor: secondaryHex,
+        accentColor: accentHex,
+      },
+      {
+        id: 'logo-lux-2',
+        variantName: 'Monogram Royal Seal',
+        styleTag: 'LUXURY • GOLDEN SEAL',
+        svgShape: 'luxury-monogram-seal',
+        primaryColor: secondaryHex,
+        secondaryColor: primaryHex,
+        accentColor: accentHex,
+      },
+      {
+        id: 'logo-lux-3',
+        variantName: 'Heraldic Shield Lion',
+        styleTag: 'LUXURY • HERITAGE SHIELD',
+        svgShape: 'luxury-shield-lion',
+        primaryColor: accentHex,
+        secondaryColor: primaryHex,
+        accentColor: secondaryHex,
+      },
+      {
+        id: 'logo-lux-4',
+        variantName: 'Imperial Star Crest',
+        styleTag: 'LUXURY • CLASSIC EMBLEM',
+        svgShape: 'luxury-royal-crest',
+        primaryColor: primaryHex,
+        secondaryColor: accentHex,
+        accentColor: secondaryHex,
+      },
+    ];
+  }
+
+  // Default minimalist concepts
   return [
     {
       id: 'logo-1',
       variantName: 'Primary Mark (Minimalist)',
-      styleTag: `${style.toUpperCase()} • GEOMETRIC`,
+      styleTag: 'MINIMALIST • GEOMETRIC',
       svgShape: 'circle-cross',
       primaryColor: primaryHex,
       secondaryColor: secondaryHex,
@@ -87,7 +252,7 @@ function createLogoConcepts(primaryHex: string, secondaryHex: string, accentHex:
     },
     {
       id: 'logo-2',
-      variantName: 'Dynamic Emblem (Bold)',
+      variantName: 'Dynamic Shield Emblem',
       styleTag: 'DYNAMIC • EMBLEM',
       svgShape: 'shield-bolt',
       primaryColor: secondaryHex,
@@ -96,7 +261,7 @@ function createLogoConcepts(primaryHex: string, secondaryHex: string, accentHex:
     },
     {
       id: 'logo-3',
-      variantName: 'Organic Node (Modern)',
+      variantName: 'Organic Eco Node',
       styleTag: 'MODERN • ECO-TECH',
       svgShape: 'leaf-node',
       primaryColor: accentHex,
@@ -105,7 +270,7 @@ function createLogoConcepts(primaryHex: string, secondaryHex: string, accentHex:
     },
     {
       id: 'logo-4',
-      variantName: 'Corporate Wave (Tech)',
+      variantName: 'Hexagon Structural Wave',
       styleTag: 'TECH • STRUCTURAL',
       svgShape: 'hexagon-wave',
       primaryColor: primaryHex,
@@ -118,7 +283,37 @@ function createLogoConcepts(primaryHex: string, secondaryHex: string, accentHex:
 function generateFallbackBrandKit(config: BrandConfig): BrandKit {
   const nameLower = config.companyName.toLowerCase();
 
-  // Preset match 1: NovaCare
+  // Preset match 1: KageAnime / Gaming
+  if (nameLower.includes('kage') || nameLower.includes('anime') || config.style === 'anime') {
+    const palette: BrandPalette = {
+      primary: { name: 'Sakura Crimson', hex: '#FF2A5F', rgb: 'rgb(255, 42, 95)', role: 'Primary', wcagContrastWhite: 3.8, wcagContrastBlack: 12.5 },
+      secondary: { name: 'Neo Tokyo Violet', hex: '#7C3AED', rgb: 'rgb(124, 58, 237)', role: 'Secondary', wcagContrastWhite: 4.9, wcagContrastBlack: 11.0 },
+      accent: { name: 'Electric Cyan', hex: '#00F0FF', rgb: 'rgb(0, 240, 255)', role: 'Accent', wcagContrastWhite: 1.8, wcagContrastBlack: 14.5 },
+      neutral: { name: 'Cyber Void', hex: '#0B0D17', rgb: 'rgb(11, 13, 23)', role: 'Neutral', wcagContrastWhite: 18.5, wcagContrastBlack: 1.1 },
+      background: { name: 'Midnight Manga Slate', hex: '#121526', rgb: 'rgb(18, 21, 38)', role: 'Background', wcagContrastWhite: 15.8, wcagContrastBlack: 1.2 },
+      wcagCompliance: 'WCAG 2.1 AA Compliant',
+      notes: 'Sakura Crimson and Neo Tokyo Violet form high-energy contrast for anime branding.'
+    };
+    return {
+      id: 'preset-kage-anime',
+      companyName: config.companyName || 'KageStudio',
+      tagline: config.tagline || 'High-Energy Anime & Manga Universe',
+      createdAt: new Date().toISOString(),
+      config,
+      logos: createLogoConcepts('#FF2A5F', '#7C3AED', '#00F0FF', 'anime'),
+      palette,
+      typography: {
+        headingFont: 'Outfit',
+        headingCategory: 'Display Manga',
+        bodyFont: 'Inter',
+        bodyCategory: 'Sans-Serif',
+        rationale: 'Outfit provides razor-sharp high impact titles perfect for anime and gaming brands.'
+      },
+      brandStory: `${config.companyName || 'KageStudio'} creates iconic anime character universes and high-velocity digital entertainment experiences.`
+    };
+  }
+
+  // Preset match 2: NovaCare
   if (nameLower.includes('novacare') || config.industry === 'Healthcare') {
     const palette: BrandPalette = {
       primary: { name: 'Nova Blue', hex: '#2563EB', rgb: 'rgb(37, 99, 235)', role: 'Primary', wcagContrastWhite: 4.8, wcagContrastBlack: 13.5 },
@@ -148,55 +343,26 @@ function generateFallbackBrandKit(config: BrandConfig): BrandKit {
     };
   }
 
-  // Preset match 2: AetherPay
-  if (nameLower.includes('aether') || config.industry === 'FinTech') {
-    const palette: BrandPalette = {
-      primary: { name: 'Aether Emerald', hex: '#059669', rgb: 'rgb(5, 150, 105)', role: 'Primary', wcagContrastWhite: 4.6, wcagContrastBlack: 12.8 },
-      secondary: { name: 'Vault Indigo', hex: '#4F46E5', rgb: 'rgb(79, 70, 229)', role: 'Secondary', wcagContrastWhite: 5.1, wcagContrastBlack: 11.2 },
-      accent: { name: 'Solar Amber', hex: '#F59E0B', rgb: 'rgb(245, 158, 11)', role: 'Accent', wcagContrastWhite: 2.1, wcagContrastBlack: 9.8 },
-      neutral: { name: 'Midnight Charcoal', hex: '#111827', rgb: 'rgb(17, 24, 39)', role: 'Neutral', wcagContrastWhite: 16.0, wcagContrastBlack: 1.2 },
-      background: { name: 'Mint Mist', hex: '#ECFDF5', rgb: 'rgb(236, 253, 245)', role: 'Background', wcagContrastWhite: 1.1, wcagContrastBlack: 17.5 },
-      wcagCompliance: 'WCAG 2.1 AAA Compliant',
-      notes: 'Vault Indigo and Midnight Charcoal provide AAA compliance for high-contrast financial data rendering.'
-    };
-    return {
-      id: 'preset-aetherpay',
-      companyName: config.companyName || 'AetherPay',
-      tagline: config.tagline || 'Seamless Global Settlements',
-      createdAt: new Date().toISOString(),
-      config,
-      logos: createLogoConcepts('#059669', '#4F46E5', '#F59E0B', config.style),
-      palette,
-      typography: {
-        headingFont: 'Plus Jakarta Sans',
-        headingCategory: 'Geometric Sans',
-        bodyFont: 'JetBrains Mono',
-        bodyCategory: 'Monospace',
-        rationale: 'Plus Jakarta Sans conveys futuristic financial authority, while JetBrains Mono provides precise numeric clarity.'
-      },
-      brandStory: `${config.companyName || 'AetherPay'} provides frictionless borderless payments and automated treasury infrastructure for high-growth global enterprises.`
-    };
-  }
-
   // Generic fallback brand kit
-  const primaryHex = '#F59E0B'; // Amber Gold
-  const secondaryHex = '#F43F5E'; // Rose Pink
-  const accentHex = '#8B5CF6'; // Violet
+  const targetStyle = config.style as string;
+  const primaryHex = targetStyle === 'anime' ? '#FF2A5F' : targetStyle === 'professional' ? '#2563EB' : '#F59E0B';
+  const secondaryHex = targetStyle === 'anime' ? '#7C3AED' : targetStyle === 'professional' ? '#0F172A' : '#F43F5E';
+  const accentHex = targetStyle === 'anime' ? '#00F0FF' : targetStyle === 'professional' ? '#10B981' : '#8B5CF6';
 
   const palette: BrandPalette = {
-    primary: { name: 'Amber Gold', hex: primaryHex, rgb: 'rgb(245, 158, 11)', role: 'Primary', wcagContrastWhite: 2.1, wcagContrastBlack: 10.2 },
-    secondary: { name: 'Vivid Rose', hex: secondaryHex, rgb: 'rgb(244, 63, 94)', role: 'Secondary', wcagContrastWhite: 3.9, wcagContrastBlack: 11.5 },
-    accent: { name: 'Electric Violet', hex: accentHex, rgb: 'rgb(139, 92, 246)', role: 'Accent', wcagContrastWhite: 4.2, wcagContrastBlack: 12.1 },
+    primary: { name: 'Primary Core', hex: primaryHex, rgb: 'rgb(245, 158, 11)', role: 'Primary', wcagContrastWhite: 3.5, wcagContrastBlack: 12.2 },
+    secondary: { name: 'Secondary Depth', hex: secondaryHex, rgb: 'rgb(244, 63, 94)', role: 'Secondary', wcagContrastWhite: 4.1, wcagContrastBlack: 11.5 },
+    accent: { name: 'Vivid Accent', hex: accentHex, rgb: 'rgb(139, 92, 246)', role: 'Accent', wcagContrastWhite: 4.2, wcagContrastBlack: 12.1 },
     neutral: { name: 'Deep Space', hex: '#0A0D14', rgb: 'rgb(10, 13, 20)', role: 'Neutral', wcagContrastWhite: 18.2, wcagContrastBlack: 1.1 },
     background: { name: 'Cosmic Slate', hex: '#111827', rgb: 'rgb(17, 24, 39)', role: 'Background', wcagContrastWhite: 16.1, wcagContrastBlack: 1.3 },
     wcagCompliance: 'WCAG 2.1 AA Compliant',
-    notes: 'Secondary Rose and Electric Violet pass AA standards for call-to-action buttons.'
+    notes: 'Secondary and accent pass AA standards for digital screen rendering.'
   };
 
   return {
     id: crypto.randomUUID(),
     companyName: config.companyName,
-    tagline: config.tagline || 'Crafted with Artificial Intelligence',
+    tagline: config.tagline || 'Crafted with AI Brand Intelligence',
     createdAt: new Date().toISOString(),
     config,
     logos: createLogoConcepts(primaryHex, secondaryHex, accentHex, config.style),

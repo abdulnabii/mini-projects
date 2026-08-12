@@ -18,48 +18,61 @@ const INDUSTRIES: IndustryType[] = [
   'Fitness & Wellness',
   'Education',
   'Creative & Media',
+  'Gaming & Entertainment',
 ];
 
-const STYLES: { id: StylePreference; label: string; desc: string }[] = [
-  { id: 'minimalist', label: 'Minimalist', desc: 'Clean geometric lines & negative space' },
-  { id: 'bold', label: 'Bold Emblem', desc: 'High contrast, strong impact symbols' },
-  { id: 'playful', label: 'Playful & Friendly', desc: 'Rounded forms & vibrant energy' },
-  { id: 'corporate', label: 'Corporate & Trust', desc: 'Authoritative structural elegance' },
-  { id: 'tech', label: 'Tech & Futuristic', desc: 'Node circuits & sharp angular forms' },
+const STYLES: { id: StylePreference; label: string; icon: string; desc: string }[] = [
+  { id: 'anime', label: 'Anime / Mascot', icon: '🎌', desc: 'High-energy anime emblem, Kitsune mask & Mecha star' },
+  { id: 'professional', label: 'Corporate Professional', icon: '💼', desc: 'Sleek geometric monogram, prism diamond & crest' },
+  { id: 'tech', label: 'Tech & Cyberpunk', icon: '⚡', desc: 'Glowing circuit matrix & quantum orbital nodes' },
+  { id: 'luxury', label: 'Luxury & Vintage', icon: '🏛️', desc: 'Golden crown, royal monogram seal & lion shield' },
+  { id: 'minimalist', label: 'Minimalist Modern', icon: '🍃', desc: 'Clean geometric lines & negative space' },
+  { id: 'bold', label: 'Bold & Dynamic', icon: '🔥', desc: 'High-contrast emblem & striking visual mark' },
 ];
 
 const PRESETS: { name: string; tag: string; config: BrandConfig }[] = [
   {
-    name: 'NovaCare',
-    tag: 'Digital Health',
+    name: 'KageStudio',
+    tag: 'Anime & Gaming',
     config: {
-      companyName: 'NovaCare',
-      tagline: 'Next-Gen Patient Care',
-      industry: 'Healthcare',
-      style: 'minimalist',
-      colorMood: 'Trustworthy medical blue, clean white & vital mint',
+      companyName: 'KageStudio',
+      tagline: 'High-Energy Anime & Gaming Universe',
+      industry: 'Gaming & Entertainment',
+      style: 'anime',
+      colorMood: 'Sakura crimson pink, neo Tokyo violet & electric cyan',
     },
   },
   {
-    name: 'AetherPay',
-    tag: 'FinTech',
+    name: 'Apex Group',
+    tag: 'Corporate Pro',
     config: {
-      companyName: 'AetherPay',
-      tagline: 'Borderless Global Treasury',
+      companyName: 'Apex Group',
+      tagline: 'Global Enterprise Holdings',
       industry: 'FinTech',
-      style: 'tech',
-      colorMood: 'Emerald green, deep indigo & solar amber',
+      style: 'professional',
+      colorMood: 'Executive navy, platinum silver & metallic gold',
     },
   },
   {
-    name: 'BloomBites',
-    tag: 'Artisan Food',
+    name: 'CyberPulse',
+    tag: 'Cyberpunk Tech',
     config: {
-      companyName: 'BloomBites',
-      tagline: 'Organic Culinary Goodness',
-      industry: 'Food & Beverage',
-      style: 'playful',
-      colorMood: 'Warm coral, terracotta & fresh botanical leaf green',
+      companyName: 'CyberPulse',
+      tagline: 'Quantum Data & AI Security',
+      industry: 'SaaS & Tech',
+      style: 'tech',
+      colorMood: 'Neon turquoise, glowing violet & dark obsidian',
+    },
+  },
+  {
+    name: 'Aurelia Luxury',
+    tag: 'Luxury Heritage',
+    config: {
+      companyName: 'Aurelia',
+      tagline: 'Haute Couture & Fine Jewelry',
+      industry: 'Creative & Media',
+      style: 'luxury',
+      colorMood: 'Champagne gold, royal emerald & onyx black',
     },
   },
 ];
@@ -67,9 +80,9 @@ const PRESETS: { name: string; tag: string; config: BrandConfig }[] = [
 export default function BrandInputForm({ onSubmit, isLoading }: Props) {
   const [companyName, setCompanyName] = useState('');
   const [tagline, setTagline] = useState('');
-  const [industry, setIndustry] = useState<IndustryType>('SaaS & Tech');
-  const [style, setStyle] = useState<StylePreference>('minimalist');
-  const [colorMood, setColorMood] = useState('Modern gradient with amber gold and rose accents');
+  const [industry, setIndustry] = useState<IndustryType>('Gaming & Entertainment');
+  const [style, setStyle] = useState<StylePreference>('anime');
+  const [colorMood, setColorMood] = useState('Sakura crimson, neo Tokyo violet & electric cyan');
 
   const handleApplyPreset = (presetConfig: BrandConfig) => {
     setCompanyName(presetConfig.companyName);
@@ -96,7 +109,7 @@ export default function BrandInputForm({ onSubmit, isLoading }: Props) {
       {/* Preset Buttons */}
       <div className="space-y-2 text-center">
         <span className="text-xs font-mono uppercase tracking-wider text-slate-400">
-          Try a 1-Click Demo Brand Preset:
+          Try a 1-Click Brand Preset (Anime, Professional, Tech, Luxury):
         </span>
         <div className="flex flex-wrap gap-2.5 justify-center">
           {PRESETS.map((p) => (
@@ -108,7 +121,7 @@ export default function BrandInputForm({ onSubmit, isLoading }: Props) {
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
               <span>{p.name}</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300">
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 font-bold">
                 {p.tag}
               </span>
             </button>
@@ -121,14 +134,14 @@ export default function BrandInputForm({ onSubmit, isLoading }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
             <label className="block text-xs font-mono uppercase text-slate-300 mb-2">
-              Company Name <span className="text-rose-500">*</span>
+              Company / Brand Name <span className="text-rose-500">*</span>
             </label>
             <input
               type="text"
               required
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
-              placeholder="e.g. NovaCare or Lumina"
+              placeholder="e.g. KageStudio or Apex Group"
               className="w-full bg-[#0a0d14] border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-amber-500/60 font-mono transition-colors"
             />
           </div>
@@ -141,7 +154,7 @@ export default function BrandInputForm({ onSubmit, isLoading }: Props) {
               type="text"
               value={tagline}
               onChange={(e) => setTagline(e.target.value)}
-              placeholder="e.g. Next-Gen Intelligence"
+              placeholder="e.g. Anime Universe & Gaming"
               className="w-full bg-[#0a0d14] border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-amber-500/60 font-mono transition-colors"
             />
           </div>
@@ -167,13 +180,13 @@ export default function BrandInputForm({ onSubmit, isLoading }: Props) {
 
           <div>
             <label className="block text-xs font-mono uppercase text-slate-300 mb-2">
-              Color Mood Description
+              Color Mood Palette Prompt
             </label>
             <input
               type="text"
               value={colorMood}
               onChange={(e) => setColorMood(e.target.value)}
-              placeholder="e.g. Electric indigo with energetic solar yellow"
+              placeholder="e.g. Sakura crimson pink, neo Tokyo violet & cyan"
               className="w-full bg-[#0a0d14] border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-amber-500/60 font-mono transition-colors"
             />
           </div>
@@ -182,22 +195,25 @@ export default function BrandInputForm({ onSubmit, isLoading }: Props) {
         {/* Style Selection Grid */}
         <div className="space-y-3">
           <label className="block text-xs font-mono uppercase text-slate-300">
-            Design Aesthetic Style
+            Select Logo Design Aesthetic Style
           </label>
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {STYLES.map((s) => (
               <button
                 key={s.id}
                 type="button"
                 onClick={() => setStyle(s.id)}
-                className={`p-3 rounded-2xl border text-left transition-all ${
+                className={`p-4 rounded-2xl border text-left transition-all flex items-start gap-3 ${
                   style === s.id
-                    ? 'bg-amber-500/10 border-amber-400 text-white shadow-lg shadow-amber-500/10'
+                    ? 'bg-amber-500/15 border-amber-400 text-white shadow-lg shadow-amber-500/10'
                     : 'bg-[#0a0d14] border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
                 }`}
               >
-                <div className="font-mono text-xs font-bold text-amber-400 mb-1">{s.label}</div>
-                <div className="text-[10px] leading-tight text-slate-400">{s.desc}</div>
+                <span className="text-2xl">{s.icon}</span>
+                <div className="space-y-0.5">
+                  <div className="font-mono text-xs font-bold text-amber-400">{s.label}</div>
+                  <div className="text-[11px] leading-tight text-slate-300">{s.desc}</div>
+                </div>
               </button>
             ))}
           </div>
@@ -211,7 +227,7 @@ export default function BrandInputForm({ onSubmit, isLoading }: Props) {
             className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-black font-bold font-mono text-sm transition-all shadow-xl shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
           >
             <Wand2 className="w-4 h-4" />
-            <span>Generate Brand Identity Kit</span>
+            <span>Generate Professional Brand Kit</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
