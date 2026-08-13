@@ -10,13 +10,11 @@ import ReviewPanel from '@/components/ReviewPanel';
 import DiffViewer from '@/components/DiffViewer';
 import {
   Terminal,
-  Sparkles,
   Copy,
   Check,
   ShieldAlert,
   Zap,
   FileCheck,
-  Cpu,
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -123,9 +121,9 @@ export default function HomePage() {
       </div>
 
       {/* Main Workspace */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         {/* Left 6 Columns: Code Editor */}
-        <div className="lg:col-span-6 space-y-4">
+        <div className="lg:col-span-6 flex flex-col">
           <CodeEditor
             code={code}
             onChange={setCode}
@@ -137,7 +135,7 @@ export default function HomePage() {
         </div>
 
         {/* Right 6 Columns: Inspection Dashboard */}
-        <div className="lg:col-span-6 space-y-6">
+        <div className="lg:col-span-6 space-y-6 flex flex-col justify-start">
           {reviewResult ? (
             <div className="space-y-6 animate-in fade-in zoom-in duration-300">
               {/* Score Gauge */}
@@ -182,7 +180,7 @@ export default function HomePage() {
               )}
             </div>
           ) : (
-            <div className="bg-[#0d1117] border border-emerald-500/20 rounded-3xl p-8 text-center space-y-5 backdrop-blur-xl min-h-[450px] flex flex-col items-center justify-center font-mono terminal-glow">
+            <div className="bg-[#0d1117] border border-emerald-500/20 rounded-3xl p-8 text-center space-y-5 backdrop-blur-xl min-h-[500px] flex flex-col items-center justify-center font-mono terminal-glow flex-1">
               <div className="w-16 h-16 rounded-3xl bg-[#080c14] border border-zinc-800 flex items-center justify-center text-emerald-400 shadow-xl">
                 <Terminal className="w-8 h-8" />
               </div>
@@ -196,7 +194,7 @@ export default function HomePage() {
               <div className="grid grid-cols-2 gap-3 max-w-sm w-full text-[11px] font-mono text-zinc-400 pt-2">
                 <div className="bg-[#080c14] p-2.5 rounded-xl border border-zinc-800 flex items-center gap-2">
                   <ShieldAlert className="w-4 h-4 text-purple-400 shrink-0" />
-                  <span>SQLi & Memory Leaks</span>
+                  <span>SQLi &amp; Memory Leaks</span>
                 </div>
                 <div className="bg-[#080c14] p-2.5 rounded-xl border border-zinc-800 flex items-center gap-2">
                   <Zap className="w-4 h-4 text-emerald-400 shrink-0" />
