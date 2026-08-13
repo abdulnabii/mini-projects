@@ -111,6 +111,39 @@ The lowest common ancestor is defined between two nodes \`p\` and \`q\` as the l
     ],
   },
   {
+    id: 'sliding-window-max',
+    title: 'Sliding Window Maximum',
+    difficulty: 'Hard',
+    category: 'Dynamic Programming',
+    timeLimitMinutes: 35,
+    description: `You are given an array of integers \`nums\`, there is a sliding window of size \`k\` which is moving from the very left of the array to the very right. You can only see the \`k\` numbers in the window. Each time the sliding window moves right by one position.
+
+Return the max sliding window array. Must solve in $O(N)$ time complexity.`,
+    examples: [
+      { input: 'nums = [1,3,-1,-3,5,3,6,7], k = 3', output: '[3,3,5,5,6,7]' },
+      { input: 'nums = [1], k = 1', output: '[1]' },
+    ],
+    constraints: [
+      '1 <= nums.length <= 10^5',
+      '-10^4 <= nums[i] <= 10^4',
+      '1 <= k <= nums.length',
+    ],
+    starterCode: {
+      python: `from collections import deque\n\ndef maxSlidingWindow(nums: list[int], k: int) -> list[int]:\n    # Monotonic Deque O(N) solution\n    q = deque()\n    res = []\n    for i, n in enumerate(nums):\n        while q and nums[q[-1]] <= n:\n            q.pop()\n        q.append(i)\n        if q[0] == i - k:\n            q.popleft()\n        if i >= k - 1:\n            res.append(nums[q[0]])\n    return res`,
+      javascript: `function maxSlidingWindow(nums, k) {\n  const q = [];\n  const res = [];\n  for (let i = 0; i < nums.length; i++) {\n    while (q.length && nums[q[q.length - 1]] <= nums[i]) q.pop();\n    q.push(i);\n    if (q[0] === i - k) q.shift();\n    if (i >= k - 1) res.push(nums[q[0]]);\n  }\n  return res;\n}`,
+      typescript: `function maxSlidingWindow(nums: number[], k: number): number[] {\n  const q: number[] = [];\n  const res: number[] = [];\n  for (let i = 0; i < nums.length; i++) {\n    while (q.length && nums[q[q.length - 1]] <= nums[i]) q.pop();\n    q.push(i);\n    if (q[0] === i - k) q.shift();\n    if (i >= k - 1) res.push(nums[q[0]]);\n  }\n  return res;\n}`,
+      cpp: `#include <vector>\n#include <deque>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> maxSlidingWindow(vector<int>& nums, int k) {\n        deque<int> q;\n        vector<int> res;\n        for (int i = 0; i < nums.size(); i++) {\n            while (!q.empty() && nums[q.back()] <= nums[i]) q.pop_back();\n            q.push_back(i);\n            if (q.front() == i - k) q.pop_front();\n            if (i >= k - 1) res.push_back(nums[q.front()]);\n        }\n        return res;\n    }\n};`,
+      java: `import java.util.*;\nclass Solution {\n    public int[] maxSlidingWindow(int[] nums, int k) {\n        int n = nums.length;\n        int[] res = new int[n - k + 1];\n        Deque<Integer> q = new ArrayDeque<>();\n        int idx = 0;\n        for (int i = 0; i < n; i++) {\n            while (!q.isEmpty() && nums[q.peekLast()] <= nums[i]) q.pollLast();\n            q.offerLast(i);\n            if (q.peekFirst() == i - k) q.pollFirst();\n            if (i >= k - 1) res[idx++] = nums[q.peekFirst()];\n        }\n        return res;\n    }\n}`,
+    },
+    testCases: [
+      { id: 's1', input: 'nums = [1,3,-1,-3,5,3,6,7], k = 3', expectedOutput: '[3, 3, 5, 5, 6, 7]' },
+      { id: 's2', input: 'nums = [1], k = 1', expectedOutput: '[1]' },
+      { id: 's3', input: 'nums = [4,-2], k = 2', expectedOutput: '[4]' },
+      { id: 's4', input: 'nums = [9,11], k = 2', expectedOutput: '[11]', isSecret: true },
+      { id: 's5', input: 'nums = [7,2,4], k = 2', expectedOutput: '[7, 4]', isSecret: true },
+    ],
+  },
+  {
     id: 'system-design-url-shortener',
     title: 'System Design: Distributed URL Shortener (TinyURL)',
     difficulty: 'Hard',
@@ -154,6 +187,44 @@ Prepare to discuss Base62 encoding vs Key Generation Service (KGS), database sch
       { id: 'sys3', input: 'DB Sharding Key Selection', expectedOutput: 'Shard by short_code hash for uniform distribution' },
       { id: 'sys4', input: 'Rate Limiter Algorithm', expectedOutput: 'Token Bucket per IP / API Key', isSecret: true },
       { id: 'sys5', input: 'Analytics Data Pipeline', expectedOutput: 'Kafka -> Spark -> ClickHouse OLAP', isSecret: true },
+    ],
+  },
+  {
+    id: 'behavioral-leadership',
+    title: 'Behavioral Interview: Conflict Resolution & Outage Retrospective',
+    difficulty: 'Medium',
+    category: 'Behavioral',
+    timeLimitMinutes: 25,
+    description: `Behavioral & Leadership STAR Method Scenario:
+
+"Tell me about a time when you had a major disagreement with a senior teammate on your team regarding technical architecture during a critical production release outage."
+
+Your response should follow the **STAR Framework**:
+1. **Situation**: Set the context and timeline.
+2. **Task**: What was your responsibility?
+3. **Action**: How did you de-escalate disagreement and evaluate trade-offs objectively?
+4. **Result**: What was the measurable outcome and long-term learning?`,
+    examples: [
+      {
+        input: 'Disagreement on hotfix strategy during P0 latency spike outage',
+        output: 'De-escalated via data-backed benchmark logs, executed rollback first, then ran post-mortem.',
+      },
+    ],
+    constraints: [
+      'Must demonstrate empathy, objective data-driven decision making, and leadership.',
+      'Avoid blaming teammates; focus on systemic root cause analysis.',
+    ],
+    starterCode: {
+      python: `# STAR Method Behavioral Narrative Outline:\n\n"""\nSITUATION:\nDuring a black-friday traffic spike, an un-indexed DB query caused P0 API timeouts...\n\nTASK:\nMy role was on-call Incident Commander coordinating hotfix deployment...\n\nACTION:\nI proposed rolling back to the previous release while senior lead wanted to run manual SQL indexes...\n\nRESULT:\nRollback restored 100% uptime in 4 minutes. We later paired to add blue-green deployment guardrails.\n"""`,
+      javascript: `// STAR Behavioral Strategy Document\nconst behavioralResponse = {\n  situation: "",\n  task: "",\n  action: "",\n  result: ""\n};`,
+      typescript: `interface STARFramework {\n  situation: string;\n  task: string;\n  action: string;\n  result: string;\n}\n\nconst response: STARFramework = {\n  situation: "P0 Outage",\n  task: "Incident Response",\n  action: "Data-driven Consensus",\n  result: "Uptime Restored"\n};`,
+      cpp: `// Behavioral Leadership Outline`,
+      java: `// Behavioral Leadership Outline`,
+    },
+    testCases: [
+      { id: 'beh1', input: 'STAR Structure Alignment', expectedOutput: 'All 4 STAR components explicitly covered' },
+      { id: 'beh2', input: 'Empathy & De-escalation', expectedOutput: 'Active listening & benchmark validation demonstrated' },
+      { id: 'beh3', input: 'Measurable Impact Metric', expectedOutput: 'Includes quantified metrics (e.g. 4-min MTTR)' },
     ],
   },
 ];

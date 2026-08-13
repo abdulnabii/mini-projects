@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Hint, InterviewMessage } from '@/types';
-import { Bot, User, Send, Lightbulb, Sparkles, AlertCircle } from 'lucide-react';
+import { Bot, User, Send, Lightbulb, Sparkles, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 
 interface Props {
   messages: InterviewMessage[];
@@ -22,6 +22,53 @@ export default function InterviewerChat({
   isHintLoading,
 }: Props) {
   const [inputText, setInputText] = useState('');
+  const [isMuted, setIsMuted] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+
+  // Read latest AI message aloud if not muted
+  useEffect(() => {
+    if (isMuted || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg && lastMsg.sender === 'interviewer') {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(lastMsg.text.replace(/[\`\*\_]/g, ''));
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      window.speechSynthesis.speak(utterance);
+    }
+  }, [messages, isMuted]);
+
+  // Speech-to-Text Microphone voice input
+  const toggleSpeechRecognition = () => {
+    if (typeof window === 'undefined') return;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Speech recognition is not supported in this browser. Please use Google Chrome or Edge.');
+      return;
+    }
+
+    if (isListening) {
+      setIsListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onresult = (event: any) => {
+      const transcript = Array.from(event.results)
+        .map((r: any) => r[0].transcript)
+        .join('');
+      setInputText(transcript);
+    };
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+
+    recognition.start();
+  };
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,19 +89,43 @@ export default function InterviewerChat({
           </div>
           <div>
             <h3 className="font-bold text-white text-sm font-outfit">Alex (AI Staff Engineer)</h3>
-            <p className="text-[10px] text-emerald-400">Technical Interviewer Active</p>
+            <p className="text-[10px] text-emerald-400 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+              Voice-Enabled Interviewer
+            </p>
           </div>
         </div>
 
-        {/* Progressive Hint Button */}
-        <button
-          onClick={onRequestHint}
-          disabled={isHintLoading || hintsGiven.length >= 3}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 transition-all font-bold text-[11px] disabled:opacity-50"
-        >
-          <Lightbulb className="w-3.5 h-3.5" />
-          <span>{hintsGiven.length >= 3 ? 'Max Hints Used' : `Get Hint (Tier ${hintsGiven.length + 1})`}</span>
-        </button>
+        {/* Audio Controls & Progressive Hint Button */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              if (!isMuted && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+              }
+              setIsMuted(!isMuted);
+            }}
+            className={`p-2 rounded-xl border transition-all ${
+              isMuted
+                ? 'bg-slate-900 border-slate-800 text-slate-500'
+                : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+            }`}
+            title={isMuted ? 'Unmute AI Voice' : 'Mute AI Voice'}
+          >
+            {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+          </button>
+
+          <button
+            type="button"
+            onClick={onRequestHint}
+            disabled={isHintLoading || hintsGiven.length >= 3}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 transition-all font-bold text-[11px] disabled:opacity-50"
+          >
+            <Lightbulb className="w-3.5 h-3.5" />
+            <span>{hintsGiven.length >= 3 ? 'Max Hints' : `Hint (Tier ${hintsGiven.length + 1})`}</span>
+          </button>
+        </div>
       </div>
 
       {/* Messages Thread */}
@@ -95,7 +166,7 @@ export default function InterviewerChat({
         )}
       </div>
 
-      {/* Hints Accordion (if given) */}
+      {/* Hints Unlocked */}
       {hintsGiven.length > 0 && (
         <div className="space-y-2 border-t border-slate-800 pt-3">
           <label className="text-[10px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
@@ -116,13 +187,26 @@ export default function InterviewerChat({
         </div>
       )}
 
-      {/* Input Box */}
+      {/* Input Box with Microphone Voice Control */}
       <form onSubmit={handleSend} className="flex items-center gap-2 pt-2 border-t border-slate-800">
+        <button
+          type="button"
+          onClick={toggleSpeechRecognition}
+          className={`p-2.5 rounded-xl border transition-all ${
+            isListening
+              ? 'bg-rose-500 text-white border-rose-400 animate-pulse'
+              : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-emerald-400'
+          }`}
+          title={isListening ? 'Listening... Click to stop' : 'Click to Speak Approach (Voice Input)'}
+        >
+          {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+        </button>
+
         <input
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          placeholder="Talk through your approach or ask Alex a question..."
+          placeholder={isListening ? 'Listening to your voice...' : 'Speak or type your approach to Alex...'}
           className="flex-1 px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 font-mono"
         />
         <button
