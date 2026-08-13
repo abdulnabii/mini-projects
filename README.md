@@ -19,7 +19,8 @@ Welcome to the **30 AI Projects in 30 Days** repository by **Abdul Nabi**. This 
 | **09** | [AI GitHub Developer Portfolio & Impact Analyzer](./day-09-github-profile-analyzer) | DevTools / Data Viz | 🌐 [day-09-github-profile-analyzer.vercel.app](https://day-09-github-profile-analyzer.vercel.app) | Next.js 14, Tailwind CSS, Gemini API | ✅ Deployed |
 | **10** | [AI Email Composer & Subject Line Optimizer](./day-10-ai-email-composer) | AI / Productivity | 🌐 [day-10-ai-email-composer.vercel.app](https://day-10-ai-email-composer.vercel.app) | Next.js 14, Tailwind CSS, Gemini API | ✅ Deployed |
 | **11** | [AI Prompt Engineer & Optimizer Terminal](./day-11-ai-prompt-optimizer) | DevTools / AI Prompting | 🌐 [day-11-ai-prompt-optimizer.vercel.app](https://day-11-ai-prompt-optimizer.vercel.app) | Next.js 16, Tailwind CSS, Gemini API | ✅ Deployed |
-| ... | *Days 12–30* | - | - | - | ⏳ Pending |
+| **12** | [AI Coding Interview Simulator & Technical Assessor](./day-12-coding-interview-coach) | DevTools / AI Simulator | 🌐 [day-12-coding-interview-coach.vercel.app](https://day-12-coding-interview-coach.vercel.app) | Next.js 16, Tailwind CSS, Gemini API | ✅ Deployed |
+| ... | *Days 13–30* | - | - | - | ⏳ Pending |
 
 ---
 
@@ -39,7 +40,7 @@ Clone the repository and run any project locally:
 
 ```bash
 git clone https://github.com/abdulnabii/mini-projects.git
-cd mini-projects/day-11-ai-prompt-optimizer
+cd mini-projects/day-12-coding-interview-coach
 
 npm install
 npm run dev
