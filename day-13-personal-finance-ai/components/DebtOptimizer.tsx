@@ -1,16 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { Debt, DebtOptimizationResult } from '@/types';
+import { Currency, Debt, DebtOptimizationResult } from '@/types';
 import { optimizeDebtPayoff } from '@/lib/finance';
+import { formatCurrency } from '@/lib/storage';
 import { ShieldCheck, Zap, TrendingDown, DollarSign, Award, ArrowRight, Layers } from 'lucide-react';
 
 interface Props {
   debts: Debt[];
+  currency: Currency;
 }
 
-export default function DebtOptimizer({ debts }: Props) {
-  const [extraPayment, setExtraPayment] = useState<number>(400);
+export default function DebtOptimizer({ debts, currency }: Props) {
+  const [extraPayment, setExtraPayment] = useState<number>(currency === 'PKR' ? 25000 : 400);
+
+  const fmt = (amt: number) => formatCurrency(amt, currency);
 
   const optimization: DebtOptimizationResult = optimizeDebtPayoff(debts, extraPayment);
   const { avalanche, snowball, recommendation, reasoningNote } = optimization;
@@ -32,12 +36,12 @@ export default function DebtOptimizer({ debts }: Props) {
         {/* Extra Payment Slider */}
         <div className="flex items-center gap-3 bg-slate-950 p-3 rounded-2xl border border-slate-800 shrink-0">
           <label className="text-slate-400 font-bold text-[11px]">Extra Payment:</label>
-          <span className="text-amber-400 font-bold font-outfit text-sm">${extraPayment}/mo</span>
+          <span className="text-amber-400 font-bold font-outfit text-sm">{fmt(extraPayment)}/mo</span>
           <input
             type="range"
-            min="100"
-            max="1500"
-            step="50"
+            min={currency === 'PKR' ? 5000 : 100}
+            max={currency === 'PKR' ? 100000 : 1500}
+            step={currency === 'PKR' ? 2500 : 50}
             value={extraPayment}
             onChange={(e) => setExtraPayment(Number(e.target.value))}
             className="w-28 accent-amber-400 cursor-pointer"
@@ -66,11 +70,11 @@ export default function DebtOptimizer({ debts }: Props) {
             </div>
             <div>
               <span className="block text-[10px] text-slate-400 font-bold">Total Interest</span>
-              <span className="text-xl font-black text-rose-400 font-outfit">${avalanche.totalInterestPaid.toLocaleString()}</span>
+              <span className="text-xl font-black text-rose-400 font-outfit">{fmt(avalanche.totalInterestPaid)}</span>
             </div>
             <div>
               <span className="block text-[10px] text-slate-400 font-bold">Interest Saved</span>
-              <span className="text-xl font-black text-emerald-400 font-outfit">${avalanche.interestSavedVsMinimum.toLocaleString()}</span>
+              <span className="text-xl font-black text-emerald-400 font-outfit">{fmt(avalanche.interestSavedVsMinimum)}</span>
             </div>
           </div>
 
@@ -98,11 +102,11 @@ export default function DebtOptimizer({ debts }: Props) {
             </div>
             <div>
               <span className="block text-[10px] text-slate-400 font-bold">Total Interest</span>
-              <span className="text-xl font-black text-rose-400 font-outfit">${snowball.totalInterestPaid.toLocaleString()}</span>
+              <span className="text-xl font-black text-rose-400 font-outfit">{fmt(snowball.totalInterestPaid)}</span>
             </div>
             <div>
               <span className="block text-[10px] text-slate-400 font-bold">Interest Saved</span>
-              <span className="text-xl font-black text-emerald-400 font-outfit">${snowball.interestSavedVsMinimum.toLocaleString()}</span>
+              <span className="text-xl font-black text-emerald-400 font-outfit">{fmt(snowball.interestSavedVsMinimum)}</span>
             </div>
           </div>
 
@@ -128,8 +132,8 @@ export default function DebtOptimizer({ debts }: Props) {
                 <span className="font-bold text-white">{d.name}</span>
               </div>
               <div className="flex items-center gap-4">
-                <span className="text-slate-400">Min: ${d.minPayment}/mo</span>
-                <strong className="text-amber-400 font-outfit text-sm">${d.balance.toLocaleString()}</strong>
+                <span className="text-slate-400">Min: {fmt(d.minPayment)}/mo</span>
+                <strong className="text-amber-400 font-outfit text-sm">{fmt(d.balance)}</strong>
               </div>
             </div>
           ))}

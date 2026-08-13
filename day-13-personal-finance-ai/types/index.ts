@@ -1,3 +1,5 @@
+export type Currency = 'PKR' | 'USD';
+
 export type TransactionCategory =
   | 'Income'
   | 'Housing'

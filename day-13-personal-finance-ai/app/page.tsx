@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Debt, DebtOptimizationResult, FIREAnalysis, FinancialHealthGrade, FinancialSummary, Transaction } from '@/types';
+import { Currency, Debt, DebtOptimizationResult, FIREAnalysis, FinancialHealthGrade, FinancialSummary, Transaction } from '@/types';
 import { DEMO_PRESETS, getStoredTransactions, saveTransactionsToStorage } from '@/lib/storage';
 import { calculateFinancialSummary, calculateFIREAnalysis, optimizeDebtPayoff } from '@/lib/finance';
 import StatementUploader from '@/components/StatementUploader';
@@ -12,6 +12,7 @@ import AIAdvisorChat from '@/components/AIAdvisorChat';
 import { Wallet, PieChart, UploadCloud, Flame, Zap, Bot, Sparkles, ShieldCheck } from 'lucide-react';
 
 export default function HomePage() {
+  const [currency, setCurrency] = useState<Currency>('PKR');
   const [transactions, setTransactions] = useState<Transaction[]>(DEMO_PRESETS[0].transactions);
   const [debts, setDebts] = useState<Debt[]>(DEMO_PRESETS[0].debts);
   const [cashAssets, setCashAssets] = useState<number>(DEMO_PRESETS[0].cashAssets);
@@ -134,7 +135,7 @@ export default function HomePage() {
         </h1>
 
         <p className="text-sm sm:text-base text-slate-400 font-mono max-w-2xl mx-auto leading-relaxed">
-          Upload bank statements to track net worth, compute monthly burn rates, project your exact FIRE retirement date, and optimize debt payoff via Avalanche vs. Snowball engines.
+          Upload bank statements to track net worth, compute monthly burn rates in Pakistani Rupee (PKR), project your exact FIRE retirement date, and optimize debt payoff via Avalanche vs. Snowball engines.
         </p>
       </section>
 
@@ -208,12 +209,18 @@ export default function HomePage() {
 
       {/* Tab Content Rendering */}
       {activeTab === 'overview' && (
-        <FinancialOverview summary={summary} narrative={narrative} isLoadingNarrative={isLoadingNarrative} />
+        <FinancialOverview
+          summary={summary}
+          narrative={narrative}
+          isLoadingNarrative={isLoadingNarrative}
+          currency={currency}
+          onToggleCurrency={setCurrency}
+        />
       )}
 
-      {activeTab === 'fire' && <FIRECalculator fire={fire} />}
+      {activeTab === 'fire' && <FIRECalculator fire={fire} currency={currency} />}
 
-      {activeTab === 'debt' && <DebtOptimizer debts={debts} />}
+      {activeTab === 'debt' && <DebtOptimizer debts={debts} currency={currency} />}
 
       {activeTab === 'advisor' && <AIAdvisorChat onAskQuestion={handleAskAdvisor} isLoading={isAdvisorLoading} />}
 

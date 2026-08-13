@@ -1,15 +1,18 @@
 'use client';
 
-import { FinancialHealthGrade, FinancialSummary } from '@/types';
+import { Currency, FinancialHealthGrade, FinancialSummary } from '@/types';
+import { formatCurrency } from '@/lib/storage';
 import { Wallet, DollarSign, TrendingUp, TrendingDown, ShieldAlert, Sparkles, PieChart, ArrowUpRight, ArrowDownRight, CheckCircle2 } from 'lucide-react';
 
 interface Props {
   summary: FinancialSummary;
   narrative: FinancialHealthGrade | null;
   isLoadingNarrative: boolean;
+  currency: Currency;
+  onToggleCurrency: (c: Currency) => void;
 }
 
-export default function FinancialOverview({ summary, narrative, isLoadingNarrative }: Props) {
+export default function FinancialOverview({ summary, narrative, isLoadingNarrative, currency, onToggleCurrency }: Props) {
   const getGradeColor = (g: string) => {
     if (g.startsWith('A')) return 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10';
     if (g.startsWith('B')) return 'text-teal-400 border-teal-500/30 bg-teal-500/10';
@@ -17,8 +20,39 @@ export default function FinancialOverview({ summary, narrative, isLoadingNarrati
     return 'text-rose-400 border-rose-500/30 bg-rose-500/10';
   };
 
+  const fmt = (amt: number) => formatCurrency(amt, currency);
+
   return (
     <div className="space-y-8 font-mono text-xs text-slate-300">
+      {/* Top Header Controls: Currency Selector Switch */}
+      <div className="flex items-center justify-between bg-[#0d1117] border border-amber-500/20 px-5 py-3 rounded-2xl">
+        <div className="flex items-center gap-2">
+          <span className="text-slate-400 font-bold text-xs">Primary Display Currency:</span>
+          <span className="text-amber-400 font-bold text-xs">{currency === 'PKR' ? 'Pakistani Rupee (Rs. / PKR)' : 'US Dollar ($ / USD)'}</span>
+        </div>
+
+        <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
+          <button
+            type="button"
+            onClick={() => onToggleCurrency('PKR')}
+            className={`px-3 py-1 rounded-lg font-bold transition-all text-xs ${
+              currency === 'PKR' ? 'bg-amber-400 text-black shadow-md' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            PKR (Rs.)
+          </button>
+          <button
+            type="button"
+            onClick={() => onToggleCurrency('USD')}
+            className={`px-3 py-1 rounded-lg font-bold transition-all text-xs ${
+              currency === 'USD' ? 'bg-amber-400 text-black shadow-md' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            USD ($)
+          </button>
+        </div>
+      </div>
+
       {/* 1. Net Worth & Cash Flow Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Net Worth */}
@@ -29,10 +63,10 @@ export default function FinancialOverview({ summary, narrative, isLoadingNarrati
               <Wallet className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-3xl font-black text-white font-outfit">${summary.netWorth.toLocaleString()}</p>
+          <p className="text-2xl sm:text-3xl font-black text-white font-outfit">{fmt(summary.netWorth)}</p>
           <div className="flex items-center gap-2 text-[10px] text-slate-500 pt-1 border-t border-slate-800">
-            <span>Assets: <strong className="text-emerald-400">${summary.totalAssets.toLocaleString()}</strong></span>
-            <span>Liabilities: <strong className="text-rose-400">${summary.totalLiabilities.toLocaleString()}</strong></span>
+            <span>Assets: <strong className="text-emerald-400">{fmt(summary.totalAssets)}</strong></span>
+            <span>Liabilities: <strong className="text-rose-400">{fmt(summary.totalLiabilities)}</strong></span>
           </div>
         </div>
 
@@ -44,7 +78,7 @@ export default function FinancialOverview({ summary, narrative, isLoadingNarrati
               <ArrowUpRight className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-3xl font-black text-emerald-400 font-outfit">${summary.monthlyIncome.toLocaleString()}</p>
+          <p className="text-2xl sm:text-3xl font-black text-emerald-400 font-outfit">{fmt(summary.monthlyIncome)}</p>
           <p className="text-[10px] text-slate-500 pt-1 border-t border-slate-800">Primary Cash Flow Generation</p>
         </div>
 
@@ -56,7 +90,7 @@ export default function FinancialOverview({ summary, narrative, isLoadingNarrati
               <ArrowDownRight className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-3xl font-black text-rose-400 font-outfit">${summary.monthlyExpenses.toLocaleString()}</p>
+          <p className="text-2xl sm:text-3xl font-black text-rose-400 font-outfit">{fmt(summary.monthlyExpenses)}</p>
           <p className="text-[10px] text-slate-500 pt-1 border-t border-slate-800">Total Fixed &amp; Discretionary Outflow</p>
         </div>
 
@@ -68,9 +102,9 @@ export default function FinancialOverview({ summary, narrative, isLoadingNarrati
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-3xl font-black text-purple-400 font-outfit">{(summary.savingsRate * 100).toFixed(1)}%</p>
+          <p className="text-2xl sm:text-3xl font-black text-purple-400 font-outfit">{(summary.savingsRate * 100).toFixed(1)}%</p>
           <p className="text-[10px] text-slate-500 pt-1 border-t border-slate-800">
-            Net Savings: <strong className="text-purple-300">${summary.monthlySavings.toLocaleString()}/mo</strong>
+            Net Savings: <strong className="text-purple-300">{fmt(summary.monthlySavings)}/mo</strong>
           </p>
         </div>
       </div>
@@ -154,7 +188,7 @@ export default function FinancialOverview({ summary, narrative, isLoadingNarrati
             <div key={idx} className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-slate-200 text-xs">{cat.category}</span>
-                <span className="text-amber-400 font-bold">${cat.amount.toLocaleString()}</span>
+                <span className="text-amber-400 font-bold">{fmt(cat.amount)}</span>
               </div>
 
               {/* Progress bar */}
