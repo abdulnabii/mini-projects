@@ -21,7 +21,8 @@ Welcome to the **30 AI Projects in 30 Days** repository by **Abdul Nabi**. This 
 | **11** | [Medical Image Classifier & GradCAM Heatmap Overlay](./day-11-medical-image-classifier) | Healthcare AI / Computer Vision | 🌐 [day-11-medical-image-classifier.vercel.app](https://day-11-medical-image-classifier.vercel.app) | Next.js 16, HTML5 Canvas, Gemini API | ✅ Deployed |
 | **12** | [AI Coding Interview Simulator & Technical Assessor](./day-12-coding-interview-coach) | DevTools / AI Simulator | 🌐 [day-12-coding-interview-coach.vercel.app](https://day-12-coding-interview-coach.vercel.app) | Next.js 16, Tailwind CSS, Gemini API | ✅ Deployed |
 | **13** | [AI Personal Finance & FIRE Intelligence Platform](./day-13-personal-finance-ai) | FinTech / AI Intelligence | 🌐 [day-13-personal-finance-ai.vercel.app](https://day-13-personal-finance-ai.vercel.app) | Next.js 16, Tailwind CSS, Gemini API | ✅ Deployed |
-| ... | *Days 14–30* | - | - | - | ⏳ Pending |
+| **14** | [AI Language Flashcards & Spaced Repetition Platform](./day-14-language-flashcard-ai) | AI / EdTech | 🌐 [day-14-language-flashcard-ai.vercel.app](https://day-14-language-flashcard-ai.vercel.app) | Next.js 16, SM-2 Engine, Web Speech API | ✅ Deployed |
+| ... | *Days 15–30* | - | - | - | ⏳ Pending |
 
 ---
 
@@ -41,7 +42,7 @@ Clone the repository and run any project locally:
 
 ```bash
 git clone https://github.com/abdulnabii/mini-projects.git
-cd mini-projects/day-11-medical-image-classifier
+cd mini-projects/day-14-language-flashcard-ai
 
 npm install
 npm run dev
