@@ -22,7 +22,8 @@ Welcome to the **30 AI Projects in 30 Days** repository by **Abdul Nabi**. This 
 | **12** | [AI Coding Interview Simulator & Technical Assessor](./day-12-coding-interview-coach) | DevTools / AI Simulator | 🌐 [day-12-coding-interview-coach.vercel.app](https://day-12-coding-interview-coach.vercel.app) | Next.js 16, Tailwind CSS, Gemini API | ✅ Deployed |
 | **13** | [AI Personal Finance & FIRE Intelligence Platform](./day-13-personal-finance-ai) | FinTech / AI Intelligence | 🌐 [day-13-personal-finance-ai.vercel.app](https://day-13-personal-finance-ai.vercel.app) | Next.js 16, Tailwind CSS, Gemini API | ✅ Deployed |
 | **14** | [AI Language Flashcards & Spaced Repetition Platform](./day-14-language-flashcard-ai) | AI / EdTech | 🌐 [day-14-language-flashcard-ai.vercel.app](https://day-14-language-flashcard-ai.vercel.app) | Next.js 16, SM-2 Engine, Web Speech API | ✅ Deployed |
-| ... | *Days 15–30* | - | - | - | ⏳ Pending |
+| **15** | [AI-Powered Blog SEO Optimizer & SERP Intelligence Platform](./day-15-ai-blog-seo-optimizer) | Developer Tools / SEO | 🌐 [day-15-ai-blog-seo-optimizer.vercel.app](https://day-15-ai-blog-seo-optimizer.vercel.app) | Next.js 16, Flesch-Kincaid, Gemini API | ✅ Deployed |
+| ... | *Days 16–30* | - | - | - | ⏳ Pending |
 
 ---
 
@@ -42,7 +43,7 @@ Clone the repository and run any project locally:
 
 ```bash
 git clone https://github.com/abdulnabii/mini-projects.git
-cd mini-projects/day-14-language-flashcard-ai
+cd mini-projects/day-15-ai-blog-seo-optimizer
 
 npm install
 npm run dev
