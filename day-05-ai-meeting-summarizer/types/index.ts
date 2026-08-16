@@ -1,6 +1,8 @@
 export interface Attendee {
   name: string;
   role: string | null;
+  speakingPercentage?: number;
+  wordCount?: number;
 }
 
 export interface Decision {
@@ -15,6 +17,7 @@ export interface ActionItem {
   assignee: string | null;
   deadline: string | null;
   priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  completed?: boolean;
 }
 
 export interface Blocker {
@@ -25,6 +28,13 @@ export interface Blocker {
 
 export type MeetingSentiment = 'positive' | 'neutral' | 'tense' | 'mixed';
 
+export interface SpeakerStat {
+  name: string;
+  wordCount: number;
+  percentage: number;
+  color: string;
+}
+
 export interface MeetingIntelligence {
   attendees: Attendee[];
   decisions: Decision[];
@@ -33,6 +43,8 @@ export interface MeetingIntelligence {
   executiveSummary: string;
   meetingDuration: string | null;
   sentiment: MeetingSentiment;
+  speakerStats?: SpeakerStat[];
+  keyTopics?: string[];
 }
 
 export interface MeetingSession {
