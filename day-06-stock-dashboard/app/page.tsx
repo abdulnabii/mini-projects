@@ -10,12 +10,14 @@ import {
   DEFAULT_TICKERS,
   STOCK_NEWS,
 } from '@/lib/mock-prices';
-import { getAlerts, saveAlert, markAlertTriggered } from '@/lib/storage';
+import { getAlerts, markAlertTriggered } from '@/lib/storage';
 import WatchlistPanel from '@/components/WatchlistPanel';
 import PriceChart from '@/components/PriceChart';
 import SentimentPanel from '@/components/SentimentPanel';
 import MarketOverview from '@/components/MarketOverview';
 import AlertManager from '@/components/AlertManager';
+import PortfolioSummary from '@/components/PortfolioSummary';
+import { Sparkles, Activity, Layers } from 'lucide-react';
 
 export default function DashboardPage() {
   const [initialized, setInitialized] = useState(false);
@@ -66,7 +68,9 @@ export default function DashboardPage() {
       });
     }, 2000);
 
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [initialized, selectedTicker]);
 
   // Update chart when ticker changes
@@ -96,23 +100,23 @@ export default function DashboardPage() {
   }, [selectedTicker]);
 
   const selectedQuote = quotes.find((q) => q.ticker === selectedTicker);
-
   const handleAlertsChange = () => setAlerts(getAlerts());
-
   const currentPriceMap = Object.fromEntries(quotes.map((q) => [q.ticker, q.price]));
 
   return (
-    <div className="flex-1 p-4 max-w-screen-2xl mx-auto w-full space-y-4">
-      {/* Market Overview */}
-      <div>
-        <MarketOverview />
-      </div>
+    <div className="flex-1 p-4 sm:p-6 max-w-screen-2xl mx-auto w-full space-y-6 font-mono text-xs text-slate-300">
+      {/* Global Marquee Bar */}
+      <MarketOverview />
 
-      {/* Main Grid */}
-      <div className="grid grid-cols-12 gap-4">
-        {/* Watchlist — left */}
-        <div className="col-span-12 lg:col-span-3 space-y-4">
-          <WatchlistPanel quotes={quotes} selectedTicker={selectedTicker} onSelect={setSelectedTicker} />
+      {/* Main Terminal Grid */}
+      <div className="grid grid-cols-12 gap-6">
+        {/* Watchlist & Alerts — Left Column */}
+        <div className="col-span-12 lg:col-span-3 space-y-6">
+          <WatchlistPanel
+            quotes={quotes}
+            selectedTicker={selectedTicker}
+            onSelect={setSelectedTicker}
+          />
           <AlertManager
             alerts={alerts}
             currentPrices={currentPriceMap}
@@ -121,26 +125,39 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* Chart + Detail — center */}
-        <div className="col-span-12 lg:col-span-6 space-y-4">
-          {/* Stock Header */}
+        {/* Center: Candlestick/Line Chart & Paper Trading */}
+        <div className="col-span-12 lg:col-span-6 space-y-6">
+          {/* Active Asset Header Card */}
           {selectedQuote && (
-            <div className="bg-[#0d1117] border border-green-500/15 rounded-2xl px-5 py-4">
-              <div className="flex items-start justify-between flex-wrap gap-2">
-                <div>
-                  <div className="text-2xl font-bold text-white font-mono">{selectedQuote.ticker}</div>
-                  <div className="text-sm text-slate-400">{selectedQuote.name}</div>
+            <div className="bg-[#0b0f19] border border-green-500/20 rounded-3xl p-5 sm:p-6 shadow-2xl shadow-green-500/5">
+              <div className="flex items-start justify-between flex-wrap gap-3">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl sm:text-3xl font-black text-white font-outfit">
+                      {selectedQuote.ticker}
+                    </span>
+                    {selectedQuote.sector && (
+                      <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/30 font-bold">
+                        {selectedQuote.sector}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-400">{selectedQuote.name}</p>
                 </div>
-                <div className="text-right">
-                  <div className="text-xs text-slate-500 font-mono">Vol: {(selectedQuote.volume / 1_000_000).toFixed(1)}M</div>
-                  <div className="text-xs text-slate-500 font-mono">Mkt Cap: {selectedQuote.marketCap}</div>
-                  <div className="text-xs text-slate-500 font-mono">H: ${selectedQuote.high.toFixed(2)} / L: ${selectedQuote.low.toFixed(2)}</div>
+
+                <div className="text-right space-y-0.5">
+                  <div className="text-xs text-slate-400">
+                    Mkt Cap: <strong className="text-white">{selectedQuote.marketCap}</strong>
+                  </div>
+                  <div className="text-xs text-slate-400">
+                    24h Range: <strong className="text-white">${selectedQuote.low.toFixed(2)}</strong> - <strong className="text-white">${selectedQuote.high.toFixed(2)}</strong>
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Price Chart */}
+          {/* Interactive Chart */}
           <PriceChart
             ticks={chartTicks}
             ticker={selectedTicker}
@@ -148,40 +165,12 @@ export default function DashboardPage() {
             change={selectedQuote?.change || 0}
           />
 
-          {/* All Tickers Quick Row */}
-          <div className="bg-[#0d1117] border border-green-500/15 rounded-2xl p-4 overflow-x-auto">
-            <table className="w-full text-xs font-mono">
-              <thead>
-                <tr className="text-slate-500 text-[10px] uppercase border-b border-slate-800">
-                  <th className="pb-2 text-left">Ticker</th>
-                  <th className="pb-2 text-right">Price</th>
-                  <th className="pb-2 text-right">Change</th>
-                  <th className="pb-2 text-right">% Chg</th>
-                  <th className="pb-2 text-right">Volume</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/50">
-                {quotes.map((q) => {
-                  const isUp = q.change >= 0;
-                  return (
-                    <tr key={q.ticker}
-                      className={`cursor-pointer hover:bg-slate-900/50 transition-colors ${q.ticker === selectedTicker ? 'bg-green-500/5' : ''}`}
-                      onClick={() => setSelectedTicker(q.ticker)}>
-                      <td className="py-2 text-left font-bold text-white">{q.ticker}</td>
-                      <td className="py-2 text-right text-white tabular-nums">${q.price.toFixed(2)}</td>
-                      <td className={`py-2 text-right tabular-nums ${isUp ? 'text-green-400' : 'text-red-400'}`}>{isUp ? '+' : ''}{q.change.toFixed(2)}</td>
-                      <td className={`py-2 text-right tabular-nums ${isUp ? 'text-green-400' : 'text-red-400'}`}>{isUp ? '+' : ''}{q.changePercent.toFixed(2)}%</td>
-                      <td className="py-2 text-right text-slate-400">{(q.volume / 1_000_000).toFixed(1)}M</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          {/* Paper Trading & Portfolio Terminal */}
+          <PortfolioSummary quotes={quotes} selectedTicker={selectedTicker} />
         </div>
 
-        {/* Sentiment — right */}
-        <div className="col-span-12 lg:col-span-3">
+        {/* Right: AI Quant Sentiment & Catalyst Engine */}
+        <div className="col-span-12 lg:col-span-3 space-y-6">
           <SentimentPanel
             ticker={selectedTicker}
             sentiment={sentiment}
