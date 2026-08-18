@@ -14,9 +14,14 @@ import SERPPreviewCard from '@/components/SERPPreviewCard';
 import HeadingTreeCard from '@/components/HeadingTreeCard';
 import ActionPlanCard from '@/components/ActionPlanCard';
 import AISectionRewriter from '@/components/AISectionRewriter';
+import FAQSchemaGenerator from '@/components/FAQSchemaGenerator';
 import { Sparkles, Search, CheckCircle2, ArrowDown, RotateCcw } from 'lucide-react';
 
 export default function HomePage() {
+  const [currentTitle, setCurrentTitle] = useState(SAMPLE_ARTICLES[0].title);
+  const [currentTargetKeyword, setCurrentTargetKeyword] = useState(SAMPLE_ARTICLES[0].targetKeyword);
+  const [currentContent, setCurrentContent] = useState(SAMPLE_ARTICLES[0].content);
+
   const [auditResult, setAuditResult] = useState<SEOAuditResult | null>(() =>
     runFullSEOAudit(
       SAMPLE_ARTICLES[0].content,
@@ -37,7 +42,11 @@ export default function HomePage() {
     content: string,
     secondaryKeywords: string[]
   ) => {
+    setCurrentTitle(title);
+    setCurrentTargetKeyword(targetKeyword);
+    setCurrentContent(content);
     setIsLoadingAudit(true);
+
     try {
       const res = await fetch('/api/audit', {
         method: 'POST',
@@ -95,7 +104,7 @@ export default function HomePage() {
           </h1>
 
           <p className="text-sm sm:text-base text-slate-400 font-mono max-w-2xl mx-auto leading-relaxed">
-            Run comprehensive 8-point SEO health checks: keyword density, Flesch-Kincaid readability, SERP snippets, heading hierarchy, and instant AI paragraph rewrites with Gemini 1.5 Flash.
+            Run comprehensive 8-point SEO health checks: keyword density, Flesch-Kincaid readability, SERP snippets, heading hierarchy, instant AI paragraph rewrites, and Position 0 FAQ Schema generator.
           </p>
         </section>
 
@@ -128,6 +137,13 @@ export default function HomePage() {
               targetKeyword={auditResult.targetKeyword}
               onRewrite={handleRewrite}
               isLoading={isRewriting}
+            />
+
+            {/* Position 0 FAQ Schema Studio */}
+            <FAQSchemaGenerator
+              title={currentTitle}
+              targetKeyword={currentTargetKeyword}
+              content={currentContent}
             />
 
             {/* Prioritized SEO Action Plan */}
