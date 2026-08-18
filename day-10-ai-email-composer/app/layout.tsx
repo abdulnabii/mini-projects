@@ -1,22 +1,21 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Inter, JetBrains_Mono, Outfit } from 'next/font/google';
 import './globals.css';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
-const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
+const jetBrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
+const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });
 
 export const metadata: Metadata = {
-  title: 'EmailPulse.AI — AI Writing Assistant & Subject Line Optimizer',
-  description: 'Transform bullet points into 3 A/B email variants and 5 subject lines with predicted open rate scores, 1-click clipboard copy, and Gmail deep linking.',
-  keywords: ['AI email composer', 'subject line optimizer', 'open rate predictor', 'A/B email variants', 'cold outreach assistant'],
+  title: 'MailCraft.AI — AI Cold Email Copywriter & Subject Line Optimizer',
+  description: 'Transform rough notes & bullet points into 3 high-converting cold email variants, follow-up sequences, and subject lines with predicted open rates.',
+  keywords: ['AI email composer', 'cold email generator', 'subject line optimizer', 'open rate predictor', 'email copywriter'],
   authors: [{ name: 'Abdul Nabi', url: 'https://github.com/abdulnabii' }],
   openGraph: {
-    title: 'EmailPulse.AI — AI Writing Assistant & Subject Line Optimizer',
-    description: 'A/B email variant generation and subject line open rate optimization.',
-    url: 'https://ai-email-composer.vercel.app',
-    siteName: 'EmailPulse AI',
+    title: 'MailCraft.AI — AI Email Studio',
+    description: 'Transform rough notes into high-converting cold outreach packages.',
+    url: 'https://day-10-ai-email-composer.vercel.app',
+    siteName: 'MailCraft AI',
     type: 'website',
   },
 };
@@ -24,10 +23,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${mono.variable} bg-[#0b0f19] text-slate-200 min-h-screen flex flex-col`}>
-        <Navbar />
-        <main className="flex-1 flex flex-col">{children}</main>
-        <Footer />
+      <body className={`${inter.variable} ${jetBrainsMono.variable} ${outfit.variable} bg-[#080c14] text-slate-200 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500/30 selection:text-white`}>
+        {children}
       </body>
     </html>
   );

@@ -1,11 +1,13 @@
-export type EmailTone = 'Formal' | 'Casual' | 'Persuasive' | 'Apologetic';
+export type EmailTone = 'Persuasive' | 'Direct & Punchy' | 'Formal Executive' | 'Warm & Casual' | 'Urgent / Deadline';
 
 export type EmailPurpose =
   | 'Cold Outreach'
   | 'Job Application'
   | 'Follow-up'
   | 'Customer Complaint'
-  | 'Networking';
+  | 'Networking'
+  | 'Investor Pitch'
+  | 'SaaS Sales Demo';
 
 export interface EmailConfig {
   tone: EmailTone;
@@ -16,19 +18,29 @@ export interface EmailConfig {
   recipientCompany?: string;
 }
 
+export interface DeliverabilityMetrics {
+  score: number; // 0 - 100
+  inboxPlacement: 'High (Primary Inbox)' | 'Moderate' | 'Spam Risk';
+  readingGrade: string;
+  spamTriggersFound: string[];
+  readingTimeSeconds: number;
+}
+
 export interface EmailVariant {
   id: string;
-  label: 'Bold / Assertive' | 'Balanced / Standard' | 'Formal / Soft';
+  label: 'Bold & Assertive' | 'Balanced & Value-Driven' | 'Short & Punchy (Mobile)' | 'Follow-up Sequence';
   subject: string;
   body: string;
   wordCount: number;
   readingTimeSeconds: number;
+  followUpDay3?: string;
+  followUpDay7?: string;
 }
 
 export interface SubjectLineCandidate {
   subject: string;
   predictedOpenRate: number; // 0 - 100
-  strategy: 'Benefit + Curiosity' | 'Social Proof' | 'Low-Friction CTA' | 'Direct & Personal';
+  strategy: 'Benefit + Curiosity' | 'Social Proof' | 'Low-Friction CTA' | 'Direct & Personal' | 'Urgency & Timing';
   characterCount: number;
 }
 
@@ -36,6 +48,7 @@ export interface GeneratedEmailResponse {
   variants: EmailVariant[];
   subjectLines: SubjectLineCandidate[];
   recommendedSubjectIndex: number;
+  deliverability: DeliverabilityMetrics;
 }
 
 export interface SavedEmail {
