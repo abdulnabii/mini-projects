@@ -8,6 +8,7 @@ import DisclaimerModal from '@/components/DisclaimerModal';
 import ImageUploader from '@/components/ImageUploader';
 import GradCAMCanvas from '@/components/GradCAMCanvas';
 import ClassifierView from '@/components/ClassifierView';
+import RadiologyConsultantChat from '@/components/RadiologyConsultantChat';
 import ModelCard from '@/components/ModelCard';
 import { Activity, Sparkles, ShieldAlert, Layers, ArrowRight, RotateCcw } from 'lucide-react';
 
@@ -43,13 +44,13 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#090d16] text-slate-200">
+    <div className="min-h-screen flex flex-col bg-[#080c14] text-slate-200">
       {/* Disclaimer Modal */}
       <DisclaimerModal isOpen={isDisclaimerOpen} onAccept={() => setIsDisclaimerOpen(false)} />
 
       <Navbar onOpenDisclaimer={() => setIsDisclaimerOpen(true)} />
 
-      <main className="flex-1 space-y-10 py-8 px-4 sm:px-6 max-w-7xl mx-auto w-full">
+      <main className="flex-1 space-y-10 py-8 px-4 sm:px-6 max-w-7xl mx-auto w-full font-mono text-xs text-slate-300">
         {/* Hero Header */}
         <section className="text-center space-y-4 max-w-3xl mx-auto pt-2">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold">
@@ -64,13 +65,13 @@ export default function HomePage() {
             </span>
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-400 font-mono max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-400 font-mono max-w-2xl mx-auto leading-relaxed">
             Classify Chest X-Rays (Pneumonia) and Dermatology Lesions (Melanoma) with real-time gradient activation colormaps showing neural network visual attention.
           </p>
         </section>
 
         {/* Workflow Section 1: Uploader */}
-        <section className="rounded-3xl bg-[#0d121f] border border-cyan-500/20 p-6 sm:p-8 shadow-2xl shadow-cyan-500/5">
+        <section className="rounded-3xl bg-[#090d16] border border-cyan-500/20 p-6 sm:p-8 shadow-2xl shadow-cyan-500/5">
           <ImageUploader
             modelType={modelType}
             onSelectModelType={(m) => {
@@ -105,6 +106,9 @@ export default function HomePage() {
 
             {/* Classification & Educational Annotation View */}
             <ClassifierView result={result} isLoadingAnnotation={false} />
+
+            {/* AI Clinical Consultant Q&A Drawer */}
+            <RadiologyConsultantChat result={result} />
 
             {/* Model Card Specifications */}
             <ModelCard modelType={result.modelType} />
