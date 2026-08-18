@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import { RoastResult } from '@/types';
-import { Share2, Copy, Check, Award, Flame, ExternalLink, Code } from 'lucide-react';
+import { Share2, Copy, Check, Award, Flame, ExternalLink, Code, Image as ImageIcon } from 'lucide-react';
 
 interface Props {
   roast: RoastResult;
+  onOpenCanvasModal: () => void;
 }
 
-export default function ShareableBadgeCard({ roast }: Props) {
+export default function ShareableBadgeCard({ roast, onOpenCanvasModal }: Props) {
   const [copiedBadge, setCopiedBadge] = useState(false);
   const [copiedMd, setCopiedMd] = useState(false);
 
@@ -28,21 +29,32 @@ export default function ShareableBadgeCard({ roast }: Props) {
           </div>
           <div>
             <h3 className="font-bold text-white text-base font-outfit">Shareable Social Roast Badge &amp; Shield</h3>
-            <p className="text-xs text-slate-400">Embed your survivor badge on your README or share to X (Twitter)</p>
+            <p className="text-xs text-slate-400">Download 1200x630 PNG card or embed your survivor badge on GitHub</p>
           </div>
         </div>
 
-        <a
-          href={`https://twitter.com/intent/tweet?text=${tweetText}`}
-          target="_blank"
-          rel="noreferrer"
-          className="px-4 py-2.5 rounded-xl bg-[#1d9bf0] hover:bg-[#1a8cd8] text-white font-bold text-xs flex items-center gap-2 transition-all shadow-lg shadow-sky-500/20"
-        >
-          <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24">
-            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 24.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-          </svg>
-          <span>Share Roast on X / Twitter</span>
-        </a>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <button
+            type="button"
+            onClick={onOpenCanvasModal}
+            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold text-xs flex items-center gap-2 transition-all shadow-lg shadow-amber-500/20 cursor-pointer"
+          >
+            <ImageIcon className="w-4 h-4" />
+            <span>Download PNG Card</span>
+          </button>
+
+          <a
+            href={`https://twitter.com/intent/tweet?text=${tweetText}`}
+            target="_blank"
+            rel="noreferrer"
+            className="px-4 py-2.5 rounded-xl bg-[#1d9bf0] hover:bg-[#1a8cd8] text-white font-bold text-xs flex items-center gap-2 transition-all shadow-lg shadow-sky-500/20"
+          >
+            <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 24.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+            <span>Share on X / Twitter</span>
+          </a>
+        </div>
       </div>
 
       {/* Visual Badge Preview */}

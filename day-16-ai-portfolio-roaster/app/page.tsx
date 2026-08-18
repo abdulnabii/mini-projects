@@ -9,9 +9,14 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import PortfolioInput from '@/components/PortfolioInput';
 import RoastScoreOverview from '@/components/RoastScoreOverview';
+import VoiceRoastPlayer from '@/components/VoiceRoastPlayer';
 import CategoryRoastGrid from '@/components/CategoryRoastGrid';
+import HeroRedesignSandbox from '@/components/HeroRedesignSandbox';
+import RecruiterScanSimulator from '@/components/RecruiterScanSimulator';
+import HeroCodeExportStudio from '@/components/HeroCodeExportStudio';
 import ShareableBadgeCard from '@/components/ShareableBadgeCard';
 import BioRewriterModal from '@/components/BioRewriterModal';
+import CanvasShareCardModal from '@/components/CanvasShareCardModal';
 import confetti from 'canvas-confetti';
 import { Flame, Sparkles, AlertTriangle, Trophy, CheckCircle2, ArrowDown, RotateCcw, Wrench } from 'lucide-react';
 
@@ -26,6 +31,7 @@ export default function HomePage() {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isBioModalOpen, setIsBioModalOpen] = useState<boolean>(false);
+  const [isCanvasModalOpen, setIsCanvasModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const history = getStoredRoasts();
@@ -66,7 +72,7 @@ export default function HomePage() {
       }, 100);
     } catch (err) {
       console.error('Roasting failed, using fallback:', err);
-      const fallback = generateClientFallbackRoast(name, portfolioUrl || bioText, intensity);
+      const fallback = generateClientFallbackRoast(name, portfolioUrl || bioText, intensity, projectsText, githubData);
       setActiveRoast(fallback);
     } finally {
       setIsLoading(false);
@@ -111,8 +117,23 @@ export default function HomePage() {
               onOpenFixModal={() => setIsBioModalOpen(true)}
             />
 
+            {/* 1. Voice Roast Audio Player */}
+            <VoiceRoastPlayer
+              textToSpeak={`${activeRoast.overallVerdict}. ${activeRoast.topRoastPunchline}`}
+              developerName={activeRoast.developerName}
+            />
+
+            {/* 2. Side-by-Side Hero Redesign Sandbox */}
+            <HeroRedesignSandbox roast={activeRoast} />
+
+            {/* 3. Recruiter 5-Second Attention Scan Simulator */}
+            <RecruiterScanSimulator roast={activeRoast} />
+
             {/* 5-Dimension Critique & Actionable Fixes Grid */}
             <CategoryRoastGrid categories={activeRoast.categories} />
+
+            {/* 4. Ready-to-Paste Hero Code Studio */}
+            <HeroCodeExportStudio roast={activeRoast} />
 
             {/* Prioritized Action Roadmap */}
             <div className="p-6 sm:p-8 rounded-3xl bg-[#0f1420] border border-slate-800 space-y-4 font-mono text-xs shadow-xl">
@@ -152,8 +173,11 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Shareable Social Badge Card */}
-            <ShareableBadgeCard roast={activeRoast} />
+            {/* 5. Shareable Social Badge Card & PNG Card Generator */}
+            <ShareableBadgeCard
+              roast={activeRoast}
+              onOpenCanvasModal={() => setIsCanvasModalOpen(true)}
+            />
           </section>
         )}
       </main>
@@ -165,6 +189,15 @@ export default function HomePage() {
           onClose={() => setIsBioModalOpen(false)}
           developerName={activeRoast.developerName}
           currentBio={activeRoast.rewrittenHeroBio.beforeBio}
+        />
+      )}
+
+      {/* Downloadable Canvas Share Card Modal */}
+      {activeRoast && (
+        <CanvasShareCardModal
+          isOpen={isCanvasModalOpen}
+          onClose={() => setIsCanvasModalOpen(false)}
+          roast={activeRoast}
         />
       )}
 
