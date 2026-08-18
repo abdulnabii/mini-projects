@@ -1,117 +1,139 @@
 'use client';
 
-import { Transaction, ExpenseCategory } from '@/types';
-import { CATEGORIES } from '@/lib/mock-data';
-import { Target, AlertTriangle, CheckCircle2, Edit2, Save } from 'lucide-react';
 import { useState } from 'react';
+import { Transaction, ExpenseCategory, SupportedCurrency } from '@/types';
+import { CATEGORIES, formatMoney } from '@/lib/mock-data';
+import { Target, AlertTriangle, CheckCircle2, Edit3 } from 'lucide-react';
 
 interface Props {
   transactions: Transaction[];
   budgets: Record<ExpenseCategory, number>;
   onUpdateBudget: (category: ExpenseCategory, amount: number) => void;
+  currency: SupportedCurrency;
 }
 
-export default function BudgetProgress({ transactions, budgets, onUpdateBudget }: Props) {
-  const [editingCat, setEditingCat] = useState<ExpenseCategory | null>(null);
-  const [editVal, setEditVal] = useState('');
+export default function BudgetProgress({
+  transactions,
+  budgets,
+  onUpdateBudget,
+  currency,
+}: Props) {
+  const [editingCategory, setEditingCategory] = useState<ExpenseCategory | null>(null);
+  const [editAmount, setEditAmount] = useState<string>('');
 
-  // Calculate actual spending per category
-  const actuals: Record<string, number> = {};
+  const categorySpent: Record<string, number> = {};
   transactions.forEach((t) => {
-    actuals[t.category] = (actuals[t.category] || 0) + t.amount;
+    categorySpent[t.category] = (categorySpent[t.category] || 0) + t.amount;
   });
 
-  const handleStartEdit = (cat: ExpenseCategory) => {
-    setEditingCat(cat);
-    setEditVal(String(budgets[cat] || 300));
+  const handleStartEdit = (cat: ExpenseCategory, currentBudget: number) => {
+    setEditingCategory(cat);
+    setEditAmount(currentBudget.toString());
   };
 
-  const handleSaveEdit = (cat: ExpenseCategory) => {
-    const num = Number(editVal);
-    if (!isNaN(num) && num >= 0) {
-      onUpdateBudget(cat, num);
-    }
-    setEditingCat(null);
+  const handleSaveBudget = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingCategory || !editAmount || isNaN(Number(editAmount))) return;
+    onUpdateBudget(editingCategory, Number(editAmount));
+    setEditingCategory(null);
   };
 
   return (
-    <div className="bg-[#0b1616] border border-emerald-500/20 rounded-3xl p-6 space-y-5">
+    <div className="bg-[#0b1616] border border-emerald-500/20 rounded-3xl p-6 sm:p-8 space-y-6 font-mono text-xs text-slate-300 shadow-2xl">
       <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
-        <h3 className="text-base font-bold font-mono text-white flex items-center gap-2">
-          <Target className="w-4 h-4 text-emerald-400" />
-          Budget Allocation &amp; Alert Targets
+        <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2 font-outfit">
+          <Target className="w-4 h-4 text-teal-400" />
+          Budget Allocation &amp; Target Limits
         </h3>
-        <span className="text-xs font-mono text-slate-400">Monthly Caps</span>
+        <span className="text-[10px] text-slate-500">Tap budget to customize limit</span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {CATEGORIES.slice(0, 6).map((cat) => {
-          const spent = actuals[cat] || 0;
-          const cap = budgets[cat] || 300;
-          const pct = Math.min(100, (spent / cap) * 100);
+      {/* Edit Budget Modal */}
+      {editingCategory && (
+        <form
+          onSubmit={handleSaveBudget}
+          className="p-4 rounded-2xl bg-[#060e0e] border border-emerald-500/40 space-y-3 animate-in fade-in"
+        >
+          <div className="flex items-center justify-between">
+            <span className="font-bold text-white font-outfit text-xs">
+              Edit Monthly Cap: {editingCategory}
+            </span>
+            <button
+              type="button"
+              onClick={() => setEditingCategory(null)}
+              className="text-slate-500 hover:text-rose-400 text-[10px]"
+            >
+              Cancel
+            </button>
+          </div>
 
-          let statusColor = 'bg-emerald-500';
-          let statusText = 'On Track';
-          let statusBadge = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+          <div className="flex items-center gap-3">
+            <input
+              type="number"
+              min="0"
+              value={editAmount}
+              onChange={(e) => setEditAmount(e.target.value)}
+              className="flex-1 px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 font-bold"
+            />
+            <button
+              type="submit"
+              className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs font-outfit uppercase transition-all shadow-md shadow-emerald-500/20"
+            >
+              Save Cap
+            </button>
+          </div>
+        </form>
+      )}
 
-          if (pct >= 100) {
-            statusColor = 'bg-rose-500';
-            statusText = 'Over Budget';
-            statusBadge = 'bg-rose-500/10 text-rose-400 border-rose-500/30';
-          } else if (pct >= 80) {
-            statusColor = 'bg-amber-500';
-            statusText = 'Warning (>80%)';
-            statusBadge = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
-          }
+      <div className="space-y-4 max-h-[360px] overflow-y-auto pr-1">
+        {CATEGORIES.map((cat) => {
+          const spent = categorySpent[cat] || 0;
+          const budget = budgets[cat] || 300;
+          const pct = Math.min(200, Math.round((spent / budget) * 100));
+          const isOver = spent > budget;
 
           return (
             <div
               key={cat}
-              className="bg-[#060e0e] border border-slate-800 rounded-2xl p-4 space-y-3 font-mono text-xs"
+              className="p-3.5 rounded-2xl bg-[#060e0e] border border-slate-800 space-y-2 hover:border-slate-700 transition-colors"
             >
               <div className="flex items-center justify-between">
-                <span className="font-bold text-white text-sm">{cat}</span>
-                <span className={`px-2 py-0.5 rounded-full border text-[10px] ${statusBadge}`}>
-                  {statusText}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between text-slate-400 text-[11px]">
-                <span>Spent: <strong className="text-white">${spent.toFixed(2)}</strong></span>
-                <div className="flex items-center gap-1">
-                  <span>Cap:</span>
-                  {editingCat === cat ? (
-                    <div className="flex items-center gap-1">
-                      <input
-                        type="number"
-                        value={editVal}
-                        onChange={(e) => setEditVal(e.target.value)}
-                        className="w-16 bg-slate-900 border border-emerald-500/50 rounded px-1 text-white text-xs"
-                      />
-                      <button
-                        onClick={() => handleSaveEdit(cat)}
-                        className="text-emerald-400 hover:text-white"
-                      >
-                        <Save className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => handleStartEdit(cat)}
-                      className="flex items-center gap-1 font-bold text-white hover:text-emerald-400"
-                    >
-                      <span>${cap}</span>
-                      <Edit2 className="w-3 h-3 text-slate-500" />
-                    </button>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-white font-outfit text-xs">{cat}</span>
+                  {isOver && (
+                    <span className="px-2 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-[9px] font-bold">
+                      OVER LIMIT
+                    </span>
                   )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-slate-300">
+                    <strong className={isOver ? 'text-rose-400' : 'text-white'}>{formatMoney(spent, currency)}</strong>
+                    <span className="text-slate-500"> / {formatMoney(budget, currency)}</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleStartEdit(cat, budget)}
+                    className="p-1 text-slate-500 hover:text-emerald-400 rounded-lg hover:bg-slate-900 transition-colors"
+                    title="Edit Budget Cap"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
 
               {/* Progress bar */}
               <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all duration-500 ${statusColor}`}
-                  style={{ width: `${pct}%` }}
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    isOver
+                      ? 'bg-rose-500'
+                      : pct > 80
+                      ? 'bg-amber-400'
+                      : 'bg-emerald-500'
+                  }`}
+                  style={{ width: `${Math.min(100, pct)}%` }}
                 />
               </div>
             </div>

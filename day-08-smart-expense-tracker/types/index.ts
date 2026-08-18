@@ -12,6 +12,8 @@ export type ExpenseCategory =
   | 'Bills & Services'
   | 'Other';
 
+export type SupportedCurrency = 'USD' | 'PKR';
+
 export interface LineItem {
   description: string;
   amount: number;
@@ -26,7 +28,7 @@ export interface Transaction {
   lineItems?: LineItem[];
   receiptUrl?: string;
   notes?: string;
-  paymentMethod: 'Credit Card' | 'Debit Card' | 'Apple Pay' | 'Cash';
+  paymentMethod: 'Credit Card' | 'Debit Card' | 'Apple Pay' | 'Cash' | 'Bank Transfer';
 }
 
 export interface CategoryBudget {
@@ -49,6 +51,8 @@ export interface CoachRecommendation {
 
 export interface CoachReport {
   overview: string;
+  healthScore: number;
+  healthGrade: 'A+' | 'A' | 'B' | 'C' | 'D';
   insights: CoachInsight[];
   recommendations: CoachRecommendation[];
   projectedMonthlySaving: number;

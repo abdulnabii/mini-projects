@@ -1,28 +1,30 @@
 'use client';
 
-import { Wallet, Heart, ExternalLink } from 'lucide-react';
+import { Wallet, Heart } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#060e0e] border-t border-emerald-500/10 py-6 mt-auto font-mono text-xs">
-      <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-2 text-slate-400">
-          <Wallet className="w-4 h-4 text-emerald-400" />
-          <span>ExpenseMind.AI — Smart Expense Diary &amp; AI Financial Advisory</span>
+    <footer className="border-t border-slate-800/80 bg-[#040808] text-slate-400 font-mono text-xs py-8 mt-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <Wallet className="h-4 w-4 text-emerald-400" />
+          <span className="font-bold text-slate-200">ExpenseMind.AI</span>
+          <span className="text-slate-600">|</span>
+          <span>Smart Expense Tracker &amp; AI Financial Advisory</span>
         </div>
-        <div className="flex items-center gap-5 text-slate-400">
+
+        <div className="flex items-center gap-1.5 text-slate-400">
+          <span>Built with</span>
+          <Heart className="h-3.5 w-3.5 fill-emerald-500 text-emerald-500" />
+          <span>by</span>
           <a
-            href="https://github.com/abdulnabii/mini-projects"
+            href="https://github.com/abdulnabii"
             target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 text-emerald-400 hover:underline"
+            rel="noreferrer"
+            className="font-bold text-emerald-400 hover:underline"
           >
-            <span>GitHub</span>
-            <ExternalLink className="w-3 h-3" />
+            Abdul Nabi
           </a>
-          <span className="flex items-center gap-1">
-            Built by Abdul Nabi <Heart className="w-3 h-3 text-emerald-400 fill-emerald-400" />
-          </span>
         </div>
       </div>
     </footer>

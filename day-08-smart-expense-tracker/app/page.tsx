@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Transaction, CoachReport, ExpenseCategory } from '@/types';
+import { Transaction, CoachReport, ExpenseCategory, SupportedCurrency } from '@/types';
 import {
   getStoredTransactions,
   saveTransaction,
@@ -9,18 +9,23 @@ import {
   getStoredBudgets,
   saveBudget,
 } from '@/lib/storage';
+import { formatMoney } from '@/lib/mock-data';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import ReceiptScanner from '@/components/ReceiptScanner';
 import SpendingDonut from '@/components/SpendingDonut';
 import BudgetProgress from '@/components/BudgetProgress';
 import TransactionTable from '@/components/TransactionTable';
 import AICoachPanel from '@/components/AICoachPanel';
-import { Wallet, DollarSign, TrendingDown, PiggyBank, Target, Sparkles } from 'lucide-react';
+import CoachChat from '@/components/CoachChat';
+import { DollarSign, TrendingDown, PiggyBank, Target, Sparkles, Wallet } from 'lucide-react';
 
 export default function ExpenseDashboardPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [budgets, setBudgets] = useState<Record<ExpenseCategory, number>>({} as Record<ExpenseCategory, number>);
   const [coachReport, setCoachReport] = useState<CoachReport | null>(null);
   const [coachLoading, setCoachLoading] = useState(false);
+  const [currency, setCurrency] = useState<SupportedCurrency>('USD');
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
@@ -70,96 +75,120 @@ export default function ExpenseDashboardPage() {
   // Metrics
   const totalSpent = transactions.reduce((acc, t) => acc + t.amount, 0);
   const totalBudgetCap = Object.values(budgets).reduce((acc, b) => acc + b, 0) || 4500;
-  const netBalance = Math.max(0, 5200 - totalSpent);
-  const savingsRate = Math.round((netBalance / 5200) * 100);
+  const monthlyIncome = currency === 'PKR' ? 1450000 : 5200;
+  const netBalance = Math.max(0, monthlyIncome - totalSpent);
+  const savingsRate = Math.round((netBalance / monthlyIncome) * 100);
 
   if (!initialized) return null;
 
   return (
-    <div className="flex-1 p-4 sm:p-8 max-w-7xl mx-auto w-full space-y-8 font-mono">
-      {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-emerald-500/20 pb-6">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono mb-2">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Smart Personal Financial Intelligence</span>
+    <div className="min-h-screen flex flex-col bg-[#060e0e] text-slate-200">
+      <Navbar currency={currency} onToggleCurrency={setCurrency} />
+
+      <main className="flex-1 p-4 sm:p-8 max-w-7xl mx-auto w-full space-y-8 font-mono text-xs text-slate-300">
+        {/* Header Hero Banner */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-emerald-500/20 pb-6 pt-2">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>AI FINANCIAL INTELLIGENCE &amp; VISION OCR</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight font-outfit">
+              Financial Dashboard &amp; <span className="text-emerald-400">Expense Diary</span>
+            </h1>
+            <p className="text-xs text-slate-400">
+              Track receipts, audit monthly outflows, and receive actionable AI cutback recommendations.
+            </p>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Financial Dashboard &amp; <span className="text-emerald-400">Expense Diary</span>
-          </h1>
-        </div>
 
-        <div className="flex items-center gap-2 bg-[#0b1616] border border-emerald-500/20 px-4 py-2 rounded-2xl text-xs">
-          <span className="text-slate-400">Monthly Net Income:</span>
-          <span className="text-emerald-400 font-bold text-sm">$5,200.00</span>
-        </div>
-      </div>
-
-      {/* Overview Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-[#0b1616] border border-slate-800 rounded-2xl p-5 space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>Total Logged Outflow</span>
-            <DollarSign className="w-4 h-4 text-emerald-400" />
+          <div className="flex items-center gap-2 bg-[#0b1616] border border-emerald-500/20 px-4 py-2.5 rounded-2xl text-xs shadow-lg shrink-0">
+            <span className="text-slate-400 font-bold">Monthly Net Income:</span>
+            <span className="text-emerald-400 font-black text-sm font-outfit">
+              {formatMoney(monthlyIncome, currency)}
+            </span>
           </div>
-          <div className="text-2xl font-bold text-white tabular-nums">${totalSpent.toFixed(2)}</div>
-          <div className="text-[10px] text-slate-500">{transactions.length} receipts &amp; entries</div>
         </div>
 
-        <div className="bg-[#0b1616] border border-slate-800 rounded-2xl p-5 space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>Monthly Budget Cap</span>
-            <Target className="w-4 h-4 text-teal-400" />
+        {/* 4 Overview Stat Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-[#0b1616] border border-slate-800 rounded-3xl p-5 space-y-2 shadow-xl">
+            <div className="flex items-center justify-between text-xs text-slate-400">
+              <span className="font-bold uppercase text-[10px]">Total Logged Outflow</span>
+              <DollarSign className="w-4 h-4 text-emerald-400" />
+            </div>
+            <div className="text-2xl font-black text-white font-outfit tabular-nums">
+              {formatMoney(totalSpent, currency)}
+            </div>
+            <div className="text-[10px] text-slate-500">{transactions.length} receipts &amp; entries</div>
           </div>
-          <div className="text-2xl font-bold text-white tabular-nums">${totalBudgetCap.toFixed(2)}</div>
-          <div className="text-[10px] text-slate-500">Across 12 category targets</div>
-        </div>
 
-        <div className="bg-[#0b1616] border border-slate-800 rounded-2xl p-5 space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>Surplus Net Balance</span>
-            <PiggyBank className="w-4 h-4 text-emerald-400" />
+          <div className="bg-[#0b1616] border border-slate-800 rounded-3xl p-5 space-y-2 shadow-xl">
+            <div className="flex items-center justify-between text-xs text-slate-400">
+              <span className="font-bold uppercase text-[10px]">Monthly Budget Cap</span>
+              <Target className="w-4 h-4 text-teal-400" />
+            </div>
+            <div className="text-2xl font-black text-white font-outfit tabular-nums">
+              {formatMoney(totalBudgetCap, currency)}
+            </div>
+            <div className="text-[10px] text-slate-500">Across 12 category targets</div>
           </div>
-          <div className="text-2xl font-bold text-emerald-400 tabular-nums">${netBalance.toFixed(2)}</div>
-          <div className="text-[10px] text-slate-500">Estimated remaining cash flow</div>
-        </div>
 
-        <div className="bg-[#0b1616] border border-slate-800 rounded-2xl p-5 space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>Savings Rate Ratio</span>
-            <TrendingDown className="w-4 h-4 text-teal-400" />
+          <div className="bg-[#0b1616] border border-slate-800 rounded-3xl p-5 space-y-2 shadow-xl">
+            <div className="flex items-center justify-between text-xs text-slate-400">
+              <span className="font-bold uppercase text-[10px]">Surplus Net Balance</span>
+              <PiggyBank className="w-4 h-4 text-emerald-400" />
+            </div>
+            <div className="text-2xl font-black text-emerald-400 font-outfit tabular-nums">
+              {formatMoney(netBalance, currency)}
+            </div>
+            <div className="text-[10px] text-slate-500">Estimated remaining cashflow</div>
           </div>
-          <div className="text-2xl font-bold text-white tabular-nums">{savingsRate}%</div>
-          <div className="text-[10px] text-emerald-400">Target: ≥ 35% monthly savings</div>
+
+          <div className="bg-[#0b1616] border border-slate-800 rounded-3xl p-5 space-y-2 shadow-xl">
+            <div className="flex items-center justify-between text-xs text-slate-400">
+              <span className="font-bold uppercase text-[10px]">Savings Rate Ratio</span>
+              <TrendingDown className="w-4 h-4 text-teal-400" />
+            </div>
+            <div className="text-2xl font-black text-white font-outfit tabular-nums">{savingsRate}%</div>
+            <div className="text-[10px] text-emerald-400 font-bold">Target: ≥ 35% monthly savings</div>
+          </div>
         </div>
-      </div>
 
-      {/* Receipt Scanner */}
-      <ReceiptScanner onAddTransaction={handleAddTransaction} />
+        {/* AI Receipt Scanner */}
+        <ReceiptScanner onAddTransaction={handleAddTransaction} currency={currency} />
 
-      {/* AI Spending Coach Panel */}
-      <AICoachPanel
-        report={coachReport}
-        isLoading={coachLoading}
-        onRefresh={() => fetchCoachReport(transactions, budgets)}
-      />
-
-      {/* Analytics Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <SpendingDonut transactions={transactions} />
-        <BudgetProgress
-          transactions={transactions}
-          budgets={budgets}
-          onUpdateBudget={handleUpdateBudget}
+        {/* Gemini AI Financial Coach */}
+        <AICoachPanel
+          report={coachReport}
+          isLoading={coachLoading}
+          onRefresh={() => fetchCoachReport(transactions, budgets)}
+          currency={currency}
         />
-      </div>
 
-      {/* Expense History Table */}
-      <TransactionTable
-        transactions={transactions}
-        onAddTransaction={handleAddTransaction}
-        onDeleteTransaction={handleDeleteTransaction}
-      />
+        {/* Interactive Advisor Q&A Chat */}
+        <CoachChat transactions={transactions} budgets={budgets} />
+
+        {/* Analytics Grid: Category Donut & Budget Progress */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <SpendingDonut transactions={transactions} currency={currency} />
+          <BudgetProgress
+            transactions={transactions}
+            budgets={budgets}
+            onUpdateBudget={handleUpdateBudget}
+            currency={currency}
+          />
+        </div>
+
+        {/* Expense History Table */}
+        <TransactionTable
+          transactions={transactions}
+          onAddTransaction={handleAddTransaction}
+          onDeleteTransaction={handleDeleteTransaction}
+          currency={currency}
+        />
+      </main>
+
+      <Footer />
     </div>
   );
 }
