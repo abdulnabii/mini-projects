@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Inter, JetBrains_Mono, Outfit } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
+const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });
 
 export const metadata: Metadata = {
   title: 'GitPulse.AI — AI GitHub Developer Portfolio & Impact Analyzer',
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'GitPulse.AI — AI GitHub Developer Portfolio & Impact Analyzer',
     description: 'Visual developer portfolio analysis, impact scores, and AI persona.',
-    url: 'https://github-profile-analyzer.vercel.app',
+    url: 'https://day-09-github-profile-analyzer.vercel.app',
     siteName: 'GitPulse AI',
     type: 'website',
   },
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${mono.variable} bg-[#0d1117] text-slate-200 min-h-screen flex flex-col`}>
+      <body className={`${inter.variable} ${mono.variable} ${outfit.variable} bg-[#0a0d14] text-slate-200 min-h-screen flex flex-col font-sans antialiased selection:bg-emerald-500/30 selection:text-white`}>
         <Navbar />
         <main className="flex-1 flex flex-col">{children}</main>
         <Footer />

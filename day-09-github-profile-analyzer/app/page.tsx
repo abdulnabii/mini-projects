@@ -8,12 +8,14 @@ import ImpactScoreList from '@/components/ImpactScoreList';
 import ContributionHeatmap from '@/components/ContributionHeatmap';
 import PersonaCard from '@/components/PersonaCard';
 import ShareableCard from '@/components/ShareableCard';
+import ResumeBulletsGenerator from '@/components/ResumeBulletsGenerator';
 import { Search, Sparkles, Loader2, GitBranch, ArrowRight } from 'lucide-react';
 
 const PRESET_USERS = [
   { username: 'abdulnabii', label: 'Abdul Nabi (AI Dev)' },
   { username: 'torvalds', label: 'Linus Torvalds (Linux)' },
   { username: 'gaearon', label: 'Dan Abramov (React)' },
+  { username: 'antfu', label: 'Anthony Fu (Vue/Vite)' },
 ];
 
 export default function Home() {
@@ -61,15 +63,15 @@ export default function Home() {
     <div className="flex-1 p-4 sm:p-8 max-w-7xl mx-auto w-full space-y-10 font-mono">
       {/* Header Title */}
       <div className="text-center space-y-3 max-w-3xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>AI Developer Portfolio &amp; Impact Engine</span>
+          <span>AI DEVELOPER PORTFOLIO &amp; REPO IMPACT ENGINE</span>
         </div>
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight font-outfit">
           Analyze Any <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-sky-400">GitHub Profile</span>
         </h1>
-        <p className="text-slate-400 text-sm sm:text-base">
-          Repository impact scores, language DNA radar, 52-week contribution heatmap, and AI developer persona synthesis.
+        <p className="text-slate-400 text-xs sm:text-sm font-mono max-w-2xl mx-auto">
+          Repository impact scores, language DNA radar, 52-week contribution heatmap, AI developer persona synthesis, and FAANG resume bullet generator.
         </p>
       </div>
 
@@ -125,7 +127,7 @@ export default function Home() {
         <div className="max-w-md mx-auto bg-[#161b22] border border-emerald-500/20 rounded-3xl p-8 text-center space-y-4 animate-pulse">
           <Loader2 className="w-8 h-8 text-emerald-400 animate-spin mx-auto" />
           <div className="space-y-1">
-            <h3 className="text-sm font-bold text-white">Fetching GitHub Data &amp; Synthesizing Persona...</h3>
+            <h3 className="text-sm font-bold text-white font-outfit">Fetching GitHub Data &amp; Synthesizing Persona...</h3>
             <p className="text-xs text-slate-400">Evaluating repository impact metrics and language distribution.</p>
           </div>
         </div>
@@ -144,6 +146,9 @@ export default function Home() {
           <ProfileHeader profile={profile} />
 
           <PersonaCard persona={profile.persona} />
+
+          {/* AI Resume Bullets & LinkedIn Headline Studio */}
+          <ResumeBulletsGenerator profile={profile} />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">

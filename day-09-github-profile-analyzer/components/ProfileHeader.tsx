@@ -1,13 +1,32 @@
 'use client';
 
 import { GitHubProfileData } from '@/types';
-import { MapPin, Building, Users, Flame, GitCommit, ExternalLink } from 'lucide-react';
+import { MapPin, Building, Users, Flame, GitCommit, ExternalLink, Award, Sparkles, Copy, Check } from 'lucide-react';
+import { useState } from 'react';
 
 interface Props {
   profile: GitHubProfileData;
 }
 
 export default function ProfileHeader({ profile }: Props) {
+  const [copied, setCopied] = useState(false);
+
+  // Compute Overall Developer Tier
+  const totalStars = profile.repos.reduce((acc, r) => acc + r.stars, 0);
+  const getDeveloperTier = () => {
+    if (totalStars > 100 || profile.totalCommitsPastYear > 500) return { tier: 'S-TIER', label: 'High-Impact Core Builder', color: 'bg-amber-500/10 border-amber-500 text-amber-400' };
+    if (profile.totalCommitsPastYear > 150) return { tier: 'A-TIER', label: 'Consistent Production Engineer', color: 'bg-emerald-500/10 border-emerald-500 text-emerald-400' };
+    return { tier: 'B-TIER', label: 'Active Developer', color: 'bg-sky-500/10 border-sky-500 text-sky-400' };
+  };
+
+  const devTier = getDeveloperTier();
+
+  const handleCopyProfile = () => {
+    navigator.clipboard.writeText(`https://github.com/${profile.username}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="bg-[#161b22] border border-emerald-500/20 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl font-mono">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
@@ -17,20 +36,36 @@ export default function ProfileHeader({ profile }: Props) {
             alt={profile.username}
             className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl border-2 border-emerald-500/40 shadow-xl object-cover"
           />
-          <div className="space-y-1">
+          <div className="space-y-1.5">
+            <div className="flex flex-wrap items-center gap-3">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-outfit">{profile.name}</h2>
+              <span className={`px-2.5 py-0.5 rounded-full border text-[10px] font-bold ${devTier.color}`}>
+                {devTier.tier} • {devTier.label}
+              </span>
+            </div>
+
             <div className="flex items-center gap-2">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{profile.name}</h2>
+              <span className="text-emerald-400 text-sm font-bold block">@{profile.username}</span>
               <a
                 href={`https://github.com/${profile.username}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-slate-400 hover:text-emerald-400 transition-colors"
+                className="text-slate-400 hover:text-emerald-400 transition-colors p-1"
+                title="Open GitHub Profile"
               >
-                <ExternalLink className="w-4 h-4" />
+                <ExternalLink className="w-3.5 h-3.5" />
               </a>
+              <button
+                type="button"
+                onClick={handleCopyProfile}
+                className="text-slate-500 hover:text-slate-300 transition-colors p-1"
+                title="Copy GitHub Link"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              </button>
             </div>
-            <span className="text-emerald-400 text-sm font-bold block">@{profile.username}</span>
-            <p className="text-slate-300 text-xs max-w-xl leading-relaxed">{profile.bio}</p>
+
+            <p className="text-slate-300 text-xs max-w-xl leading-relaxed font-sans">{profile.bio}</p>
 
             <div className="flex flex-wrap gap-4 pt-1 text-xs text-slate-400">
               {profile.company && (
