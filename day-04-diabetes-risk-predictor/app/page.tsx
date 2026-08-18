@@ -7,6 +7,8 @@ import { saveRiskSession } from '@/lib/storage';
 import RiskGauge from '@/components/RiskGauge';
 import SHAPChart from '@/components/SHAPChart';
 import RecommendationCard from '@/components/RecommendationCard';
+import WhatIfSimulator from '@/components/WhatIfSimulator';
+import ClinicalChat from '@/components/ClinicalChat';
 import DisclaimerModal from '@/components/DisclaimerModal';
 import {
   Activity,
@@ -19,6 +21,8 @@ import {
   Zap,
   User,
   HeartPulse,
+  Sliders,
+  Stethoscope,
 } from 'lucide-react';
 
 const PRESET_PATIENTS: { id: string; name: string; vitals: PatientVitals; label: string }[] = [
@@ -48,7 +52,6 @@ export default function HomePage() {
   const [recommendations, setRecommendations] = useState<RecommendationItem[]>([]);
   const [isLoadingRecs, setIsLoadingRecs] = useState(false);
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
-
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   // Check if disclaimer accepted once
@@ -127,11 +130,11 @@ export default function HomePage() {
             <Activity className="w-3.5 h-3.5" />
             <span>Clinical ML Ensemble Model (UCI Pima Dataset • 94% Accuracy)</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
-            Diabetes Risk Predictor & SHAP Analyzer
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-outfit">
+            Diabetes Risk Predictor &amp; SHAP Analyzer
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1 font-sans">
-            Enter 8 clinical vitals for instant machine learning risk probability, SHAP feature attribution, and AI lifestyle advice.
+            Enter 8 clinical vitals for instant machine learning risk probability, SHAP feature attribution, and interactive lifestyle mitigation.
           </p>
         </div>
 
@@ -179,7 +182,7 @@ export default function HomePage() {
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4 text-teal-400" />
                 <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-                  Patient Profile & Vitals Intake
+                  Patient Profile &amp; Vitals Intake
                 </h3>
               </div>
               <input
@@ -359,6 +362,16 @@ export default function HomePage() {
           <RecommendationCard recommendations={recommendations} isLoading={isLoadingRecs} />
         </div>
       </div>
+
+      {/* Interactive What-If Risk Mitigator */}
+      <section className="no-print">
+        <WhatIfSimulator baselineVitals={vitals} baselineRiskPercent={prediction.riskPercent} />
+      </section>
+
+      {/* Clinical AI Endocrinology Assistant Q&A */}
+      <section className="no-print">
+        <ClinicalChat vitals={vitals} riskPercent={prediction.riskPercent} />
+      </section>
 
       {/* Mandatory Clinical Disclaimer Modal */}
       <DisclaimerModal isOpen={isDisclaimerOpen} onAccept={handleAcceptDisclaimer} />
