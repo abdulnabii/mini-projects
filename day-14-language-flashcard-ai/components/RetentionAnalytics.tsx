@@ -2,7 +2,7 @@
 
 import { Deck, LeaderboardUser } from '@/types';
 import { INITIAL_LEADERBOARD } from '@/lib/storage';
-import { TrendingUp, Trophy, Clock, CheckCircle2, Award, Calendar } from 'lucide-react';
+import { TrendingUp, Trophy, Clock, CheckCircle2, Award, Calendar, Brain } from 'lucide-react';
 
 interface Props {
   decks: Deck[];
@@ -16,12 +16,36 @@ export default function RetentionAnalytics({ decks, userXP }: Props) {
 
   const retentionRate =
     allCards.length > 0
-      ? Math.round(((allCards.filter((c) => (c.lastQualityScore || 0) >= 3).length || 1) / (allCards.length || 1)) * 100)
+      ? Math.round(
+          ((allCards.filter((c) => (c.lastQualityScore || 0) >= 3).length || 1) / (allCards.length || 1)) * 100
+        )
       : 88;
 
   const leaderboard: LeaderboardUser[] = INITIAL_LEADERBOARD.map((u) =>
     u.isCurrentUser ? { ...u, xp: userXP } : u
   ).sort((a, b) => b.xp - a.xp);
+
+  // SVG Ebbinghaus Retention Curve Points
+  const W = 560;
+  const H = 160;
+  const PAD = 25;
+
+  // Days 0 to 30 curve points
+  const pointsWithoutReview = [];
+  const pointsWithSM2 = [];
+
+  for (let t = 0; t <= 30; t += 2) {
+    const x = PAD + (t / 30) * (W - 2 * PAD);
+    // Exponential decay R = e^(-0.25*t)
+    const decayR = Math.exp(-0.18 * t);
+    const yDecay = H - PAD - decayR * (H - 2 * PAD);
+    pointsWithoutReview.push(`${x.toFixed(1)},${yDecay.toFixed(1)}`);
+
+    // SM-2 reinforced curve (stays > 85%)
+    const sm2R = Math.max(0.85, Math.exp(-0.02 * t));
+    const ySM2 = H - PAD - sm2R * (H - 2 * PAD);
+    pointsWithSM2.push(`${x.toFixed(1)},${ySM2.toFixed(1)}`);
+  }
 
   return (
     <div className="space-y-6 font-mono text-xs text-slate-300">
@@ -57,6 +81,46 @@ export default function RetentionAnalytics({ decks, userXP }: Props) {
         </div>
       </div>
 
+      {/* Ebbinghaus Memory Retention Decay Curve (SVG) */}
+      <div className="p-6 rounded-3xl bg-[#0e1424] border border-slate-800 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-bold text-white text-sm font-outfit flex items-center gap-2">
+            <Brain className="w-4 h-4 text-emerald-400" />
+            Ebbinghaus Forgetting Curve vs. SuperMemo-2 Spaced Intervals
+          </h3>
+          <div className="flex items-center gap-3 text-[10px]">
+            <span className="flex items-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-400" /> Standard Decay
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" /> SM-2 Retention
+            </span>
+          </div>
+        </div>
+
+        <div className="w-full overflow-x-auto">
+          <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-36 drop-shadow-xl min-w-[480px]">
+            {/* Axis */}
+            <line x1={PAD} y1={H - PAD} x2={W - PAD} y2={H - PAD} stroke="#1e293b" strokeWidth="1" />
+            <line x1={PAD} y1={PAD} x2={PAD} y2={H - PAD} stroke="#1e293b" strokeWidth="1" />
+
+            {/* Decay Path */}
+            <polyline points={pointsWithoutReview.join(' ')} fill="none" stroke="#f43f5e" strokeWidth="2" strokeDasharray="3 3" />
+
+            {/* SM2 Path */}
+            <polyline points={pointsWithSM2.join(' ')} fill="none" stroke="#10b981" strokeWidth="3" />
+
+            {/* Labels */}
+            <text x={PAD + 5} y={PAD + 15} fill="#10b981" fontSize="10" fontFamily="monospace">
+              95% Target Retention
+            </text>
+            <text x={W - PAD - 80} y={H - PAD - 10} fill="#f43f5e" fontSize="10" fontFamily="monospace">
+              20% Without SM-2
+            </text>
+          </svg>
+        </div>
+      </div>
+
       {/* 2. Weekly Leaderboard */}
       <div className="p-6 rounded-3xl bg-[#0e1424] border border-slate-800 space-y-4">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -78,9 +142,17 @@ export default function RetentionAnalytics({ decks, userXP }: Props) {
               }`}
             >
               <div className="flex items-center gap-3">
-                <span className={`w-6 text-center font-black font-outfit ${
-                  idx === 0 ? 'text-amber-400 text-base' : idx === 1 ? 'text-slate-300' : idx === 2 ? 'text-amber-600' : 'text-slate-500'
-                }`}>
+                <span
+                  className={`w-6 text-center font-black font-outfit ${
+                    idx === 0
+                      ? 'text-amber-400 text-base'
+                      : idx === 1
+                      ? 'text-slate-300'
+                      : idx === 2
+                      ? 'text-amber-600'
+                      : 'text-slate-500'
+                  }`}
+                >
                   #{idx + 1}
                 </span>
                 <span className="text-lg">{user.avatar}</span>
