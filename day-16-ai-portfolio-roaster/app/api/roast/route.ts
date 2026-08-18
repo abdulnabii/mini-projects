@@ -22,15 +22,15 @@ export async function POST(req: Request) {
     } = await req.json();
 
     const devName = name?.trim() || githubData?.name || 'Developer';
-    
-    let targetInfo = `Name: ${devName}\nPortfolio URL: ${portfolioUrl || 'N/A'}\nBio: ${bioText || 'N/A'}\nProjects: ${projectsText || 'N/A'}`;
+
+    let targetInfo = `Developer Name: ${devName}\nPortfolio URL: ${portfolioUrl || 'N/A'}\nBio: ${bioText || 'N/A'}\nProjects / Tech Stack:\n${projectsText || 'N/A'}`;
 
     if (githubData) {
-      targetInfo += `\n\n[REAL GITHUB LIVE DATA]:
+      targetInfo += `\n\n[LIVE GITHUB VERIFIED STATS]:
 GitHub Username: @${githubData.username}
-Public Repos: ${githubData.publicRepos}
-Followers: ${githubData.followers}
-Top Repositories:
+Public Repos Count: ${githubData.publicRepos}
+Followers Count: ${githubData.followers}
+Top Repositories & Tech:
 ${githubData.formattedProjectsText}`;
     }
 
@@ -51,34 +51,37 @@ ${githubData.formattedProjectsText}`;
         const prompt = `You are the Lead Critic & Chief Roaster at PortfolioRoaster.AI.
 Tone Setting: ${toneInstruction}
 
-Analyze this developer's portfolio and GitHub submission:
+IMPORTANT RULES:
+1. DO NOT use cliché generic phrases like "A todo app, weather app and calculator" UNLESS those exact words appear in the input!
+2. Inspect the EXACT projects, repositories, bio words, and tech stack provided below and craft CUSTOM, highly personalized, specific roasts citing their actual tools, project names, or GitHub repo names.
+3. Every critique must include a genuinely useful engineering refactor fix.
+
+Input Data to Analyze:
 ${targetInfo}
 
 Evaluate across 5 specific dimensions:
 1. Design & Typography (visual aesthetics, color palette, spacing, layout)
-2. Project Quality & Depth (are their GitHub repos tutorial clones, empty forks, or real-world production apps with stars?)
+2. Project Quality & Depth (are their projects and GitHub repos production-grade, deployed, or unmonetized experiments?)
 3. About Section & Cringe Factor (generic buzzwords vs clear value proposition)
 4. UX, Navigation & Speed (mobile usability, clarity, interactive friction, README quality)
 5. Recruiter & ATS Hireability (would a FAANG or startup recruiter hire them in 5 seconds?)
 
-If GitHub repo data is provided, reference actual repo names, stars, and language choices directly in the roasts!
-
 Return ONLY valid JSON with this exact schema (no markdown wrap, no other text):
 {
-  "overallScore": 42,
-  "overallVerdict": "One punchy, memorable summary verdict",
-  "topRoastPunchline": "The single funniest and most devastating truth about this portfolio and GitHub presence",
-  "survivalBadge": "A badge title (e.g. Survived the Roast - Barely)",
+  "overallScore": 68,
+  "overallVerdict": "One custom, memorable summary verdict citing their specific background",
+  "topRoastPunchline": "The single funniest and most devastating truth tailored specifically to their input",
+  "survivalBadge": "A custom badge title matching their score",
   "categories": {
-    "design": { "score": 38, "grade": "D", "roast": "Detailed roast text", "actionableTip": "Actionable fix", "keyIssues": ["Issue 1", "Issue 2"] },
-    "projects": { "score": 45, "grade": "C", "roast": "Detailed roast text", "actionableTip": "Actionable fix", "keyIssues": ["Issue 1", "Issue 2"] },
-    "aboutBio": { "score": 30, "grade": "F", "roast": "Detailed roast text", "actionableTip": "Actionable fix", "keyIssues": ["Issue 1", "Issue 2"] },
-    "uxAndSpeed": { "score": 52, "grade": "C", "roast": "Detailed roast text", "actionableTip": "Actionable fix", "keyIssues": ["Issue 1", "Issue 2"] },
-    "recruiterAppeal": { "score": 35, "grade": "D", "roast": "Detailed roast text", "actionableTip": "Actionable fix", "keyIssues": ["Issue 1", "Issue 2"] }
+    "design": { "score": 60, "grade": "C", "roast": "Specific roast text", "actionableTip": "Actionable fix", "keyIssues": ["Issue 1", "Issue 2"] },
+    "projects": { "score": 70, "grade": "B", "roast": "Specific roast text citing their projects", "actionableTip": "Actionable fix", "keyIssues": ["Issue 1", "Issue 2"] },
+    "aboutBio": { "score": 55, "grade": "C", "roast": "Specific roast text citing their bio", "actionableTip": "Actionable fix", "keyIssues": ["Issue 1", "Issue 2"] },
+    "uxAndSpeed": { "score": 75, "grade": "B", "roast": "Specific roast text", "actionableTip": "Actionable fix", "keyIssues": ["Issue 1", "Issue 2"] },
+    "recruiterAppeal": { "score": 65, "grade": "C", "roast": "Specific roast text", "actionableTip": "Actionable fix", "keyIssues": ["Issue 1", "Issue 2"] }
   },
   "rewrittenHeroBio": {
-    "beforeBio": "${bioText ? bioText.slice(0, 120) : 'Passionate developer'}",
-    "afterBio": "Compelling 2-sentence high-converting bio",
+    "beforeBio": "${bioText ? bioText.slice(0, 120) : 'Software developer'}",
+    "afterBio": "Compelling 2-sentence high-converting bio tailored to their actual skills",
     "improvedTagline": "Sharp 1-sentence hero headline",
     "targetKeywords": ["Keyword 1", "Keyword 2", "Keyword 3", "Keyword 4"]
   },
@@ -105,12 +108,18 @@ Return ONLY valid JSON with this exact schema (no markdown wrap, no other text):
 
         return NextResponse.json(roastResult);
       } catch (err) {
-        console.warn('Gemini roasting failed, using fallback engine:', err);
+        console.warn('Gemini roasting failed, using dynamic fallback engine:', err);
       }
     }
 
-    // High quality client fallback
-    const fallback = generateClientFallbackRoast(devName, portfolioUrl || bioText || 'Portfolio', intensity);
+    // High quality dynamic fallback
+    const fallback = generateClientFallbackRoast(
+      devName,
+      portfolioUrl || bioText || 'Portfolio',
+      intensity,
+      projectsText,
+      githubData
+    );
     return NextResponse.json(fallback);
   } catch (err) {
     console.error('Roast API error:', err);
