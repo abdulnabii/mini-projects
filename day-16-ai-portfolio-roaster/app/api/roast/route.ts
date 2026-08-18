@@ -10,17 +10,29 @@ export async function POST(req: Request) {
       portfolioUrl,
       bioText,
       projectsText,
+      githubData,
       intensity = 'spicy',
     }: {
       name?: string;
       portfolioUrl?: string;
       bioText?: string;
       projectsText?: string;
+      githubData?: any;
       intensity?: RoastIntensity;
     } = await req.json();
 
-    const devName = name?.trim() || 'Developer';
-    const targetInfo = `Name: ${devName}\nPortfolio URL: ${portfolioUrl || 'N/A'}\nBio: ${bioText || 'N/A'}\nProjects: ${projectsText || 'N/A'}`;
+    const devName = name?.trim() || githubData?.name || 'Developer';
+    
+    let targetInfo = `Name: ${devName}\nPortfolio URL: ${portfolioUrl || 'N/A'}\nBio: ${bioText || 'N/A'}\nProjects: ${projectsText || 'N/A'}`;
+
+    if (githubData) {
+      targetInfo += `\n\n[REAL GITHUB LIVE DATA]:
+GitHub Username: @${githubData.username}
+Public Repos: ${githubData.publicRepos}
+Followers: ${githubData.followers}
+Top Repositories:
+${githubData.formattedProjectsText}`;
+    }
 
     const apiKey = process.env.GEMINI_API_KEY;
 
@@ -39,21 +51,23 @@ export async function POST(req: Request) {
         const prompt = `You are the Lead Critic & Chief Roaster at PortfolioRoaster.AI.
 Tone Setting: ${toneInstruction}
 
-Analyze this developer's portfolio submission:
+Analyze this developer's portfolio and GitHub submission:
 ${targetInfo}
 
 Evaluate across 5 specific dimensions:
 1. Design & Typography (visual aesthetics, color palette, spacing, layout)
-2. Project Quality & Depth (are they generic tutorial clones or real-world apps?)
+2. Project Quality & Depth (are their GitHub repos tutorial clones, empty forks, or real-world production apps with stars?)
 3. About Section & Cringe Factor (generic buzzwords vs clear value proposition)
-4. UX, Navigation & Speed (mobile usability, clarity, interactive friction)
+4. UX, Navigation & Speed (mobile usability, clarity, interactive friction, README quality)
 5. Recruiter & ATS Hireability (would a FAANG or startup recruiter hire them in 5 seconds?)
+
+If GitHub repo data is provided, reference actual repo names, stars, and language choices directly in the roasts!
 
 Return ONLY valid JSON with this exact schema (no markdown wrap, no other text):
 {
   "overallScore": 42,
   "overallVerdict": "One punchy, memorable summary verdict",
-  "topRoastPunchline": "The single funniest and most devastating truth about this portfolio",
+  "topRoastPunchline": "The single funniest and most devastating truth about this portfolio and GitHub presence",
   "survivalBadge": "A badge title (e.g. Survived the Roast - Barely)",
   "categories": {
     "design": { "score": 38, "grade": "D", "roast": "Detailed roast text", "actionableTip": "Actionable fix", "keyIssues": ["Issue 1", "Issue 2"] },
@@ -83,7 +97,7 @@ Return ONLY valid JSON with this exact schema (no markdown wrap, no other text):
         const roastResult: RoastResult = {
           id: `roast_${Date.now()}`,
           developerName: devName,
-          targetUrlOrTitle: portfolioUrl || devName,
+          targetUrlOrTitle: portfolioUrl || (githubData ? `github.com/${githubData.username}` : devName),
           intensity,
           ...parsed,
           createdAt: new Date().toISOString(),

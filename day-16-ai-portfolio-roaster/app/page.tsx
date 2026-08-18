@@ -39,14 +39,15 @@ export default function HomePage() {
     portfolioUrl: string,
     bioText: string,
     projectsText: string,
-    intensity: RoastIntensity
+    intensity: RoastIntensity,
+    githubData?: any
   ) => {
     setIsLoading(true);
     try {
       const res = await fetch('/api/roast', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, portfolioUrl, bioText, projectsText, intensity }),
+        body: JSON.stringify({ name, portfolioUrl, bioText, projectsText, intensity, githubData }),
       });
 
       const data: RoastResult = await res.json();
@@ -92,7 +93,7 @@ export default function HomePage() {
           </h1>
 
           <p className="text-sm sm:text-base text-slate-400 font-mono max-w-2xl mx-auto leading-relaxed">
-            Get brutally honest AI critiques on visual design, project depth, bio cringe factor, UX navigation, and ATS recruiter appeal — followed by precision engineering fixes.
+            Get brutally honest AI critiques on visual design, GitHub repository depth, bio cringe factor, UX navigation, and ATS recruiter appeal — followed by precision engineering fixes.
           </p>
         </section>
 
