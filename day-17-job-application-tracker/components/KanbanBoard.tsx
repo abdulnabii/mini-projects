@@ -3,13 +3,15 @@
 import { useState } from 'react';
 import { JobApplication, PipelineStage, JobPriority } from '@/types';
 import JobCard from './JobCard';
-import { Plus, Search, Filter, Layers, Briefcase, CheckCircle2, Flame } from 'lucide-react';
+import { Plus, Search, Filter, Layers, Briefcase, CheckCircle2, Flame, Sparkles } from 'lucide-react';
 
 interface Props {
   jobs: JobApplication[];
   onOpenMatch: (job: JobApplication) => void;
   onOpenCoverLetter: (job: JobApplication) => void;
   onOpenInterviewPrep: (job: JobApplication) => void;
+  onOpenFollowUp: (job: JobApplication) => void;
+  onOpenNegotiator: (job: JobApplication) => void;
   onMoveStage: (jobId: string, targetStage: PipelineStage) => void;
   onDeleteJob: (jobId: string) => void;
   onOpenAddModal: (defaultStage?: PipelineStage) => void;
@@ -21,16 +23,17 @@ interface ColumnConfig {
   badgeColor: string;
   borderAccent: string;
   icon: string;
+  glow: string;
 }
 
 const COLUMNS: ColumnConfig[] = [
-  { id: 'wishlist', title: 'Wishlist', badgeColor: 'text-slate-400 bg-slate-800', borderAccent: 'border-slate-800', icon: '💡' },
-  { id: 'applied', title: 'Applied', badgeColor: 'text-sky-400 bg-sky-500/10', borderAccent: 'border-sky-500/30', icon: '📨' },
-  { id: 'screening', title: 'Phone Screen', badgeColor: 'text-cyan-400 bg-cyan-500/10', borderAccent: 'border-cyan-500/30', icon: '📞' },
-  { id: 'technical', title: 'Technical Round', badgeColor: 'text-purple-400 bg-purple-500/10', borderAccent: 'border-purple-500/30', icon: '💻' },
-  { id: 'final', title: 'Final Round', badgeColor: 'text-amber-400 bg-amber-500/10', borderAccent: 'border-amber-500/30', icon: '🏆' },
-  { id: 'offer', title: 'Offer Received', badgeColor: 'text-emerald-400 bg-emerald-500/10', borderAccent: 'border-emerald-500/40', icon: '🎉' },
-  { id: 'archived', title: 'Archived', badgeColor: 'text-slate-500 bg-slate-900', borderAccent: 'border-slate-900', icon: '📁' },
+  { id: 'wishlist', title: 'Wishlist', badgeColor: 'text-slate-400 bg-slate-800/80', borderAccent: 'border-slate-800', icon: '💡', glow: '' },
+  { id: 'applied', title: 'Applied', badgeColor: 'text-sky-400 bg-sky-500/10', borderAccent: 'border-sky-500/30', icon: '📨', glow: 'shadow-sky-500/5' },
+  { id: 'screening', title: 'Phone Screen', badgeColor: 'text-cyan-400 bg-cyan-500/10', borderAccent: 'border-cyan-500/30', icon: '📞', glow: 'shadow-cyan-500/5' },
+  { id: 'technical', title: 'Technical Round', badgeColor: 'text-purple-400 bg-purple-500/10', borderAccent: 'border-purple-500/30', icon: '💻', glow: 'shadow-purple-500/5' },
+  { id: 'final', title: 'Final Round', badgeColor: 'text-amber-400 bg-amber-500/10', borderAccent: 'border-amber-500/30', icon: '🏆', glow: 'shadow-amber-500/5' },
+  { id: 'offer', title: 'Offer Received', badgeColor: 'text-emerald-400 bg-emerald-500/10', borderAccent: 'border-emerald-500/40', icon: '🎉', glow: 'shadow-emerald-500/10' },
+  { id: 'archived', title: 'Archived', badgeColor: 'text-slate-500 bg-slate-900', borderAccent: 'border-slate-900', icon: '📁', glow: '' },
 ];
 
 export default function KanbanBoard({
@@ -38,6 +41,8 @@ export default function KanbanBoard({
   onOpenMatch,
   onOpenCoverLetter,
   onOpenInterviewPrep,
+  onOpenFollowUp,
+  onOpenNegotiator,
   onMoveStage,
   onDeleteJob,
   onOpenAddModal,
@@ -100,14 +105,14 @@ export default function KanbanBoard({
 
       {/* 7-Column Horizontal Kanban Board */}
       <div className="overflow-x-auto pb-4">
-        <div className="flex gap-4 min-w-[1350px]">
+        <div className="flex gap-4 min-w-[1450px]">
           {COLUMNS.map((col) => {
             const columnJobs = filteredJobs.filter((j) => j.stage === col.id);
 
             return (
               <div
                 key={col.id}
-                className="w-80 shrink-0 rounded-3xl bg-[#0b1220]/90 border border-slate-800/90 flex flex-col max-h-[750px] shadow-lg"
+                className={`w-80 shrink-0 rounded-3xl bg-[#0b1220]/90 border border-slate-800/90 flex flex-col max-h-[750px] shadow-xl ${col.glow}`}
               >
                 {/* Column Header */}
                 <div className="p-3.5 border-b border-slate-800/80 flex items-center justify-between">
@@ -139,6 +144,8 @@ export default function KanbanBoard({
                         onOpenMatch={onOpenMatch}
                         onOpenCoverLetter={onOpenCoverLetter}
                         onOpenInterviewPrep={onOpenInterviewPrep}
+                        onOpenFollowUp={onOpenFollowUp}
+                        onOpenNegotiator={onOpenNegotiator}
                         onMoveStage={onMoveStage}
                         onDeleteJob={onDeleteJob}
                       />

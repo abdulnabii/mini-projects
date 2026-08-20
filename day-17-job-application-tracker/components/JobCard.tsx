@@ -12,7 +12,8 @@ import {
   MapPin,
   DollarSign,
   Briefcase,
-  CheckCircle,
+  Mail,
+  TrendingUp,
 } from 'lucide-react';
 
 interface Props {
@@ -20,6 +21,8 @@ interface Props {
   onOpenMatch: (job: JobApplication) => void;
   onOpenCoverLetter: (job: JobApplication) => void;
   onOpenInterviewPrep: (job: JobApplication) => void;
+  onOpenFollowUp: (job: JobApplication) => void;
+  onOpenNegotiator: (job: JobApplication) => void;
   onMoveStage: (jobId: string, targetStage: PipelineStage) => void;
   onDeleteJob: (jobId: string) => void;
 }
@@ -31,6 +34,8 @@ export default function JobCard({
   onOpenMatch,
   onOpenCoverLetter,
   onOpenInterviewPrep,
+  onOpenFollowUp,
+  onOpenNegotiator,
   onMoveStage,
   onDeleteJob,
 }: Props) {
@@ -50,25 +55,45 @@ export default function JobCard({
 
   const matchScore = job.matchResult?.matchScore;
 
+  // Company avatar gradient
+  const getCompanyGradient = (name: string) => {
+    const charCode = name.charCodeAt(0) % 4;
+    if (charCode === 0) return 'from-emerald-500 to-teal-700';
+    if (charCode === 1) return 'from-indigo-500 to-purple-700';
+    if (charCode === 2) return 'from-cyan-500 to-blue-700';
+    return 'from-amber-500 to-orange-700';
+  };
+
   return (
-    <div className="p-4 rounded-2xl bg-slate-950/95 border border-slate-800/90 hover:border-slate-700 transition-all space-y-3 font-mono text-xs text-slate-300 shadow-md group relative">
+    <div className="p-4 rounded-2xl bg-[#090e18]/95 border border-slate-800/90 hover:border-emerald-500/40 transition-all space-y-3 font-mono text-xs text-slate-300 shadow-md group relative">
       {/* Top Meta Bar */}
       <div className="flex items-center justify-between gap-2">
-        <span
-          className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase ${
-            job.priority === 'HIGH'
-              ? 'bg-rose-500/10 border border-rose-500/30 text-rose-400'
-              : job.priority === 'MEDIUM'
-              ? 'bg-amber-500/10 border border-amber-500/30 text-amber-400'
-              : 'bg-slate-800 text-slate-400'
-          }`}
-        >
-          {job.priority} Priority
-        </span>
+        <div className="flex items-center gap-2">
+          {/* Company Avatar */}
+          <div
+            className={`w-7 h-7 rounded-xl bg-gradient-to-br ${getCompanyGradient(
+              job.companyName
+            )} flex items-center justify-center font-bold text-white text-xs shadow-sm`}
+          >
+            {job.companyName.slice(0, 2).toUpperCase()}
+          </div>
+
+          <span
+            className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase ${
+              job.priority === 'HIGH'
+                ? 'bg-rose-500/10 border border-rose-500/30 text-rose-400'
+                : job.priority === 'MEDIUM'
+                ? 'bg-amber-500/10 border border-amber-500/30 text-amber-400'
+                : 'bg-slate-800 text-slate-400'
+            }`}
+          >
+            {job.priority}
+          </span>
+        </div>
 
         {matchScore !== undefined ? (
           <span
-            className={`px-2 py-0.5 rounded-md text-[10px] font-bold border flex items-center gap-1 ${
+            className={`px-2 py-0.5 rounded-md text-[10px] font-bold border flex items-center gap-1 shadow-sm ${
               matchScore >= 85
                 ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400'
                 : matchScore >= 70
@@ -83,10 +108,10 @@ export default function JobCard({
           <button
             type="button"
             onClick={() => onOpenMatch(job)}
-            className="text-[9px] text-emerald-400 hover:underline flex items-center gap-0.5 font-bold"
+            className="text-[9px] text-emerald-400 hover:underline flex items-center gap-0.5 font-bold cursor-pointer"
           >
             <Sparkles className="w-2.5 h-2.5" />
-            <span>Calc Fit %</span>
+            <span>Calc Fit</span>
           </button>
         )}
       </div>
@@ -131,36 +156,55 @@ export default function JobCard({
         </div>
       )}
 
-      {/* Quick AI Action Icons */}
-      <div className="grid grid-cols-3 gap-1 pt-1 border-t border-slate-900">
+      {/* AI Super-Actions Grid */}
+      <div className="grid grid-cols-4 gap-1 pt-1 border-t border-slate-900">
         <button
           type="button"
           onClick={() => onOpenMatch(job)}
-          className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-emerald-500/50 hover:text-emerald-300 text-slate-400 text-[10px] font-bold flex items-center justify-center gap-1 transition-all cursor-pointer"
+          className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-emerald-500/50 hover:text-emerald-300 text-slate-400 text-[10px] font-bold flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer"
           title="Analyze Resume Fit & Skills Gap"
         >
           <Sparkles className="w-3 h-3 text-emerald-400" />
-          <span>Fit AI</span>
+          <span className="text-[8px]">Fit AI</span>
         </button>
 
         <button
           type="button"
           onClick={() => onOpenCoverLetter(job)}
-          className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-cyan-500/50 hover:text-cyan-300 text-slate-400 text-[10px] font-bold flex items-center justify-center gap-1 transition-all cursor-pointer"
+          className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-cyan-500/50 hover:text-cyan-300 text-slate-400 text-[10px] font-bold flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer"
           title="Generate Tailored Cover Letter"
         >
           <FileText className="w-3 h-3 text-cyan-400" />
-          <span>Cover</span>
+          <span className="text-[8px]">Cover</span>
         </button>
 
         <button
           type="button"
           onClick={() => onOpenInterviewPrep(job)}
-          className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-purple-500/50 hover:text-purple-300 text-slate-400 text-[10px] font-bold flex items-center justify-center gap-1 transition-all cursor-pointer"
+          className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-purple-500/50 hover:text-purple-300 text-slate-400 text-[10px] font-bold flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer"
           title="Generate Predicted Interview Questions"
         >
           <MessageSquare className="w-3 h-3 text-purple-400" />
-          <span>Prep</span>
+          <span className="text-[8px]">Prep</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => (job.stage === 'offer' ? onOpenNegotiator(job) : onOpenFollowUp(job))}
+          className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-amber-500/50 hover:text-amber-300 text-slate-400 text-[10px] font-bold flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer"
+          title={job.stage === 'offer' ? 'Salary Negotiation Counter-Offer' : 'Generate Follow-Up Email'}
+        >
+          {job.stage === 'offer' ? (
+            <>
+              <DollarSign className="w-3 h-3 text-amber-400" />
+              <span className="text-[8px] text-amber-300">Offer</span>
+            </>
+          ) : (
+            <>
+              <Mail className="w-3 h-3 text-sky-400" />
+              <span className="text-[8px]">Nudge</span>
+            </>
+          )}
         </button>
       </div>
 
