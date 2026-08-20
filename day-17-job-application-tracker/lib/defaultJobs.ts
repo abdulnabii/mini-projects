@@ -1,0 +1,158 @@
+import { JobApplication, ResumeProfile } from '@/types';
+
+export const DEFAULT_RESUME_PROFILE: ResumeProfile = {
+  name: 'Alex Rivera',
+  email: 'alex.rivera@example.com',
+  targetRole: 'Senior Full-Stack Engineer',
+  yearsExperience: '4+ Years',
+  skills: [
+    'React',
+    'Next.js',
+    'TypeScript',
+    'Node.js',
+    'PostgreSQL',
+    'Tailwind CSS',
+    'GraphQL',
+    'REST APIs',
+    'Docker',
+    'Redis',
+    'Git',
+    'CI/CD',
+    'AWS (S3, Lambda)',
+  ],
+  resumeText: `Full-Stack Software Engineer with 4+ years of production experience architecting scalable React, Next.js, and TypeScript web applications. Built high-throughput microservices handling 100k+ daily active users, integrated PostgreSQL and Redis caching layers for sub-50ms API response times, and engineered automated CI/CD pipelines with Docker and AWS. Passionate about developer tooling, clean architectural patterns, and AI-assisted workflows.`,
+};
+
+export const DEFAULT_JOB_APPLICATIONS: JobApplication[] = [
+  {
+    id: 'job_stripe_1',
+    companyName: 'Stripe',
+    roleTitle: 'Senior Frontend Engineer (Billing Platform)',
+    location: 'San Francisco, CA',
+    workplaceType: 'Remote',
+    salaryRange: '$175,000 - $215,000',
+    jobDescription:
+      'We are looking for a Senior Frontend Engineer to build resilient, high-conversion UI workflows for Stripe Billing and Subscriptions. You will work extensively with TypeScript, React, Next.js, performance optimization, and global localization while collaborating with backend systems handling billions in transactions.',
+    url: 'https://stripe.com/jobs',
+    stage: 'technical',
+    appliedDate: '2026-08-10',
+    lastContactDate: '2026-08-17',
+    notes: 'Completed technical coding round. Deep dive on React re-render optimization and state machines for complex checkout flows.',
+    priority: 'HIGH',
+    tags: ['FinTech', 'React', 'TypeScript', 'High Pay'],
+    matchResult: {
+      matchScore: 92,
+      verdict: 'Exceptional Fit — Strong TypeScript & React production background',
+      matchedSkills: ['React', 'Next.js', 'TypeScript', 'REST APIs', 'Performance Optimization', 'Git'],
+      missingSkills: ['State Machines (XState)', 'PCI-DSS Compliance Exposure'],
+      resumeStrengths: [
+        '4+ years building high-throughput React applications',
+        'Demonstrated experience with sub-50ms latency backends and complex UX',
+      ],
+      gapRecommendations: [
+        'Highlight any past financial data or transactional state management handling',
+        'Mention experience with automated end-to-end testing in Playwright or Cypress',
+      ],
+      tailoredSummary:
+        'Senior Full-Stack Engineer with 4+ years specializing in high-performance TypeScript and React architectures, proven track record building resilient subscription workflows and low-latency API integrations.',
+    },
+  },
+  {
+    id: 'job_vercel_2',
+    companyName: 'Vercel',
+    roleTitle: 'Full-Stack Developer (AI Tools & SDKs)',
+    location: 'New York, NY',
+    workplaceType: 'Remote',
+    salaryRange: '$165,000 - $200,000',
+    jobDescription:
+      'Join Vercel to build the next generation of AI-native developer experiences. Looking for engineers with deep fluency in Next.js App Router, React Server Components, TypeScript, AI SDK integrations, and edge compute runtime architectures.',
+    url: 'https://vercel.com/careers',
+    stage: 'final',
+    appliedDate: '2026-08-04',
+    lastContactDate: '2026-08-18',
+    notes: 'Final leadership round scheduled with VP of Engineering on Friday. Focus on system design and open-source contributions.',
+    priority: 'HIGH',
+    tags: ['DevTools', 'Next.js', 'AI SDK', 'Edge'],
+    matchResult: {
+      matchScore: 95,
+      verdict: 'Top Tier Match — Ideal profile for Next.js & TypeScript AI workflows',
+      matchedSkills: ['Next.js', 'React', 'TypeScript', 'Node.js', 'Redis', 'Tailwind CSS', 'Docker'],
+      missingSkills: ['Vercel Edge Runtime Internals', 'Rust / WebAssembly'],
+      resumeStrengths: [
+        'Comprehensive 30+ Next.js production deployments',
+        'Expert-level familiarity with modern App Router, Turbopack, and Tailwind styling',
+      ],
+      gapRecommendations: [
+        'Link to active GitHub open-source repositories and live Vercel deployments',
+        'Explain streaming response patterns and Server-Sent Events (SSE) experience',
+      ],
+      tailoredSummary:
+        'Full-Stack Developer specializing in modern Next.js App Router, TypeScript, and AI-integrated cloud architectures. Experienced in shipping fast, edge-optimized web applications with seamless UX.',
+    },
+  },
+  {
+    id: 'job_supabase_3',
+    companyName: 'Supabase',
+    roleTitle: 'Backend Infrastructure Engineer',
+    location: 'Singapore / Global',
+    workplaceType: 'Remote',
+    salaryRange: '$150,000 - $190,000',
+    jobDescription:
+      'We are looking for an engineer to scale our managed PostgreSQL, real-time replication, and authentication services. Experience with PostgreSQL internals, Row Level Security (RLS), Docker orchestration, and high-concurrency Node.js/Go backends required.',
+    url: 'https://supabase.com/careers',
+    stage: 'screening',
+    appliedDate: '2026-08-14',
+    lastContactDate: '2026-08-16',
+    notes: 'Recruiter phone screening completed. Invited to submit asynchronous technical assessment.',
+    priority: 'MEDIUM',
+    tags: ['PostgreSQL', 'Databases', 'Open Source'],
+    matchResult: {
+      matchScore: 84,
+      verdict: 'Strong Match — Solid database & backend foundation',
+      matchedSkills: ['PostgreSQL', 'Node.js', 'Docker', 'Redis', 'REST APIs', 'Git'],
+      missingSkills: ['Elixir / Phoenix', 'Postgres Extension Development (C/Rust)'],
+      resumeStrengths: [
+        'Demonstrated database optimization and indexing experience',
+        'Familiarity with containerized microservices and caching',
+      ],
+      gapRecommendations: [
+        'Highlight any Row Level Security (RLS) policies or complex SQL migrations written',
+        'Mention background in distributed caching and connection pooling (PgBouncer)',
+      ],
+      tailoredSummary:
+        'Backend Engineer with strong PostgreSQL, Node.js, and Docker microservices experience, focused on building high-reliability database APIs and scalable event streams.',
+    },
+  },
+  {
+    id: 'job_openai_4',
+    companyName: 'OpenAI',
+    roleTitle: 'Software Engineer (Platform & User Interfaces)',
+    location: 'San Francisco, CA',
+    workplaceType: 'Hybrid',
+    salaryRange: '$220,000 - $310,000',
+    jobDescription:
+      'Build scalable web applications and developer tools for millions of developers using OpenAI APIs. Requires mastery of React, TypeScript, Python/Node backend services, high-concurrency API gateways, and real-time streaming interfaces.',
+    url: 'https://openai.com/careers',
+    stage: 'applied',
+    appliedDate: '2026-08-18',
+    notes: 'Submitted tailored resume and cover letter emphasizing AI mini-project deployments and token streaming experience.',
+    priority: 'HIGH',
+    tags: ['AI/LLM', 'High Compensation', 'Platform'],
+  },
+  {
+    id: 'job_figma_5',
+    companyName: 'Figma',
+    roleTitle: 'Product Engineer (Collaboration Systems)',
+    location: 'San Francisco, CA',
+    workplaceType: 'Hybrid',
+    salaryRange: '$170,000 - $225,000',
+    jobDescription:
+      'Help build real-time multiplayer collaboration experiences for designers and engineers worldwide. Experience with WebSockets, CRDTs, canvas rendering, and high-performance TypeScript essential.',
+    url: 'https://figma.com/careers',
+    stage: 'wishlist',
+    appliedDate: '2026-08-19',
+    notes: 'Connected with Engineering Manager on LinkedIn. Preparing referral application.',
+    priority: 'MEDIUM',
+    tags: ['Multiplayer', 'WebSockets', 'Canvas', 'Design Tools'],
+  },
+];
