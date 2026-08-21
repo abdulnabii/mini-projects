@@ -1,4 +1,4 @@
-import { ClassificationResult, ModelType } from '@/types';
+import { ClassificationResult, ModelType, PathologyFinding } from '@/types';
 
 export type ColormapType = 'jet' | 'turbo' | 'viridis' | 'hot';
 
@@ -44,60 +44,127 @@ export function runMedicalInference(
   let predictedClass = '';
   let confidence = 0.913;
   let probabilities: Record<string, number> = {};
+  let differentialFindings: PathologyFinding[] = [];
   let gradcamLayerName = '';
   const gridSize = 16;
-  const heatmapGrid: number[][] = Array.from({ length: gridSize }, () => Array(gridSize).fill(0.1));
+  const heatmapGrid: number[][] = Array.from({ length: gridSize }, () => Array(gridSize).fill(0.08));
 
   if (modelType === 'xray') {
     gradcamLayerName = 'conv5_block3_out (DenseNet-121)';
-    const isPositive = isPneumoniaSample !== undefined ? isPneumoniaSample : Math.random() > 0.35;
+    const isPositive = isPneumoniaSample !== undefined ? isPneumoniaSample : true;
 
     if (isPositive) {
-      predictedClass = 'Pneumonia (Consolidation Detected)';
+      predictedClass = 'Lobar Pneumonia (Alveolar Infiltrate)';
       confidence = 0.913;
       probabilities = {
-        'Pneumonia': 0.913,
-        'Normal': 0.087,
+        'Bacterial / Lobar Pneumonia': 0.913,
+        'Pleural Effusion': 0.184,
+        'Atelectasis (Collapse)': 0.126,
+        'Cardiomegaly': 0.042,
+        'Normal / Clear Thorax': 0.038,
       };
 
-      // Hotspots in lower right quadrant
+      differentialFindings = [
+        {
+          condition: 'Bacterial / Lobar Pneumonia',
+          probability: 0.913,
+          riskLevel: 'CRITICAL',
+          anatomicalLocation: 'Right Lower Lobe (Costophrenic Base)',
+          clinicalSignificance: 'Dense alveolar airspace consolidation with air bronchograms visible in right basilar parenchyma.',
+        },
+        {
+          condition: 'Pleural Effusion',
+          probability: 0.184,
+          riskLevel: 'LOW_RISK',
+          anatomicalLocation: 'Right Costophrenic Sulcus',
+          clinicalSignificance: 'Mild blunting of the lateral costophrenic angle; secondary to localized parapneumonic fluid.',
+        },
+        {
+          condition: 'Atelectasis',
+          probability: 0.126,
+          riskLevel: 'LOW_RISK',
+          anatomicalLocation: 'Right Basilar Segment',
+          clinicalSignificance: 'Subsegmental volume loss adjacent to primary consolidative infiltrate.',
+        },
+      ];
+
+      // Hotspots in lower right lung quadrant
       for (let r = 0; r < gridSize; r++) {
         for (let c = 0; c < gridSize; c++) {
           const dist = Math.hypot(r - 10, c - 10);
           if (dist < 5.5) {
-            heatmapGrid[r][c] = Math.max(0.1, 1.0 - dist / 5.5);
+            heatmapGrid[r][c] = Math.max(0.12, 1.0 - dist / 5.5);
           } else {
             heatmapGrid[r][c] = Math.random() * 0.12;
           }
         }
       }
     } else {
-      predictedClass = 'Normal (No Infiltrates)';
+      predictedClass = 'Normal Thorax (Clear Bilateral Lung Fields)';
       confidence = 0.948;
       probabilities = {
-        'Normal': 0.948,
-        'Pneumonia': 0.052,
+        'Normal / Clear Thorax': 0.948,
+        'Bacterial / Lobar Pneumonia': 0.032,
+        'Pleural Effusion': 0.018,
+        'Atelectasis (Collapse)': 0.014,
+        'Cardiomegaly': 0.012,
       };
+
+      differentialFindings = [
+        {
+          condition: 'Normal / Clear Thorax',
+          probability: 0.948,
+          riskLevel: 'NORMAL',
+          anatomicalLocation: 'Bilateral Pulmonary Fields',
+          clinicalSignificance: 'Clear lung parenchyma, sharp costophrenic angles, normal cardiothoracic ratio (< 0.50).',
+        },
+      ];
 
       // Uniform low activation
       for (let r = 0; r < gridSize; r++) {
         for (let c = 0; c < gridSize; c++) {
-          heatmapGrid[r][c] = Math.random() * 0.18;
+          heatmapGrid[r][c] = Math.random() * 0.16;
         }
       }
     }
   } else {
     // Dermatology Model
     gradcamLayerName = 'top_conv (EfficientNet-B0)';
-    const isMalignant = isMelanomaSample !== undefined ? isMelanomaSample : Math.random() > 0.4;
+    const isMalignant = isMelanomaSample !== undefined ? isMelanomaSample : true;
 
     if (isMalignant) {
-      predictedClass = 'Malignant Melanoma (High Risk)';
+      predictedClass = 'Malignant Cutaneous Melanoma (High Risk)';
       confidence = 0.884;
       probabilities = {
         'Malignant Melanoma': 0.884,
-        'Benign Nevus': 0.116,
+        'Basal Cell Carcinoma': 0.218,
+        'Benign Dysplastic Nevus': 0.142,
+        'Seborrheic Keratosis': 0.056,
       };
+
+      differentialFindings = [
+        {
+          condition: 'Malignant Melanoma',
+          probability: 0.884,
+          riskLevel: 'CRITICAL',
+          anatomicalLocation: 'Lesion Periphery & Deep Reticular Margin',
+          clinicalSignificance: 'Marked border irregularity, multi-chromatic pigment distribution, and peripheral radial streaming.',
+        },
+        {
+          condition: 'Basal Cell Carcinoma',
+          probability: 0.218,
+          riskLevel: 'MODERATE_RISK',
+          anatomicalLocation: 'Central Nodule Area',
+          clinicalSignificance: 'Arborizing telangiectasia differential pattern considered at lesion boundary.',
+        },
+        {
+          condition: 'Benign Dysplastic Nevus',
+          probability: 0.142,
+          riskLevel: 'LOW_RISK',
+          anatomicalLocation: 'Surrounding Epidermal Margin',
+          clinicalSignificance: 'Atypical melanocytic architecture without ulceration.',
+        },
+      ];
 
       // Central lesion hotspot
       for (let r = 0; r < gridSize; r++) {
@@ -111,12 +178,24 @@ export function runMedicalInference(
         }
       }
     } else {
-      predictedClass = 'Benign Nevus (Typical Mole)';
+      predictedClass = 'Benign Melanocytic Nevus (Low Risk)';
       confidence = 0.932;
       probabilities = {
-        'Benign Nevus': 0.932,
-        'Malignant Melanoma': 0.068,
+        'Benign Melanocytic Nevus': 0.932,
+        'Seborrheic Keratosis': 0.088,
+        'Malignant Melanoma': 0.046,
+        'Basal Cell Carcinoma': 0.024,
       };
+
+      differentialFindings = [
+        {
+          condition: 'Benign Melanocytic Nevus',
+          probability: 0.932,
+          riskLevel: 'NORMAL',
+          anatomicalLocation: 'Symmetric Central Macule',
+          clinicalSignificance: 'Uniform pigment network, symmetric oval geometry, sharply defined regular borders.',
+        },
+      ];
 
       for (let r = 0; r < gridSize; r++) {
         for (let c = 0; c < gridSize; c++) {
@@ -129,14 +208,18 @@ export function runMedicalInference(
   const endTime = performance.now();
 
   return {
-    id: `res_${Date.now()}`,
+    id: `scan_${Date.now()}`,
     modelType,
     predictedClass,
     confidence,
     probabilities,
+    differentialFindings,
     uncertaintyFlag: confidence < 0.7,
-    inferenceTimeMs: Math.round(endTime - startTime + Math.floor(Math.random() * 150) + 420),
+    inferenceTimeMs: Math.round(endTime - startTime + Math.floor(Math.random() * 120) + 380),
     gradcamLayerName,
     heatmapGrid,
+    patientId: `PX-${Math.floor(10000 + Math.random() * 90000)}-DX`,
+    studyDate: new Date().toISOString().split('T')[0],
+    modalityCode: modelType === 'xray' ? 'DX (Digital Radiography - PA Chest)' : 'DS (Dermoscopy - Epiluminescence)',
   };
 }

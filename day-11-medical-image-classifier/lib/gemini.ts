@@ -11,19 +11,28 @@ export async function generateEducationalAnnotation(
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-      const prompt = `You are an educational assistant specializing in AI radiology and dermatology explainability.
-Given this medical classification result:
-- Model Mode: ${result.modelType === 'xray' ? 'Chest X-Ray (CheXNet DenseNet-121)' : 'Dermatology (EfficientNet-B0)'}
-- Predicted Class: ${result.predictedClass}
+      const prompt = `You are an educational clinical teaching assistant specializing in AI computer vision in radiology and dermatology.
+Analyze this medical image classification finding:
+- Modality: ${result.modelType === 'xray' ? 'Chest Radiograph (DenseNet-121 CheXNet)' : 'Dermatology Dermoscopy (EfficientNet-B0)'}
+- Primary Diagnostic Finding: ${result.predictedClass}
 - Confidence Rating: ${(result.confidence * 100).toFixed(1)}%
-- GradCAM Layer: ${result.gradcamLayerName}
+- Target Conv Layer: ${result.gradcamLayerName}
+- Differential Screenings: ${
+        result.differentialFindings?.map((f) => `${f.condition}: ${(f.probability * 100).toFixed(1)}%`).join(', ') ||
+        'Standard screening'
+      }
 
-Return ONLY a valid JSON object matching this schema (no markdown wrapping):
+Return ONLY valid JSON matching this exact schema (no markdown wrapping, no backticks, no other text):
 {
-  "anatomicalRegion": "Right Lower Lobe (Costophrenic Angle)",
-  "radiologyExplanation": "The GradCAM activation map highlights concentrated high-intensity gradients (red region) in the right lower pulmonary zone. Increased focal opacity in this region corresponds to inflammatory alveolar exudate typical of bacterial lobar pneumonia.",
-  "clinicalRelevance": "High — lower lobe consolidation is the most frequent radiographic presentation in community-acquired pneumonia.",
-  "aiLimitationNote": "GradCAM highlights neural network feature activation, not a definitive histopathological diagnosis. Always correlate with clinical auscultation and laboratory findings."
+  "anatomicalRegion": "Right Lower Lobe (Costophrenic Base & Alveolar Parenchyma)",
+  "radiologyExplanation": "The GradCAM activation map highlights concentrated peak gradients (red hot zone) in the right lower pulmonary field. Increased focal radio-opacity in this zone corresponds to alveolar exudate and air bronchograms characteristic of bacterial lobar pneumonia.",
+  "clinicalRelevance": "High — lower lobe alveolar consolidation is the classic hallmark of acute community-acquired pneumonia.",
+  "aiLimitationNote": "GradCAM highlights convolutional feature attention, not a definitive histopathological biopsy. Always correlate with physical auscultation, clinical presentation, and lab inflammatory markers.",
+  "recommendedWorkup": [
+    "High-Resolution Chest CT if symptoms persist",
+    "Sputum gram stain and bacterial culture",
+    "Repeat PA radiograph in 48-72 hours"
+  ]
 }`;
 
       const res = await model.generateContent(prompt);
@@ -44,6 +53,11 @@ Return ONLY a valid JSON object matching this schema (no markdown wrapping):
         'High — alveolar consolidation in lower pulmonary lobes is a hallmark finding in acute community-acquired pneumonia.',
       aiLimitationNote:
         'GradCAM visualizes convolutional feature attention, not a certified clinical diagnosis. Always confirm with standard radiological review.',
+      recommendedWorkup: [
+        'Complete Blood Count (CBC) with differential',
+        'Pulse oximetry monitoring',
+        'Follow-up PA chest radiograph',
+      ],
     };
   } else {
     return {
@@ -54,6 +68,11 @@ Return ONLY a valid JSON object matching this schema (no markdown wrapping):
         'High — asymmetric borders and color variation are key criteria of the ABCDE melanoma diagnostic guideline.',
       aiLimitationNote:
         'Superficial visual attention cannot substitute for dermatoscopic biopsy and histopathological examination.',
+      recommendedWorkup: [
+        'Dermoscopic high-magnification polarized evaluation',
+        'Excisional biopsy with 2mm margin',
+        'Histopathological staging examination',
+      ],
     };
   }
 }

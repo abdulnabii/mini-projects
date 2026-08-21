@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { getColormapColor, ColormapType } from '@/lib/medicalEngine';
-import { Eye, Sliders, Layers, Crosshair, SplitSquareVertical, Palette } from 'lucide-react';
+import { Eye, Sliders, Layers, Crosshair, SplitSquareVertical, Palette, Contrast, Sun, Moon, Sparkles } from 'lucide-react';
 
 interface Props {
   imageSrc: string;
@@ -11,16 +11,33 @@ interface Props {
   predictedClass: string;
 }
 
+type WindowingPreset = 'standard' | 'invert' | 'bone' | 'soft_tissue';
+
 export default function GradCAMCanvas({ imageSrc, heatmapGrid, modelType, predictedClass }: Props) {
   const [opacity, setOpacity] = useState<number>(0.65);
   const [showHeatmap, setShowHeatmap] = useState<boolean>(true);
   const [colormap, setColormap] = useState<ColormapType>('jet');
   const [isSplitMode, setIsSplitMode] = useState<boolean>(false);
+  const [windowPreset, setWindowPreset] = useState<WindowingPreset>('standard');
   const [hoverCoord, setHoverCoord] = useState<{ x: number; y: number; val: number } | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imageObjRef = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
+    // Preload actual image element
+    if (imageSrc) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = imageSrc;
+      img.onload = () => {
+        imageObjRef.current = img;
+        renderCanvas();
+      };
+    }
+  }, [imageSrc]);
+
+  const renderCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -31,53 +48,62 @@ export default function GradCAMCanvas({ imageSrc, heatmapGrid, modelType, predic
     canvas.width = width;
     canvas.height = height;
 
-    // Draw background medical graphic simulation
-    ctx.fillStyle = modelType === 'xray' ? '#04070d' : '#1e1418';
-    ctx.fillRect(0, 0, width, height);
-
-    // Draw base anatomical structure simulation
-    if (modelType === 'xray') {
-      // Draw Ribcage & Lungs
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      // Left lung outline
-      ctx.ellipse(140, 220, 75, 140, 0, 0, Math.PI * 2);
-      // Right lung outline
-      ctx.ellipse(300, 220, 75, 140, 0, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Ribs lines
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
-      ctx.lineWidth = 3;
-      for (let i = 0; i < 6; i++) {
-        const y = 120 + i * 38;
-        ctx.beginPath();
-        ctx.arc(140, y, 65, Math.PI * 0.8, Math.PI * 0.2, true);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(300, y, 65, Math.PI * 0.8, Math.PI * 0.2, true);
-        ctx.stroke();
-      }
-
-      // Heart silhouette
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
-      ctx.beginPath();
-      ctx.ellipse(220, 260, 50, 70, -0.2, 0, Math.PI * 2);
-      ctx.fill();
-    } else {
-      // Dermatology Lesion Simulation
-      ctx.fillStyle = '#c88c78';
-      ctx.fillRect(0, 0, width, height);
-
-      // Irregular lesion core
-      ctx.fillStyle = predictedClass.includes('Malignant') ? '#2a1a1f' : '#6b4337';
-      ctx.beginPath();
-      ctx.ellipse(220, 220, 100, 80, 0.3, 0, Math.PI * 2);
-      ctx.fill();
+    // Apply Windowing Filters
+    ctx.filter = 'none';
+    if (windowPreset === 'invert') {
+      ctx.filter = 'invert(100%)';
+    } else if (windowPreset === 'bone') {
+      ctx.filter = 'contrast(200%) brightness(120%) grayscale(100%)';
+    } else if (windowPreset === 'soft_tissue') {
+      ctx.filter = 'contrast(140%) brightness(90%)';
     }
 
-    // Draw GradCAM Heatmap Overlay
+    // 1. Draw Image or High-Fidelity Anatomical Silhouette
+    if (imageObjRef.current) {
+      ctx.drawImage(imageObjRef.current, 0, 0, width, height);
+    } else {
+      ctx.fillStyle = modelType === 'xray' ? '#04070d' : '#1e1418';
+      ctx.fillRect(0, 0, width, height);
+
+      if (modelType === 'xray') {
+        // High-Fidelity Ribcage & Lungs
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.ellipse(140, 220, 75, 140, 0, 0, Math.PI * 2);
+        ctx.ellipse(300, 220, 75, 140, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.lineWidth = 3;
+        for (let i = 0; i < 6; i++) {
+          const y = 120 + i * 38;
+          ctx.beginPath();
+          ctx.arc(140, y, 65, Math.PI * 0.8, Math.PI * 0.2, true);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(300, y, 65, Math.PI * 0.8, Math.PI * 0.2, true);
+          ctx.stroke();
+        }
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+        ctx.beginPath();
+        ctx.ellipse(220, 260, 50, 70, -0.2, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.fillStyle = '#c88c78';
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = predictedClass.includes('Malignant') ? '#2a1a1f' : '#6b4337';
+        ctx.beginPath();
+        ctx.ellipse(220, 220, 100, 80, 0.3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Reset filter for heatmap blending
+    ctx.filter = 'none';
+
+    // 2. Draw GradCAM Heatmap Overlay
     if (showHeatmap && heatmapGrid && heatmapGrid.length > 0) {
       const rows = heatmapGrid.length;
       const cols = heatmapGrid[0].length;
@@ -87,7 +113,7 @@ export default function GradCAMCanvas({ imageSrc, heatmapGrid, modelType, predic
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           if (isSplitMode && c < cols / 2) {
-            // In split mode, left half is un-overlayed original scan
+            // Split mode: left side is un-overlayed baseline scan
             continue;
           }
 
@@ -109,7 +135,11 @@ export default function GradCAMCanvas({ imageSrc, heatmapGrid, modelType, predic
         ctx.stroke();
       }
     }
-  }, [imageSrc, heatmapGrid, opacity, showHeatmap, modelType, predictedClass, colormap, isSplitMode]);
+  };
+
+  useEffect(() => {
+    renderCanvas();
+  }, [imageSrc, heatmapGrid, opacity, showHeatmap, modelType, predictedClass, colormap, isSplitMode, windowPreset]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -142,7 +172,7 @@ export default function GradCAMCanvas({ imageSrc, heatmapGrid, modelType, predic
           </div>
           <div>
             <h3 className="font-bold text-white text-base font-outfit">GradCAM Activation Map Compositor</h3>
-            <p className="text-xs text-slate-400">Multi-Spectral Neural Activation Visualization</p>
+            <p className="text-xs text-slate-400">Multi-Spectral Neural Activation &amp; Diagnostic Windowing</p>
           </div>
         </div>
 
@@ -151,7 +181,7 @@ export default function GradCAMCanvas({ imageSrc, heatmapGrid, modelType, predic
           <button
             type="button"
             onClick={() => setIsSplitMode(!isSplitMode)}
-            className={`px-3 py-1.5 rounded-xl font-bold transition-all text-xs flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-xl font-bold transition-all text-xs flex items-center gap-1.5 cursor-pointer ${
               isSplitMode
                 ? 'bg-cyan-500 text-black shadow-md'
                 : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white'
@@ -164,7 +194,7 @@ export default function GradCAMCanvas({ imageSrc, heatmapGrid, modelType, predic
           <button
             type="button"
             onClick={() => setShowHeatmap(!showHeatmap)}
-            className={`px-3 py-1.5 rounded-xl font-bold transition-all text-xs flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-xl font-bold transition-all text-xs flex items-center gap-1.5 cursor-pointer ${
               showHeatmap
                 ? 'bg-cyan-500 text-black shadow-md'
                 : 'bg-slate-950 border border-slate-800 text-slate-400'
@@ -202,9 +232,38 @@ export default function GradCAMCanvas({ imageSrc, heatmapGrid, modelType, predic
         </div>
 
         {/* Controls & Spectrum Sidebar */}
-        <div className="space-y-5 flex-1 w-full">
+        <div className="space-y-4 flex-1 w-full">
+          {/* Clinical Windowing Presets */}
+          <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+            <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+              <Contrast className="w-4 h-4 text-cyan-400" />
+              Radiological Windowing &amp; Contrast Presets
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {[
+                { id: 'standard', label: 'Native View' },
+                { id: 'invert', label: 'Invert Film' },
+                { id: 'bone', label: 'Bone Window' },
+                { id: 'soft_tissue', label: 'Soft Tissue' },
+              ].map((w) => (
+                <button
+                  key={w.id}
+                  type="button"
+                  onClick={() => setWindowPreset(w.id as WindowingPreset)}
+                  className={`p-2 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
+                    windowPreset === w.id
+                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                      : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {w.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Colormap Selector */}
-          <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2.5">
+          <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
             <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
               <Palette className="w-4 h-4 text-cyan-400" />
               Multi-Spectral Colormap Palette
@@ -215,7 +274,7 @@ export default function GradCAMCanvas({ imageSrc, heatmapGrid, modelType, predic
                   key={c}
                   type="button"
                   onClick={() => setColormap(c)}
-                  className={`p-2 rounded-xl text-xs font-bold uppercase transition-all ${
+                  className={`p-2 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer ${
                     colormap === c
                       ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
                       : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
@@ -228,7 +287,7 @@ export default function GradCAMCanvas({ imageSrc, heatmapGrid, modelType, predic
           </div>
 
           {/* Opacity Slider */}
-          <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+          <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
                 <Sliders className="w-4 h-4 text-cyan-400" />
@@ -248,15 +307,15 @@ export default function GradCAMCanvas({ imageSrc, heatmapGrid, modelType, predic
           </div>
 
           {/* Scale Legend */}
-          <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
-            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+          <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
               GradCAM Activation Intensity Scale ({colormap.toUpperCase()})
             </label>
-            <div className="h-4 rounded-full bg-gradient-to-r from-blue-600 via-emerald-400 to-red-600 w-full" />
+            <div className="h-3.5 rounded-full bg-gradient-to-r from-blue-600 via-emerald-400 to-red-600 w-full" />
             <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono">
-              <span>0.0 (Irrelevant)</span>
-              <span>0.5 (Moderate Attention)</span>
-              <span className="text-rose-400 font-bold">1.0 (Primary Focus)</span>
+              <span>0.0 (Baseline Background)</span>
+              <span>0.5 (Intermediate Region)</span>
+              <span className="text-rose-400 font-bold">1.0 (Peak Attention)</span>
             </div>
           </div>
         </div>

@@ -1,8 +1,22 @@
 'use client';
 
-import { ClassificationResult } from '@/types';
-import { Activity, ShieldAlert, Sparkles, CheckCircle2, Clock, BookOpen, AlertTriangle, FileText, Copy, Check } from 'lucide-react';
 import { useState } from 'react';
+import { ClassificationResult } from '@/types';
+import StructuredReportModal from './StructuredReportModal';
+import {
+  Activity,
+  ShieldAlert,
+  Sparkles,
+  CheckCircle2,
+  Clock,
+  BookOpen,
+  AlertTriangle,
+  FileText,
+  Copy,
+  Check,
+  Stethoscope,
+  Layers,
+} from 'lucide-react';
 
 interface Props {
   result: ClassificationResult;
@@ -10,60 +24,64 @@ interface Props {
 }
 
 export default function ClassifierView({ result, isLoadingAnnotation }: Props) {
-  const [copied, setCopied] = useState(false);
-  const isPositive = result.predictedClass.includes('Pneumonia') || result.predictedClass.includes('Malignant');
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const isPositive =
+    result.predictedClass.includes('Pneumonia') ||
+    result.predictedClass.includes('Malignant') ||
+    result.predictedClass.includes('Lobar');
 
-  const handleCopyReport = () => {
-    const reportText = `MEDVISION CLINICAL AI FINDINGS REPORT
-Modality: ${result.modelType === 'xray' ? 'Chest Radiography (DenseNet-121)' : 'Dermatology Dermoscopy (EfficientNet-B0)'}
-Primary Prediction: ${result.predictedClass} (${(result.confidence * 100).toFixed(1)}% confidence)
-Inference Latency: ${result.inferenceTimeMs}ms
-Anatomical Zone: ${result.educationalAnnotation?.anatomicalRegion || 'Target focus area'}
-Radiological Notes: ${result.educationalAnnotation?.radiologyExplanation || 'N/A'}
-Clinical Relevance: ${result.educationalAnnotation?.clinicalRelevance || 'N/A'}
-Disclaimer: Educational & Research Simulator Only.`;
-
-    navigator.clipboard.writeText(reportText);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const getRiskBadge = (risk: string) => {
+    switch (risk) {
+      case 'CRITICAL':
+        return 'bg-rose-500/10 border-rose-500/30 text-rose-400';
+      case 'MODERATE_RISK':
+        return 'bg-amber-500/10 border-amber-500/30 text-amber-400';
+      case 'LOW_RISK':
+        return 'bg-blue-500/10 border-blue-500/30 text-blue-400';
+      default:
+        return 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400';
+    }
   };
 
   return (
     <div className="space-y-6 font-mono text-xs text-slate-300">
       {/* Primary Prediction Banner */}
       <div
-        className={`p-6 sm:p-8 rounded-3xl border-2 space-y-4 shadow-2xl ${
+        className={`p-6 sm:p-8 rounded-3xl border-2 space-y-5 shadow-2xl ${
           isPositive
-            ? 'bg-rose-500/10 border-rose-500 text-rose-100 shadow-rose-500/10'
-            : 'bg-emerald-500/10 border-emerald-500 text-emerald-100 shadow-emerald-500/10'
+            ? 'bg-rose-500/10 border-rose-500/40 text-rose-100 shadow-rose-500/10'
+            : 'bg-emerald-500/10 border-emerald-500/40 text-emerald-100 shadow-emerald-500/10'
         }`}
       >
         {/* DICOM Header Simulator */}
         <div className="flex flex-wrap items-center justify-between gap-3 text-[10px] text-slate-400 border-b border-slate-800/80 pb-3">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <span>
-              PATIENT ID: <strong className="text-white font-mono">PX-84920-DX</strong>
+              PATIENT ID: <strong className="text-white font-mono">{result.patientId || 'PX-84920-DX'}</strong>
             </span>
             <span>•</span>
-            <span>MODALITY: <strong className="text-cyan-400">DX DIGITAL RADIOGRAPHY</strong></span>
+            <span>
+              MODALITY: <strong className="text-cyan-400">{result.modalityCode || 'DX DIGITAL RADIOGRAPHY'}</strong>
+            </span>
             <span>•</span>
-            <span>EXPOSURE: <strong className="text-slate-200">120 kVp / 2.5 mAs</strong></span>
+            <span>STUDY: <strong className="text-slate-200">{result.studyDate || '2026-08-21'}</strong></span>
           </div>
 
           <button
             type="button"
-            onClick={handleCopyReport}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 hover:text-white transition-all text-[10px] font-bold"
+            onClick={() => setIsReportModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold transition-all text-xs font-outfit shadow-md shadow-cyan-500/20 cursor-pointer"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copied ? 'Copied Findings' : 'Export Report'}</span>
+            <FileText className="w-3.5 h-3.5" />
+            <span>Structured Consultation Report</span>
           </button>
         </div>
 
+        {/* Primary Classification & Confidence */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div
-              className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold ${
+              className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold shadow-md ${
                 isPositive ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-black'
               }`}
             >
@@ -89,40 +107,91 @@ Disclaimer: Educational & Research Simulator Only.`;
           </div>
         </div>
 
-        {/* Low Confidence Uncertainty Warning Banner */}
+        {/* Low Confidence Uncertainty Warning */}
         {result.uncertaintyFlag && (
           <div className="p-3.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-200 text-[11px] flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
             <span>
-              <strong>Model Uncertainty Warning:</strong> Top class probability is below 70%. High model uncertainty detected.
+              <strong>Model Uncertainty Warning:</strong> Top class probability is below 70%. Second opinion recommended.
             </span>
           </div>
         )}
 
-        {/* Softmax Probability Bars */}
+        {/* Multi-Condition Differential Pathology Table */}
         <div className="space-y-3 pt-2">
-          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            Softmax Class Distribution
-          </label>
-          <div className="space-y-2">
-            {Object.entries(result.probabilities).map(([cls, prob], idx) => (
-              <div key={idx} className="p-3.5 rounded-xl bg-slate-950/90 border border-slate-800 space-y-1.5">
-                <div className="flex items-center justify-between font-bold">
-                  <span className="text-slate-200 font-outfit text-xs">{cls}</span>
-                  <span className="text-cyan-400">{(prob * 100).toFixed(1)}%</span>
+          <div className="flex items-center justify-between">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+              <Stethoscope className="w-3.5 h-3.5 text-cyan-400" />
+              Multi-Pathology Differential Screening ({result.modelType === 'xray' ? 'CheXNet 5-Class' : 'ISIC 4-Class'})
+            </label>
+            <span className="text-[10px] text-slate-500">Softmax &amp; Sigmoid Multilabel Output</span>
+          </div>
+
+          <div className="grid grid-cols-1 gap-2.5">
+            {result.differentialFindings && result.differentialFindings.length > 0 ? (
+              result.differentialFindings.map((finding, idx) => (
+                <div
+                  key={idx}
+                  className="p-3.5 rounded-2xl bg-slate-950/90 border border-slate-800/90 space-y-2"
+                >
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-white font-outfit text-xs">{finding.condition}</span>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${getRiskBadge(
+                          finding.riskLevel
+                        )}`}
+                      >
+                        {finding.riskLevel}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-slate-400">{finding.anatomicalLocation}</span>
+                      <span className="font-bold text-cyan-400 font-mono">
+                        {(finding.probability * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        finding.probability > 0.6
+                          ? 'bg-rose-500'
+                          : finding.probability > 0.25
+                          ? 'bg-amber-400'
+                          : 'bg-emerald-400'
+                      }`}
+                      style={{ width: `${finding.probability * 100}%` }}
+                    />
+                  </div>
+
+                  <p className="text-[10px] text-slate-400 font-sans leading-relaxed">
+                    {finding.clinicalSignificance}
+                  </p>
                 </div>
-                <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      cls.includes('Pneumonia') || cls.includes('Malignant')
-                        ? 'bg-rose-500'
-                        : 'bg-emerald-400'
-                    }`}
-                    style={{ width: `${prob * 100}%` }}
-                  />
+              ))
+            ) : (
+              Object.entries(result.probabilities).map(([cls, prob], idx) => (
+                <div key={idx} className="p-3.5 rounded-xl bg-slate-950/90 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center justify-between font-bold">
+                    <span className="text-slate-200 font-outfit text-xs">{cls}</span>
+                    <span className="text-cyan-400">{(prob * 100).toFixed(1)}%</span>
+                  </div>
+                  <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        cls.includes('Pneumonia') || cls.includes('Malignant')
+                          ? 'bg-rose-500'
+                          : 'bg-emerald-400'
+                      }`}
+                      style={{ width: `${prob * 100}%` }}
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
@@ -132,7 +201,7 @@ Disclaimer: Educational & Research Simulator Only.`;
             <Clock className="w-3.5 h-3.5 text-cyan-400" />
             Inference Forward Pass Latency: <strong className="text-slate-300">{result.inferenceTimeMs}ms</strong>
           </span>
-          <span>WebGL Acceleration Active</span>
+          <span>WebGL Acceleration Active • GradCAM Backprop</span>
         </div>
       </div>
 
@@ -180,6 +249,13 @@ Disclaimer: Educational & Research Simulator Only.`;
           </div>
         ) : null}
       </div>
+
+      {/* Structured Report Modal */}
+      <StructuredReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        result={result}
+      />
     </div>
   );
 }
