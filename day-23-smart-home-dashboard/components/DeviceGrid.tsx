@@ -20,6 +20,7 @@ interface Props {
   devices: Device[];
   onUpdateDevice: (id: string, updates: Partial<Device>) => void;
   onBulkUpdate: (updates: { id: string; changes: Partial<Device> }[]) => void;
+  onOpenConfig?: (device: Device) => void;
 }
 
 const ROOM_FILTERS: { room: Room; icon: any }[] = [
@@ -32,15 +33,18 @@ const ROOM_FILTERS: { room: Room; icon: any }[] = [
   { room: 'Patio & Outdoor', icon: Sun },
 ];
 
-export default function DeviceGrid({ devices, onUpdateDevice, onBulkUpdate }: Props) {
+export default function DeviceGrid({
+  devices,
+  onUpdateDevice,
+  onBulkUpdate,
+  onOpenConfig,
+}: Props) {
   const [selectedRoom, setSelectedRoom] = useState<Room>('All Rooms');
 
   const filteredDevices =
     selectedRoom === 'All Rooms'
       ? devices
       : devices.filter((d) => d.room === selectedRoom);
-
-  const totalActive = devices.filter((d) => d.isOn).length;
 
   const handleTurnOffAllLights = () => {
     const lightUpdates = devices
@@ -118,6 +122,7 @@ export default function DeviceGrid({ devices, onUpdateDevice, onBulkUpdate }: Pr
             key={device.id}
             device={device}
             onUpdateDevice={onUpdateDevice}
+            onOpenConfig={onOpenConfig}
           />
         ))}
       </div>

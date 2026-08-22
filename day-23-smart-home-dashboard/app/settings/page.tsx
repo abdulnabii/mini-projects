@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Device, Room, DeviceType } from '@/types';
 import { getStoredDevices, saveDevicesToStorage } from '@/lib/deviceStore';
+import DeviceConfigModal from '@/components/DeviceConfigModal';
 import {
   Network,
   Home,
@@ -19,6 +20,8 @@ import {
   Globe,
   Loader2,
   RefreshCw,
+  Settings,
+  Edit,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -42,6 +45,7 @@ const DEVICE_TYPES: { type: DeviceType; label: string }[] = [
 
 export default function SettingsPage() {
   const [devices, setDevices] = useState<Device[]>([]);
+  const [editingDevice, setEditingDevice] = useState<Device | null>(null);
 
   // Integration credentials
   const [haUrl, setHaUrl] = useState('http://homeassistant.local:8123');
@@ -78,13 +82,6 @@ export default function SettingsPage() {
     }, 800);
   };
 
-  const handleTestMqtt = () => {
-    setMqttStatus('testing');
-    setTimeout(() => {
-      setMqttStatus('connected');
-    }, 600);
-  };
-
   const handleAddCustomDevice = (e: React.FormEvent) => {
     e.preventDefault();
     if (!devName.trim()) return;
@@ -119,6 +116,14 @@ export default function SettingsPage() {
     });
   };
 
+  const handleSaveConfig = (id: string, updates: Partial<Device>) => {
+    const updated = devices.map((d) =>
+      d.id === id ? { ...d, ...updates, lastUpdated: new Date().toISOString() } : d
+    );
+    setDevices(updated);
+    saveDevicesToStorage(updated);
+  };
+
   const handleDeleteDevice = (id: string) => {
     const updated = devices.filter((d) => d.id !== id);
     setDevices(updated);
@@ -131,13 +136,13 @@ export default function SettingsPage() {
       <div className="p-6 sm:p-8 rounded-3xl bg-[#0d1117] border border-cyan-500/30 shadow-2xl space-y-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs">
           <Network className="w-3.5 h-3.5" />
-          <span>SMART HOME ECOSYSTEM BRIDGE</span>
+          <span>SMART HOME ECOSYSTEM BRIDGE &amp; HARDWARE CONFIG</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-black text-white font-outfit">
-          Connect Real Hardware &amp; Custom Devices
+          Connect Real Hardware &amp; Edit Configurations
         </h2>
         <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
-          Bridge your physical smart home devices via Home Assistant REST/WebSocket API, Zigbee2MQTT broker, Tuya Cloud, or add custom smart hardware directly to AuraHome.AI.
+          Bridge your physical smart home devices via Home Assistant REST/WebSocket API, Zigbee2MQTT broker, Tuya Cloud, or configure hardware parameters directly.
         </p>
       </div>
 
@@ -263,7 +268,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Add Custom Device Form */}
+        {/* Add Custom Device Form & Inventory */}
         <div className="space-y-4">
           <h3 className="font-bold text-white text-base font-outfit flex items-center gap-2">
             <Plus className="w-4 h-4 text-cyan-400" />
@@ -341,42 +346,72 @@ export default function SettingsPage() {
             </button>
           </form>
 
-          {/* Current Connected Device Inventory */}
+          {/* Current Connected Device Inventory with Edit triggers */}
           <div className="p-6 rounded-3xl bg-[#0d1117] border border-slate-800 space-y-3 shadow-xl">
             <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-              <h4 className="font-bold text-white text-xs">
-                Active Hardware Inventory ({devices.length})
-              </h4>
-              <span className="text-[10px] text-slate-500">Local State Machine</span>
+              <div>
+                <h4 className="font-bold text-white text-xs">
+                  Hardware Inventory ({devices.length})
+                </h4>
+                <p className="text-[10px] text-slate-500">
+                  Click 'Edit' to change names, wattage rating, room, or stream URLs
+                </p>
+              </div>
+              <span className="text-[10px] text-cyan-400 font-bold">Local Sync</span>
             </div>
 
-            <div className="space-y-2 max-h-56 overflow-y-auto pr-1 text-xs">
+            <div className="space-y-2 max-h-64 overflow-y-auto pr-1 text-xs">
               {devices.map((d) => (
                 <div
                   key={d.id}
-                  className="flex items-center justify-between p-2.5 rounded-xl bg-[#161b22] border border-slate-800"
+                  className="flex items-center justify-between p-3 rounded-xl bg-[#161b22] border border-slate-800 hover:border-cyan-500/40 transition-all"
                 >
-                  <div>
-                    <span className="font-bold text-white">{d.name}</span>
-                    <span className="text-slate-500 text-[10px] ml-2">
-                      ({d.room} • {d.type})
-                    </span>
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-white">{d.name}</span>
+                      <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-900 text-cyan-300 border border-slate-800">
+                        {d.powerWatts}W
+                      </span>
+                    </div>
+                    <p className="text-slate-500 text-[10px]">
+                      {d.room} • {d.type}
+                    </p>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteDevice(d.id)}
-                    className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-slate-900 transition-colors cursor-pointer"
-                    title="Remove device"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setEditingDevice(d)}
+                      className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-cyan-400 hover:border-cyan-500/50 text-[11px] font-bold transition-colors cursor-pointer flex items-center gap-1"
+                    >
+                      <Settings className="w-3 h-3" />
+                      <span>Edit</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteDevice(d.id)}
+                      className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-slate-900 transition-colors cursor-pointer"
+                      title="Remove device"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Edit Device Config Modal */}
+      <DeviceConfigModal
+        device={editingDevice}
+        isOpen={!!editingDevice}
+        onClose={() => setEditingDevice(null)}
+        onSave={handleSaveConfig}
+        onDelete={handleDeleteDevice}
+      />
     </div>
   );
 }

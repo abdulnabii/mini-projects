@@ -6,6 +6,7 @@ import { getStoredDevices, saveDevicesToStorage, PRESET_SCENES } from '@/lib/dev
 import VoiceCommandCenter from '@/components/VoiceCommandCenter';
 import SceneBar from '@/components/SceneBar';
 import DeviceGrid from '@/components/DeviceGrid';
+import DeviceConfigModal from '@/components/DeviceConfigModal';
 import {
   Zap,
   Mic,
@@ -22,6 +23,7 @@ import confetti from 'canvas-confetti';
 export default function SmartHomeDashboard() {
   const [devices, setDevices] = useState<Device[]>([]);
   const [activeSceneId, setActiveSceneId] = useState<string | null>(null);
+  const [editingDevice, setEditingDevice] = useState<Device | null>(null);
 
   useEffect(() => {
     setDevices(getStoredDevices());
@@ -31,6 +33,16 @@ export default function SmartHomeDashboard() {
     const updated = devices.map((d) =>
       d.id === id ? { ...d, ...updates, lastUpdated: new Date().toISOString() } : d
     );
+    setDevices(updated);
+    saveDevicesToStorage(updated);
+  };
+
+  const handleSaveConfig = (id: string, updates: Partial<Device>) => {
+    handleUpdateDevice(id, updates);
+  };
+
+  const handleDeleteDevice = (id: string) => {
+    const updated = devices.filter((d) => d.id !== id);
     setDevices(updated);
     saveDevicesToStorage(updated);
   };
@@ -121,7 +133,7 @@ export default function SmartHomeDashboard() {
           </span>
         </h1>
         <p className="text-slate-400 text-xs sm:text-sm font-mono max-w-2xl mx-auto leading-relaxed">
-          Speak natural language commands to control smart lights, thermostats, deadbolts, and entertainment zones. Monitor real-time wattage draw and trigger automated scenes with Gemini 1.5.
+          Speak natural language commands to control smart lights, thermostats, deadbolts, and entertainment zones. Customize hardware configurations and monitor real-time wattage draw.
         </p>
       </div>
 
@@ -185,14 +197,27 @@ export default function SmartHomeDashboard() {
               Room-by-Room Telemetry
             </h3>
           </div>
+          <span className="text-[10px] text-slate-500">
+            Click ⚙️ on any device card to edit hardware configuration
+          </span>
         </div>
 
         <DeviceGrid
           devices={devices}
           onUpdateDevice={handleUpdateDevice}
           onBulkUpdate={handleBulkUpdate}
+          onOpenConfig={(device) => setEditingDevice(device)}
         />
       </div>
+
+      {/* Device Config Modal */}
+      <DeviceConfigModal
+        device={editingDevice}
+        isOpen={!!editingDevice}
+        onClose={() => setEditingDevice(null)}
+        onSave={handleSaveConfig}
+        onDelete={handleDeleteDevice}
+      />
     </div>
   );
 }

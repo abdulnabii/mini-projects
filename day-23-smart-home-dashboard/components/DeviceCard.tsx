@@ -16,11 +16,13 @@ import {
   Leaf,
   Sliders,
   Radio,
+  Settings,
 } from 'lucide-react';
 
 interface Props {
   device: Device;
   onUpdateDevice: (id: string, updates: Partial<Device>) => void;
+  onOpenConfig?: (device: Device) => void;
 }
 
 const COLOR_PRESETS = [
@@ -30,7 +32,7 @@ const COLOR_PRESETS = [
   { name: 'Crisp Daylight', hex: '#ffffff' },
 ];
 
-export default function DeviceCard({ device, onUpdateDevice }: Props) {
+export default function DeviceCard({ device, onUpdateDevice, onOpenConfig }: Props) {
   const togglePower = () => {
     const nextOn = !device.isOn;
     onUpdateDevice(device.id, {
@@ -80,7 +82,7 @@ export default function DeviceCard({ device, onUpdateDevice }: Props) {
           : 'bg-[#080d14] border-slate-850 opacity-80 hover:opacity-100'
       }`}
     >
-      {/* Top Bar: Icon + Room + Power Toggle */}
+      {/* Top Bar: Icon + Room + Edit Config & Power Toggle */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div
@@ -99,24 +101,37 @@ export default function DeviceCard({ device, onUpdateDevice }: Props) {
             <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider block">
               {device.room}
             </span>
-            <h4 className="font-bold text-white text-xs font-outfit truncate max-w-[140px]">
+            <h4 className="font-bold text-white text-xs font-outfit truncate max-w-[130px]">
               {device.name}
             </h4>
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={togglePower}
-          className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-            device.isOn
-              ? 'bg-emerald-500 text-black shadow-md shadow-emerald-500/20'
-              : 'bg-slate-900 text-slate-500 border border-slate-800 hover:text-white'
-          }`}
-          title={device.isOn ? 'Turn Off' : 'Turn On'}
-        >
-          <Power className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-1.5">
+          {onOpenConfig && (
+            <button
+              type="button"
+              onClick={() => onOpenConfig(device)}
+              className="w-8 h-8 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-cyan-400 hover:border-cyan-500/40 flex items-center justify-center transition-all cursor-pointer"
+              title="Edit Device Configuration"
+            >
+              <Settings className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={togglePower}
+            className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+              device.isOn
+                ? 'bg-emerald-500 text-black shadow-md shadow-emerald-500/20'
+                : 'bg-slate-900 text-slate-500 border border-slate-800 hover:text-white'
+            }`}
+            title={device.isOn ? 'Turn Off' : 'Turn On'}
+          >
+            <Power className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Device-Specific Controls */}
