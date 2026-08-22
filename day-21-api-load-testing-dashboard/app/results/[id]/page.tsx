@@ -14,17 +14,17 @@ import K6ScriptExporter from '@/components/K6ScriptExporter';
 import ExportReportModal from '@/components/ExportReportModal';
 import {
   ArrowLeft,
-  Share2,
   FileText,
-  Play,
   RotateCcw,
   Sparkles,
   Zap,
   Activity,
-  Flame,
   CheckCircle2,
   AlertTriangle,
   XCircle,
+  BarChart3,
+  Code2,
+  ShieldAlert,
 } from 'lucide-react';
 
 export default function TestResultPage() {
@@ -34,6 +34,7 @@ export default function TestResultPage() {
 
   const [result, setResult] = useState<TestResult | null>(null);
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'metrics' | 'diagnostic' | 'export'>('metrics');
 
   useEffect(() => {
     if (!id) return;
@@ -41,7 +42,6 @@ export default function TestResultPage() {
     if (stored) {
       setResult(stored);
     } else {
-      // Check preset mocks
       const preset = BENCHMARK_PRESETS.find((p) => p.mockResult.id === id);
       if (preset) {
         setResult(preset.mockResult);
@@ -64,11 +64,11 @@ export default function TestResultPage() {
 
   return (
     <div className="space-y-8 font-sans">
-      {/* Top Breadcrumb & Actions Bar */}
+      {/* Top Navigation & Action Controls */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <Link
           href="/"
-          className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors"
+          className="flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-white transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Load Studio</span>
@@ -77,52 +77,54 @@ export default function TestResultPage() {
         <div className="flex items-center gap-2.5 flex-wrap">
           <button
             onClick={() => setIsExportOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 border border-white/10 hover:border-cyan-500/40 text-xs font-bold text-white transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 border border-white/10 hover:border-cyan-500/40 text-xs font-bold text-white transition-all cursor-pointer shadow-sm"
           >
             <FileText className="w-4 h-4 text-cyan-400" />
-            <span>Export Stakeholder Report</span>
+            <span>Export Executive Report</span>
           </button>
 
           <Link
             href="/"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-black font-extrabold text-xs shadow-md shadow-cyan-500/20 hover:scale-105 transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-400 via-cyan-500 to-blue-600 hover:from-cyan-300 hover:to-blue-500 text-black font-extrabold text-xs shadow-lg shadow-cyan-500/20 hover:scale-105 transition-all"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>Rerun Test</span>
+            <span>Rerun Benchmark</span>
           </Link>
         </div>
       </div>
 
       {/* Main Results Header Banner */}
-      <div className="p-6 sm:p-8 rounded-3xl glass-card border-2 border-cyan-500/30 shadow-2xl space-y-4">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="space-y-1.5">
+      <div className="p-6 sm:p-8 rounded-3xl glass-card border border-white/[0.08] shadow-2xl space-y-4 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+          <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-mono text-[10px] font-bold border border-cyan-500/30 uppercase">
                 {result.config.method}
               </span>
               <span className="text-xs text-slate-400 font-mono">
-                {result.config.virtualUsers} VUs • {result.config.durationSeconds}s Duration • {result.config.loadProfile.replace('_', ' ')}
+                {result.config.virtualUsers} Virtual Users • {result.config.durationSeconds}s Duration • {result.config.loadProfile.replace('_', ' ')}
               </span>
             </div>
-            <h2 className="text-xl sm:text-3xl font-black text-white font-outfit">
+            <h2 className="text-2xl sm:text-3xl font-black text-white font-outfit">
               {result.config.title}
             </h2>
             <p className="text-xs font-mono text-slate-300 break-all">{result.config.url}</p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="p-3 px-5 rounded-2xl bg-slate-950 border border-white/10 text-center">
-              <span className="text-2xl font-black font-mono text-cyan-400 leading-none">
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="p-3.5 px-5 rounded-2xl bg-slate-950 border border-white/10 text-center">
+              <span className="text-2xl sm:text-3xl font-black font-mono text-cyan-400 leading-none">
                 {result.avgRps}
               </span>
               <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mt-1">
-                Avg RPS
+                Avg Throughput
               </span>
             </div>
 
-            <div className="p-3 px-5 rounded-2xl bg-slate-950 border border-white/10 text-center">
-              <span className="text-2xl font-black font-mono text-emerald-400 leading-none">
+            <div className="p-3.5 px-5 rounded-2xl bg-slate-950 border border-white/10 text-center">
+              <span className="text-2xl sm:text-3xl font-black font-mono text-emerald-400 leading-none">
                 {p.p50}ms
               </span>
               <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mt-1">
@@ -154,11 +156,11 @@ export default function TestResultPage() {
         </div>
 
         <div className="p-5 rounded-2xl glass-card space-y-1">
-          <span className="text-[10px] font-bold text-slate-400 uppercase">P99 Tail SLA</span>
+          <span className="text-[10px] font-bold text-slate-400 uppercase">P99 Tail Latency</span>
           <div className="text-2xl font-black text-amber-400">
             {p.p99} <span className="text-xs font-normal text-slate-500">ms</span>
           </div>
-          <span className="text-[10px] text-slate-400">P95: {p.p95}ms</span>
+          <span className="text-[10px] text-slate-400">P95 SLA: {p.p95}ms</span>
         </div>
 
         <div className="p-5 rounded-2xl glass-card space-y-1">
@@ -172,33 +174,81 @@ export default function TestResultPage() {
         </div>
       </div>
 
-      {/* Live Charts (Throughput & Latency Curve) */}
-      <div className="grid grid-cols-1 gap-6">
-        <LiveThroughputChart
-          data={result.timeSeries}
-          peakRps={result.peakRps}
-          avgRps={result.avgRps}
-        />
+      {/* Segmented View Tabs */}
+      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-950/80 border border-white/10 text-xs w-fit">
+        <button
+          onClick={() => setActiveTab('metrics')}
+          className={`px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            activeTab === 'metrics'
+              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-md'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <BarChart3 className="w-3.5 h-3.5" />
+          <span>Real-Time Telemetry &amp; Charts</span>
+        </button>
 
-        <LatencyPercentileCurve
-          percentiles={result.percentiles}
-          timeSeries={result.timeSeries}
-        />
+        <button
+          onClick={() => setActiveTab('diagnostic')}
+          className={`px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            activeTab === 'diagnostic'
+              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-md'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+          <span>AI SRE Diagnostic</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('export')}
+          className={`px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            activeTab === 'export'
+              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-md'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <Code2 className="w-3.5 h-3.5" />
+          <span>k6 &amp; cURL Scripts</span>
+        </button>
       </div>
 
-      {/* Status Codes & Error Log */}
-      <StatusCodeDonut
-        statusCodes={result.statusCodes}
-        recentErrors={result.recentErrors}
-        errorRate={result.errorRate}
-        totalRequests={result.totalRequests}
-      />
+      {/* Tab 1: Metrics & Charts */}
+      {activeTab === 'metrics' && (
+        <div className="space-y-6 animate-in fade-in duration-200">
+          <LiveThroughputChart
+            data={result.timeSeries}
+            peakRps={result.peakRps}
+            avgRps={result.avgRps}
+          />
 
-      {/* Gemini AI Root-Cause Diagnostic Studio */}
-      <AIBottleneckDiagnostic analysis={result.aiAnalysis} />
+          <LatencyPercentileCurve
+            percentiles={result.percentiles}
+            timeSeries={result.timeSeries}
+          />
 
-      {/* Native k6 / cURL Script Exporter */}
-      <K6ScriptExporter config={result.config} />
+          <StatusCodeDonut
+            statusCodes={result.statusCodes}
+            recentErrors={result.recentErrors}
+            errorRate={result.errorRate}
+            totalRequests={result.totalRequests}
+          />
+        </div>
+      )}
+
+      {/* Tab 2: AI Diagnostic */}
+      {activeTab === 'diagnostic' && (
+        <div className="animate-in fade-in duration-200">
+          <AIBottleneckDiagnostic analysis={result.aiAnalysis} />
+        </div>
+      )}
+
+      {/* Tab 3: k6 & cURL Export */}
+      {activeTab === 'export' && (
+        <div className="animate-in fade-in duration-200">
+          <K6ScriptExporter config={result.config} />
+        </div>
+      )}
 
       {/* Export Report Modal */}
       <ExportReportModal

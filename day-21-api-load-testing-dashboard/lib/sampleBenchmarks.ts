@@ -6,6 +6,8 @@ export interface BenchmarkPreset {
   category: string;
   description: string;
   icon: string;
+  expectedRps: string;
+  expectedLatency: string;
   config: TestConfig;
   mockResult: TestResult;
 }
@@ -15,8 +17,10 @@ export const BENCHMARK_PRESETS: BenchmarkPreset[] = [
     id: 'preset_ecommerce',
     name: 'E-Commerce Catalog & Search API',
     category: 'High Throughput Read',
-    description: 'High concurrency read workload simulating Black Friday shoppers querying product inventory.',
+    description: 'Simulates high-traffic flash sale shoppers querying product inventory with multi-criteria filtering.',
     icon: '🛍️',
+    expectedRps: '~200 RPS',
+    expectedLatency: '180ms P50',
     config: {
       id: 'cfg_ecommerce',
       title: 'E-Commerce Catalog & Search API Concurrency Test',
@@ -24,7 +28,7 @@ export const BENCHMARK_PRESETS: BenchmarkPreset[] = [
       method: 'GET',
       headers: [
         { key: 'Accept', value: 'application/json', enabled: true },
-        { key: 'User-Agent', value: 'LoadPulse.AI/2.0', enabled: true },
+        { key: 'User-Agent', value: 'LoadPulse.AI/2.0 (High-Concurrency)', enabled: true },
       ],
       bodyType: 'none',
       authType: 'none',
@@ -89,7 +93,7 @@ export const BENCHMARK_PRESETS: BenchmarkPreset[] = [
       aiAnalysis: {
         verdict: 'PASS',
         performanceScore: 88,
-        summary: 'Target API performed admirably with 189.3 avg RPS. P99 tail latency increased beyond 50 VUs due to origin DB serialization.',
+        summary: 'Target API performed admirably with 189.3 avg RPS. Tail latency widened beyond 50 VUs due to unindexed search filters.',
         bottlenecks: [
           {
             id: 'b1',
@@ -115,6 +119,8 @@ export const BENCHMARK_PRESETS: BenchmarkPreset[] = [
     category: 'High Latency / Bottleneck',
     description: 'Simulates heavy unindexed database joins or slow microservice cascade under concurrency.',
     icon: '🐢',
+    expectedRps: '~30 RPS',
+    expectedLatency: '1.2s P50',
     config: {
       id: 'cfg_slow',
       title: 'Database Contention & Lock Stress Test',
@@ -198,6 +204,87 @@ export const BENCHMARK_PRESETS: BenchmarkPreset[] = [
         architecturalSuggestions: [
           'Add compound B-tree index on query filter columns',
           'Implement circuit breaker pattern (Resilience4j / Opossum) with exponential backoff',
+        ],
+      },
+    },
+  },
+  {
+    id: 'preset_microservice_ping',
+    name: 'Microservice Health & Gateway Ping',
+    category: 'Ultra Low Latency',
+    description: 'Sub-millisecond high-throughput heartbeat probe to measure reverse-proxy TLS overhead.',
+    icon: '⚡',
+    expectedRps: '~450 RPS',
+    expectedLatency: '45ms P50',
+    config: {
+      id: 'cfg_ping',
+      title: 'Microservice Health & Gateway Ping Benchmark',
+      url: 'https://httpbin.org/get',
+      method: 'GET',
+      headers: [{ key: 'Accept', value: 'application/json', enabled: true }],
+      bodyType: 'none',
+      authType: 'none',
+      virtualUsers: 100,
+      durationSeconds: 15,
+      rampUpSeconds: 2,
+      loadProfile: 'constant',
+      timeoutMs: 5000,
+    },
+    mockResult: {
+      id: 'res_ping_1',
+      config: {
+        id: 'cfg_ping',
+        title: 'Microservice Health & Gateway Ping Benchmark',
+        url: 'https://httpbin.org/get',
+        method: 'GET',
+        headers: [],
+        bodyType: 'none',
+        authType: 'none',
+        virtualUsers: 100,
+        durationSeconds: 15,
+        rampUpSeconds: 2,
+        loadProfile: 'constant',
+        timeoutMs: 5000,
+      },
+      startedAt: new Date(Date.now() - 1800000).toISOString(),
+      completedAt: new Date(Date.now() - 1800000 + 15000).toISOString(),
+      status: 'completed',
+      totalRequests: 5800,
+      successfulRequests: 5800,
+      failedRequests: 0,
+      errorRate: 0.0,
+      avgRps: 386.6,
+      peakRps: 460.0,
+      totalDataTransferMb: 8.2,
+      percentiles: {
+        min: 24,
+        p50: 48,
+        p75: 72,
+        p90: 110,
+        p95: 145,
+        p99: 210,
+        p999: 290,
+        max: 340,
+        mean: 56.2,
+      },
+      statusCodes: [
+        { code: 200, count: 5800, description: 'OK — Healthy Response', isError: false },
+      ],
+      recentErrors: [],
+      timeSeries: [
+        { timestampSec: 1, activeVus: 100, rps: 340, p50Ms: 42, p90Ms: 95, p95Ms: 120, p99Ms: 180, errorRatePercent: 0, bytesPerSec: 420000 },
+        { timestampSec: 5, activeVus: 100, rps: 410, p50Ms: 46, p90Ms: 105, p95Ms: 138, p99Ms: 195, errorRatePercent: 0, bytesPerSec: 510000 },
+        { timestampSec: 10, activeVus: 100, rps: 455, p50Ms: 50, p90Ms: 115, p95Ms: 150, p99Ms: 220, errorRatePercent: 0, bytesPerSec: 580000 },
+        { timestampSec: 15, activeVus: 100, rps: 390, p50Ms: 45, p90Ms: 100, p95Ms: 135, p99Ms: 190, errorRatePercent: 0, bytesPerSec: 490000 },
+      ],
+      aiAnalysis: {
+        verdict: 'PASS',
+        performanceScore: 98,
+        summary: 'Flawless execution with zero dropped requests and sub-50ms median response latency across 5,800 requests.',
+        bottlenecks: [],
+        architecturalSuggestions: [
+          'Maintain HTTP/2 multiplexing across all client ingress routes',
+          'Deploy regional edge zones to decrease origin Round Trip Times (RTT)',
         ],
       },
     },
