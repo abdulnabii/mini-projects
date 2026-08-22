@@ -176,37 +176,158 @@ export default function Canvas({
     };
   }, [selectedIds, onDeleteElement, onDuplicateElement]);
 
+  // Keep latest scale and offset in refs for event listeners
+  const scaleRef = useRef(scale);
+  const offsetRef = useRef(offset);
+  scaleRef.current = scale;
+  offsetRef.current = offset;
+
+  // Touch gesture state for multi-touch pinch & pan
+  const touchStateRef = useRef<{
+    initialDistance: number | null;
+    initialScale: number;
+    initialMidpoint: { x: number; y: number } | null;
+    initialOffset: { x: number; y: number };
+  }>({
+    initialDistance: null,
+    initialScale: 1,
+    initialMidpoint: null,
+    initialOffset: { x: 0, y: 0 },
+  });
+
   const getCanvasPos = (clientX: number, clientY: number) => {
     const rect = containerRef.current!.getBoundingClientRect();
     return {
-      x: (clientX - rect.left - offset.x) / scale,
-      y: (clientY - rect.top - offset.y) / scale,
+      x: (clientX - rect.left - offsetRef.current.x) / scaleRef.current,
+      y: (clientY - rect.top - offsetRef.current.y) / scaleRef.current,
     };
   };
 
-  // Zoom on wheel
-  const handleWheel = (e: WheelEvent) => {
-    e.preventDefault();
-    const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
-    const newScale = Math.min(Math.max(scale * zoomFactor, 0.15), 6.0);
-
-    const rect = containerRef.current!.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    const newOffsetX = mouseX - (mouseX - offset.x) * (newScale / scale);
-    const newOffsetY = mouseY - (mouseY - offset.y) * (newScale / scale);
-
-    onScaleChange(newScale);
-    onOffsetChange({ x: newOffsetX, y: newOffsetY });
-  };
-
+  // High-Precision Trackpad Pinch-to-Zoom & Two-Finger Pan
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    el.addEventListener('wheel', handleWheel, { passive: false });
-    return () => el.removeEventListener('wheel', handleWheel);
-  }, [scale, offset]);
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleWheelEvent = (e: WheelEvent) => {
+      e.preventDefault();
+
+      const rect = container.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      // 1. Pinch-to-Zoom on Trackpad (Browsers emit ctrlKey=true on pinch gesture) or Ctrl/Cmd + Wheel
+      if (e.ctrlKey || e.metaKey) {
+        // Continuous smooth exponential zoom proportional to pinch speed
+        const zoomDelta = -e.deltaY;
+        const zoomSpeed = 0.008;
+        const zoomFactor = Math.exp(zoomDelta * zoomSpeed);
+        const currentScale = scaleRef.current;
+        const newScale = Math.min(Math.max(currentScale * zoomFactor, 0.1), 8.0);
+
+        if (newScale !== currentScale) {
+          const newOffsetX = mouseX - (mouseX - offsetRef.current.x) * (newScale / currentScale);
+          const newOffsetY = mouseY - (mouseY - offsetRef.current.y) * (newScale / currentScale);
+
+          onScaleChange(newScale);
+          onOffsetChange({ x: newOffsetX, y: newOffsetY });
+        }
+        return;
+      }
+
+      // 2. Shift + Wheel for pure horizontal scroll
+      if (e.shiftKey) {
+        const delta = e.deltaX !== 0 ? e.deltaX : e.deltaY;
+        onOffsetChange({
+          x: offsetRef.current.x - delta,
+          y: offsetRef.current.y,
+        });
+        return;
+      }
+
+      // 3. Two-Finger Pan on Trackpad / Standard 2D Scroll
+      onOffsetChange({
+        x: offsetRef.current.x - e.deltaX,
+        y: offsetRef.current.y - e.deltaY,
+      });
+    };
+
+    // Touchscreen / Multi-Touch Pinch to Zoom & Pan
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+        const midX = (t1.clientX + t2.clientX) / 2;
+        const midY = (t1.clientY + t2.clientY) / 2;
+
+        touchStateRef.current = {
+          initialDistance: dist,
+          initialScale: scaleRef.current,
+          initialMidpoint: { x: midX, y: midY },
+          initialOffset: { ...offsetRef.current },
+        };
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && touchStateRef.current.initialDistance && touchStateRef.current.initialMidpoint) {
+        e.preventDefault();
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        const currentDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+        const currentMidX = (t1.clientX + t2.clientX) / 2;
+        const currentMidY = (t1.clientY + t2.clientY) / 2;
+
+        const scaleRatio = currentDist / touchStateRef.current.initialDistance;
+        const newScale = Math.min(
+          Math.max(touchStateRef.current.initialScale * scaleRatio, 0.1),
+          8.0
+        );
+
+        const rect = container.getBoundingClientRect();
+        const initialMidXInContainer = touchStateRef.current.initialMidpoint.x - rect.left;
+        const initialMidYInContainer = touchStateRef.current.initialMidpoint.y - rect.top;
+
+        const panDeltaX = currentMidX - touchStateRef.current.initialMidpoint.x;
+        const panDeltaY = currentMidY - touchStateRef.current.initialMidpoint.y;
+
+        const newOffsetX =
+          initialMidXInContainer -
+          (initialMidXInContainer - touchStateRef.current.initialOffset.x) *
+            (newScale / touchStateRef.current.initialScale) +
+          panDeltaX;
+
+        const newOffsetY =
+          initialMidYInContainer -
+          (initialMidYInContainer - touchStateRef.current.initialOffset.y) *
+            (newScale / touchStateRef.current.initialScale) +
+          panDeltaY;
+
+        onScaleChange(newScale);
+        onOffsetChange({ x: newOffsetX, y: newOffsetY });
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length < 2) {
+        touchStateRef.current.initialDistance = null;
+        touchStateRef.current.initialMidpoint = null;
+      }
+    };
+
+    container.addEventListener('wheel', handleWheelEvent, { passive: false });
+    container.addEventListener('touchstart', handleTouchStart, { passive: false });
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    container.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      container.removeEventListener('wheel', handleWheelEvent);
+      container.removeEventListener('touchstart', handleTouchStart);
+      container.removeEventListener('touchmove', handleTouchMove);
+      container.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [onOffsetChange, onScaleChange]);
 
   // Pointer Down
   const handlePointerDown = (e: React.PointerEvent) => {
