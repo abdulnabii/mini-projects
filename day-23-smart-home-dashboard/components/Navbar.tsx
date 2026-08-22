@@ -8,8 +8,7 @@ import {
   Shield,
   Sliders,
   Mic,
-  Activity,
-  Sparkles,
+  Network,
 } from 'lucide-react';
 
 const NAV_LINKS = [
@@ -17,6 +16,7 @@ const NAV_LINKS = [
   { href: '/energy', label: 'Energy Radar', icon: Zap, badge: 'Live' },
   { href: '/automations', label: 'Smart Rules', icon: Sliders },
   { href: '/security', label: 'Security Panel', icon: Shield },
+  { href: '/settings', label: 'Ecosystem Bridge', icon: Network, badge: 'IoT' },
 ];
 
 export default function Navbar() {
@@ -75,11 +75,11 @@ export default function Navbar() {
         {/* Action Controls */}
         <div className="flex items-center gap-2.5 shrink-0">
           <Link
-            href="/"
+            href="/settings"
             className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-400 via-teal-400 to-indigo-500 hover:from-cyan-300 hover:to-indigo-400 text-black font-extrabold text-xs shadow-md shadow-cyan-500/20 hover:scale-105 transition-all"
           >
-            <Mic className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Voice Studio</span>
+            <Network className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Connect Hardware</span>
           </Link>
 
           <a
