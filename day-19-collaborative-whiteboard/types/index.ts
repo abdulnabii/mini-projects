@@ -2,20 +2,39 @@ export type ToolType =
   | 'select'
   | 'pan'
   | 'pencil'
+  | 'highlighter'
+  | 'laser'
   | 'rectangle'
+  | 'rounded_rect'
   | 'ellipse'
+  | 'diamond'
+  | 'cylinder'
+  | 'cloud'
   | 'arrow'
+  | 'step_arrow'
+  | 'line'
   | 'text'
-  | 'sticky';
+  | 'sticky'
+  | 'frame';
 
 export type ElementType =
   | 'pencil'
+  | 'highlighter'
   | 'rectangle'
+  | 'rounded_rect'
   | 'ellipse'
+  | 'diamond'
+  | 'cylinder'
+  | 'cloud'
   | 'arrow'
+  | 'step_arrow'
+  | 'line'
   | 'text'
   | 'sticky'
+  | 'frame'
   | 'diagram_shape';
+
+export type GridStyle = 'dots' | 'grid' | 'blueprint' | 'blank';
 
 export interface CanvasElement {
   id: string;
@@ -30,40 +49,53 @@ export interface CanvasElement {
   stroke?: string;
   strokeWidth?: number;
   fontSize?: number;
+  fontFamily?: 'sans' | 'mono' | 'serif';
+  textAlign?: 'left' | 'center' | 'right';
   rotation?: number;
   stickyColor?: string;
+  stickyEmoji?: string;
+  stickyAuthor?: string;
+  frameTitle?: string;
   opacity?: number;
+  label?: string;
+  zIndex?: number;
 }
 
 export interface UserPresence {
-  cursor: { x: number; y: number } | null;
+  id: string;
   name: string;
   color: string;
-  activeTool: ToolType;
+  cursor: { x: number; y: number };
+  activeTool: string;
+  activity: string;
+  lastActive: number;
 }
 
 export interface DiagramSpec {
   title: string;
+  category?: string;
   elements: DiagramElement[];
   connections: DiagramConnection[];
 }
 
 export interface DiagramElement {
   id: string;
-  type: 'rectangle' | 'ellipse' | 'cylinder' | 'diamond';
+  type: 'rectangle' | 'rounded_rect' | 'ellipse' | 'cylinder' | 'diamond' | 'cloud';
   label: string;
+  subLabel?: string;
   x: number;
   y: number;
   color: string;
   width?: number;
   height?: number;
+  iconName?: string;
 }
 
 export interface DiagramConnection {
   from: string;
   to: string;
   label?: string;
-  style?: 'arrow' | 'dashed';
+  style?: 'arrow' | 'dashed' | 'step';
 }
 
 export interface DrawStyle {
@@ -71,5 +103,12 @@ export interface DrawStyle {
   stroke: string;
   strokeWidth: number;
   opacity: number;
-  fontSize?: number;
+  fontSize: number;
+  fontFamily?: 'sans' | 'mono' | 'serif';
+}
+
+export interface LaserPoint {
+  x: number;
+  y: number;
+  timestamp: number;
 }
