@@ -1,79 +1,60 @@
 @import "tailwindcss";
 
-:root {
-  --bg-main: #030712;
-  --bg-card: #08111e;
-  --bg-card-subtle: #0c1626;
-  --border-glass: rgba(255, 255, 255, 0.08);
-  --accent-emerald: #10b981;
-  --accent-mint: #34d399;
-  --accent-cyan: #06b6d4;
-  --accent-amber: #f59e0b;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-html,
 body {
-  max-width: 100vw;
-  overflow-x: hidden;
-  background-color: var(--bg-main);
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.06) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.06) 0px, transparent 50%),
-    radial-gradient(at 50% 100%, rgba(99, 102, 241, 0.04) 0px, transparent 50%);
-  background-attachment: fixed;
-  color: #f8fafc;
-  font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  letter-spacing: -0.01em;
+  background-color: #060e14;
+  color: #e2e8f0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-sans), sans-serif;
+  background-image:
+    radial-gradient(at 10% 10%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+    radial-gradient(at 90% 90%, rgba(6, 182, 212, 0.06) 0px, transparent 50%);
 }
 
 .font-outfit {
-  font-family: var(--font-outfit), var(--font-sans), sans-serif;
+  font-family: var(--font-outfit), sans-serif;
 }
 
-/* Glass Card & Inner Highlight */
+/* Glass Card & Surface System */
 .glass-card {
-  background-color: rgba(9, 18, 30, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
-    0 20px 40px -15px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  background-color: #0d1117;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
 }
 
 .glass-card:hover {
-  border-color: rgba(16, 185, 129, 0.3);
+  border-color: rgba(16, 185, 129, 0.4);
 }
 
 .glass-pill {
-  background: rgba(12, 22, 38, 0.8);
-  backdrop-filter: blur(16px);
+  background-color: #161b22;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #060e14;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(16, 185, 129, 0.25);
-  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.3);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(16, 185, 129, 0.5);
+  background: rgba(16, 185, 129, 0.6);
 }
 
-/* Laser Scan Animation */
+/* Tabular Numbers */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Laser Scan Animation for Vision Scanner */
 @keyframes laserSweep {
   0% { top: 0%; opacity: 0.8; }
   50% { top: 96%; opacity: 1; }
@@ -84,16 +65,9 @@ body {
   animation: laserSweep 2.2s ease-in-out infinite;
 }
 
-/* Text Gradients */
+/* Gradient text helpers */
 .gradient-text-emerald {
   background: linear-gradient(135deg, #34d399 0%, #2dd4bf 50%, #38bdf8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.gradient-text-glow {
-  background: linear-gradient(135deg, #ffffff 0%, #a7f3d0 60%, #38bdf8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

@@ -32,6 +32,7 @@ import {
   TrendingUp,
   ShieldCheck,
   Zap,
+  Activity,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -66,44 +67,52 @@ export default function DashboardPage() {
   const totalProteinConsumed = mealLogs.reduce((sum, m) => sum + m.totals.protein, 0);
 
   return (
-    <div className="space-y-8 font-sans">
-      {/* Welcome Hero Banner */}
-      <div className="p-6 sm:p-10 rounded-3xl glass-card relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        {/* Glow ambient background mesh */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="space-y-10 font-mono w-full min-w-0">
+      {/* Header Title (Project 9/10/21/22 Signature Style) */}
+      <div className="text-center space-y-3 max-w-3xl mx-auto">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>PRECISION AI NUTRITION &amp; METABOLIC INTELLIGENCE</span>
+        </div>
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight font-outfit">
+          Precision Vision Nutrition &amp;{' '}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400">
+            Macro Intelligence
+          </span>
+        </h1>
+        <p className="text-slate-400 text-xs sm:text-sm font-mono max-w-2xl mx-auto leading-relaxed">
+          Snap any meal photo for instant macronutrient &amp; caloric decomposition. Track protein targets, water hydration, and longevity micronutrients powered by Gemini 1.5 Vision.
+        </p>
+      </div>
 
-        <div className="relative z-10 space-y-2">
+      {/* Active Profile Banner */}
+      <div className="p-6 rounded-3xl bg-[#0d1117] border border-emerald-500/30 shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-mono text-xs font-bold flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              Active Protocol: {profile.dietType.replace(/_/g, ' ').toUpperCase()}
+            <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30 uppercase">
+              {profile.dietType.replace(/_/g, ' ')}
             </span>
+            <span className="text-xs text-slate-400">Targeting {profile.goal.replace(/_/g, ' ')}</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black text-white font-outfit tracking-tight">
-            Welcome Back, <span className="gradient-text-emerald">{profile.name}</span>
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
-            Targeting <strong className="text-emerald-400">{profile.goal.replace(/_/g, ' ')}</strong> with{' '}
-            <strong className="text-white">{profile.targetCalories.toLocaleString()} kcal</strong> and{' '}
-            <strong className="text-emerald-400">{profile.targetProteinG}g protein</strong> daily energy expenditure.
-          </p>
+          <h2 className="text-xl sm:text-2xl font-black text-white font-outfit">
+            Welcome Back, {profile.name}
+          </h2>
         </div>
 
-        {/* Quick Launch Action CTAs */}
-        <div className="relative z-10 flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap">
           <Link
             href="/scan"
-            className="px-6 py-4 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 hover:from-emerald-300 hover:to-cyan-400 text-black font-black text-xs shadow-xl shadow-emerald-500/20 hover:scale-105 transition-all flex items-center gap-2"
+            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 hover:from-emerald-300 hover:to-cyan-400 text-black font-extrabold text-xs shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all flex items-center gap-1.5"
           >
-            <Camera className="w-4 h-4" />
-            <span>AI Food Photo Scanner</span>
+            <Camera className="w-3.5 h-3.5" />
+            <span>Scan Meal Photo</span>
           </Link>
 
           <Link
             href="/plan"
-            className="px-5 py-4 rounded-2xl bg-slate-950/80 hover:bg-slate-900 border border-white/10 text-white font-bold text-xs transition-all flex items-center gap-2"
+            className="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-emerald-500/40 text-white font-bold text-xs transition-all flex items-center gap-1.5"
           >
-            <Calendar className="w-4 h-4 text-emerald-400" />
+            <Calendar className="w-3.5 h-3.5 text-emerald-400" />
             <span>7-Day Meal Plan</span>
           </Link>
         </div>
@@ -111,50 +120,50 @@ export default function DashboardPage() {
 
       {/* 4 Stat Metric Strips */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl glass-card space-y-1">
-          <span className="text-[10px] font-bold text-slate-400 uppercase font-mono flex items-center gap-1">
+        <div className="p-5 rounded-2xl bg-[#0d1117] border border-emerald-500/20 space-y-1 shadow-lg">
+          <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
             <Flame className="w-3.5 h-3.5 text-rose-400" /> Energy Budget
           </span>
-          <div className="text-2xl font-black font-mono text-white">
+          <div className="text-2xl font-black text-white">
             {totalCaloriesConsumed} <span className="text-xs text-slate-400 font-normal">/ {profile.targetCalories} kcal</span>
           </div>
-          <span className="text-[10px] text-emerald-400 font-mono">
+          <span className="text-[10px] text-emerald-400">
             {Math.max(0, profile.targetCalories - totalCaloriesConsumed)} kcal remaining
           </span>
         </div>
 
-        <div className="p-5 rounded-2xl glass-card space-y-1">
-          <span className="text-[10px] font-bold text-slate-400 uppercase font-mono flex items-center gap-1">
+        <div className="p-5 rounded-2xl bg-[#0d1117] border border-emerald-500/20 space-y-1 shadow-lg">
+          <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
             <Dumbbell className="w-3.5 h-3.5 text-emerald-400" /> Protein Target
           </span>
-          <div className="text-2xl font-black font-mono text-emerald-400">
+          <div className="text-2xl font-black text-emerald-400">
             {Math.round(totalProteinConsumed)}g <span className="text-xs text-slate-400 font-normal">/ {profile.targetProteinG}g</span>
           </div>
-          <span className="text-[10px] text-slate-400 font-mono">
+          <span className="text-[10px] text-slate-400">
             {Math.round((totalProteinConsumed / profile.targetProteinG) * 100)}% target reached
           </span>
         </div>
 
-        <div className="p-5 rounded-2xl glass-card space-y-1">
-          <span className="text-[10px] font-bold text-slate-400 uppercase font-mono flex items-center gap-1">
+        <div className="p-5 rounded-2xl bg-[#0d1117] border border-emerald-500/20 space-y-1 shadow-lg">
+          <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
             <Droplet className="w-3.5 h-3.5 text-cyan-400" /> Hydration Level
           </span>
-          <div className="text-2xl font-black font-mono text-cyan-400">
+          <div className="text-2xl font-black text-cyan-400">
             {(waterMl / 1000).toFixed(2)}L <span className="text-xs text-slate-400 font-normal">/ {(profile.targetWaterMl / 1000).toFixed(1)}L</span>
           </div>
-          <span className="text-[10px] text-slate-400 font-mono">
+          <span className="text-[10px] text-slate-400">
             {Math.round((waterMl / profile.targetWaterMl) * 100)}% hydration
           </span>
         </div>
 
-        <div className="p-5 rounded-2xl glass-card space-y-1">
-          <span className="text-[10px] font-bold text-slate-400 uppercase font-mono flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5 text-purple-400" /> Dietary Satiety
+        <div className="p-5 rounded-2xl bg-[#0d1117] border border-emerald-500/20 space-y-1 shadow-lg">
+          <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-purple-400" /> Satiety Index
           </span>
-          <div className="text-2xl font-black font-mono text-purple-400">
+          <div className="text-2xl font-black text-purple-400">
             94/100
           </div>
-          <span className="text-[10px] text-emerald-400 font-mono">
+          <span className="text-[10px] text-emerald-400">
             Low Glycemic Load
           </span>
         </div>
@@ -177,14 +186,14 @@ export default function DashboardPage() {
       </div>
 
       {/* Today's Logged Meals Feed */}
-      <div className="p-6 sm:p-8 rounded-3xl glass-card space-y-6">
-        <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
+      <div className="p-6 sm:p-8 rounded-3xl bg-[#0d1117] border border-emerald-500/20 space-y-6 shadow-2xl">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
               <Utensils className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-black text-white text-base font-outfit">Today's Meal Diary</h3>
+              <h3 className="font-bold text-white text-base font-outfit">Today's Meal Diary</h3>
               <p className="text-xs text-slate-400">{mealLogs.length} verified meals logged today</p>
             </div>
           </div>
@@ -204,7 +213,7 @@ export default function DashboardPage() {
             <p className="text-sm text-slate-400">No meals logged yet today.</p>
             <Link
               href="/scan"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 text-black font-bold text-xs"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-500 text-black font-bold text-xs"
             >
               <Camera className="w-4 h-4" />
               <span>Scan Your First Meal</span>
@@ -215,14 +224,14 @@ export default function DashboardPage() {
             {mealLogs.map((meal) => (
               <div
                 key={meal.id}
-                className="p-4 sm:p-5 rounded-2xl bg-slate-950/60 border border-white/5 hover:border-emerald-500/30 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                className="p-4 sm:p-5 rounded-2xl bg-[#161b22] border border-slate-800 hover:border-emerald-500/40 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-md"
               >
                 <div className="flex items-center gap-4">
                   {meal.imageSrc && (
                     <img
                       src={meal.imageSrc}
                       alt={meal.mealName}
-                      className="w-16 h-16 rounded-xl object-cover border border-white/10 shrink-0"
+                      className="w-16 h-16 rounded-xl object-cover border border-slate-700 shrink-0"
                     />
                   )}
                   <div className="space-y-1">
@@ -251,7 +260,7 @@ export default function DashboardPage() {
 
                   <button
                     onClick={() => handleDeleteMeal(meal.id)}
-                    className="p-2 rounded-lg bg-slate-900 border border-white/10 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
+                    className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
                     title="Delete meal entry"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
