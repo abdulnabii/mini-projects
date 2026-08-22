@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { TestConfig, TestResult, MetricPoint } from '@/types';
 import TestConfigurator from '@/components/TestConfigurator';
+import LiveExecutionHUD from '@/components/LiveExecutionHUD';
 import { saveTestResult } from '@/lib/storage';
 import { calculatePercentiles } from '@/lib/loadEngine';
 import {
@@ -28,10 +29,12 @@ export default function Home() {
   const [progressSec, setProgressSec] = useState(0);
   const [liveRps, setLiveRps] = useState(0);
   const [liveVus, setLiveVus] = useState(0);
+  const [activeConfig, setActiveConfig] = useState<TestConfig | null>(null);
 
   const handleStartTest = async (config: TestConfig) => {
     setIsRunning(true);
     setProgressSec(0);
+    setActiveConfig(config);
 
     const totalSeconds = config.durationSeconds;
     const timeSeries: MetricPoint[] = [];
@@ -213,55 +216,15 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Live Runner Modal */}
-      {isRunning && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in duration-200">
-          <div className="p-8 rounded-3xl bg-[#0d1117] border-2 border-cyan-500/50 max-w-md w-full text-center space-y-6 shadow-2xl shadow-cyan-500/20 font-mono">
-            <div className="w-14 h-14 rounded-2xl bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-cyan-400 mx-auto animate-spin">
-              <Loader2 className="w-7 h-7" />
-            </div>
-
-            <div className="space-y-1">
-              <span className="text-[10px] font-bold uppercase text-cyan-400 tracking-wider">
-                Generating Concurrent Virtual Traffic
-              </span>
-              <h3 className="text-xl font-black text-white font-outfit">
-                Executing Load Benchmark...
-              </h3>
-              <p className="text-xs text-slate-400">
-                Streaming live metrics to coordinator. Compiling statistical percentiles.
-              </p>
-            </div>
-
-            {/* Live Stats */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-4 rounded-2xl bg-slate-950 border border-cyan-500/30 text-center">
-                <span className="text-2xl font-black text-cyan-400 block">{liveRps}</span>
-                <span className="text-[10px] text-slate-400 uppercase font-bold">Live RPS</span>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-950 border border-indigo-500/30 text-center">
-                <span className="text-2xl font-black text-indigo-400 block">{liveVus}</span>
-                <span className="text-[10px] text-slate-400 uppercase font-bold">Active VUs</span>
-              </div>
-            </div>
-
-            {/* Progress Bar */}
-            <div className="space-y-1.5">
-              <div className="flex justify-between text-xs text-slate-400">
-                <span>Progress</span>
-                <span className="text-cyan-400 font-bold">{progressSec}s elapsed</span>
-              </div>
-              <div className="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-indigo-500 transition-all duration-500"
-                  style={{ width: `${Math.min(100, (progressSec / 15) * 100)}%` }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Live Execution HUD Modal */}
+      <LiveExecutionHUD
+        isRunning={isRunning}
+        progressSec={progressSec}
+        totalSec={activeConfig?.durationSeconds || 15}
+        liveRps={liveRps}
+        liveVus={liveVus}
+        url={activeConfig?.url || ''}
+      />
 
       {/* Main Test Configurator */}
       <TestConfigurator onStartTest={handleStartTest} isRunning={isRunning} />

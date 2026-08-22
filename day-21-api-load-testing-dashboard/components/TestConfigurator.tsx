@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { TestConfig, HttpMethod, LoadProfileType, HttpHeader } from '@/types';
 import { BENCHMARK_PRESETS, BenchmarkPreset } from '@/lib/sampleBenchmarks';
 import { DEFAULT_TEST_CONFIG } from '@/lib/loadEngine';
+import InteractiveWaveformPreview from '@/components/InteractiveWaveformPreview';
 import {
   Zap,
   Play,
@@ -29,6 +30,7 @@ import {
   Radio,
   Loader2,
   Search,
+  Command,
 } from 'lucide-react';
 
 interface Props {
@@ -47,7 +49,7 @@ const LOAD_PROFILES: {
   {
     id: 'ramping_spike',
     label: 'Ramping Spike',
-    desc: 'Linear ramp to peak VUs, sustained plateau, then cooldown',
+    desc: 'Linear ramp to peak VUs, sustained plateau, followed by cooldown',
     badge: 'Recommended',
   },
   {
@@ -155,11 +157,11 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
 
   return (
     <div className="space-y-8 font-mono w-full min-w-0">
-      {/* Target Search Bar & Preset Quick-Select (Project 9 Style) */}
+      {/* Target Search Bar & Preset Quick-Select */}
       <div className="max-w-4xl mx-auto space-y-3">
         {/* Preset Chips */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs text-slate-400">Try Sample Targets:</span>
+          <span className="text-xs text-slate-400">Try Benchmark Targets:</span>
           {BENCHMARK_PRESETS.map((p) => (
             <button
               key={p.id}
@@ -203,7 +205,7 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
                 setProbeStatus('idle');
               }}
               placeholder="Enter target API URL (e.g. https://dummyjson.com/products)..."
-              className="w-full bg-transparent pl-10 pr-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none font-mono"
+              className="w-full bg-transparent pl-10 pr-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none font-mono font-bold"
             />
           </div>
 
@@ -213,12 +215,12 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
               onClick={handleProbeConnection}
               disabled={!urlValid || probeStatus === 'probing'}
               className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-500/50 text-cyan-400 text-xs font-bold transition-all cursor-pointer disabled:opacity-40"
-              title="Test target ping"
+              title="Test pre-flight connectivity"
             >
               {probeStatus === 'probing' ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
               ) : probeStatus === 'healthy' ? (
-                <span className="text-emerald-400">{probeLatency}ms</span>
+                <span className="text-emerald-400">{probeLatency}ms (OK)</span>
               ) : (
                 <span>Probe</span>
               )}
@@ -228,7 +230,7 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
               type="button"
               onClick={() => onStartTest(config)}
               disabled={isRunning || !urlValid}
-              className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-300 hover:to-teal-400 text-black font-extrabold text-xs transition-all shadow-lg shadow-cyan-500/20 disabled:opacity-50 cursor-pointer"
+              className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-400 via-teal-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-black font-extrabold text-xs transition-all shadow-lg shadow-cyan-500/20 disabled:opacity-50 cursor-pointer hover:scale-105"
             >
               <Play className="w-4 h-4 fill-black" />
               <span>Launch Test</span>
@@ -241,16 +243,16 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
         )}
       </div>
 
-      {/* 2-Column Split Workspace (Project 8/10 Style) */}
+      {/* 2-Column Split Workspace */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-7xl mx-auto">
         {/* Left Column: Workload & Concurrency */}
         <div className="bg-[#0d1117] border border-cyan-500/20 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
           <div className="flex items-center justify-between border-b border-slate-800 pb-4">
             <div className="flex items-center gap-2.5">
               <Users className="w-5 h-5 text-cyan-400" />
-              <h3 className="text-base font-bold text-white font-outfit">Concurrency &amp; Traffic Curve</h3>
+              <h3 className="text-base font-bold text-white font-outfit">Concurrency &amp; Traffic Model</h3>
             </div>
-            <span className="px-2 py-0.5 rounded-md bg-cyan-500/10 text-cyan-300 text-[10px] font-bold border border-cyan-500/30">
+            <span className="px-2.5 py-0.5 rounded-md bg-cyan-500/10 text-cyan-300 text-[10px] font-bold border border-cyan-500/30">
               {config.virtualUsers} VUs Peak
             </span>
           </div>
@@ -258,8 +260,8 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
           {/* Virtual Users Slider */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-300">Virtual Users (VUs):</span>
-              <strong className="text-cyan-400 text-sm">{config.virtualUsers} VUs</strong>
+              <span className="text-slate-300 font-bold">Virtual Users (VUs):</span>
+              <strong className="text-cyan-400 text-sm font-black">{config.virtualUsers} VUs</strong>
             </div>
             <input
               type="range"
@@ -279,8 +281,8 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
           {/* Duration Slider */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-300">Test Duration:</span>
-              <strong className="text-indigo-400 text-sm">{config.durationSeconds}s</strong>
+              <span className="text-slate-300 font-bold">Test Duration:</span>
+              <strong className="text-indigo-400 text-sm font-black">{config.durationSeconds}s</strong>
             </div>
             <input
               type="range"
@@ -297,9 +299,16 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
             </div>
           </div>
 
+          {/* Dynamic Live Waveform Preview */}
+          <InteractiveWaveformPreview
+            vus={config.virtualUsers}
+            duration={config.durationSeconds}
+            profile={config.loadProfile}
+          />
+
           {/* Traffic Profiles */}
-          <div className="space-y-2.5 pt-2">
-            <span className="text-xs text-slate-400 block">Traffic Profile:</span>
+          <div className="space-y-2.5 pt-1">
+            <span className="text-xs text-slate-400 block">Traffic Waveform Profile:</span>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {LOAD_PROFILES.map((prof) => {
                 const isSelected = config.loadProfile === prof.id;
@@ -334,7 +343,7 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
             <div className="flex items-center justify-between border-b border-slate-800 pb-4">
               <div className="flex items-center gap-2.5">
                 <Code2 className="w-5 h-5 text-cyan-400" />
-                <h3 className="text-base font-bold text-white font-outfit">Headers, Auth &amp; Body</h3>
+                <h3 className="text-base font-bold text-white font-outfit">Headers, Auth &amp; Payloads</h3>
               </div>
 
               {/* Tabs */}
@@ -362,7 +371,7 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
 
             {/* Tab 1: Headers */}
             {activeTab === 'headers' && (
-              <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+              <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
                 {config.headers.map((h, idx) => (
                   <div key={idx} className="flex items-center gap-2">
                     <input
@@ -375,18 +384,18 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
                       value={h.key}
                       onChange={(e) => updateHeader(idx, 'key', e.target.value)}
                       placeholder="Header Key (e.g. Accept)"
-                      className="flex-1 p-2 rounded-xl bg-[#161b22] border border-slate-800 text-xs text-white placeholder-slate-600 focus:outline-none"
+                      className="flex-1 p-2.5 rounded-xl bg-[#161b22] border border-slate-800 text-xs text-white placeholder-slate-600 focus:outline-none"
                     />
                     <input
                       value={h.value}
                       onChange={(e) => updateHeader(idx, 'value', e.target.value)}
                       placeholder="Value"
-                      className="flex-1 p-2 rounded-xl bg-[#161b22] border border-slate-800 text-xs text-white placeholder-slate-600 focus:outline-none"
+                      className="flex-1 p-2.5 rounded-xl bg-[#161b22] border border-slate-800 text-xs text-white placeholder-slate-600 focus:outline-none"
                     />
                     <button
                       type="button"
                       onClick={() => removeHeader(idx)}
-                      className="p-2 rounded-xl bg-[#161b22] text-slate-500 hover:text-rose-400 border border-slate-800 cursor-pointer"
+                      className="p-2.5 rounded-xl bg-[#161b22] text-slate-500 hover:text-rose-400 border border-slate-800 cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -399,7 +408,7 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
                   className="px-3.5 py-1.5 rounded-xl bg-[#161b22] border border-slate-800 text-xs font-bold text-cyan-400 hover:border-cyan-500/50 transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Add Header</span>
+                  <span>Add Request Header</span>
                 </button>
               </div>
             )}
@@ -413,9 +422,9 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
                       key={t}
                       type="button"
                       onClick={() => setConfig({ ...config, authType: t })}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition-all cursor-pointer ${
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-bold capitalize transition-all cursor-pointer ${
                         config.authType === t
-                          ? 'bg-cyan-500 text-black shadow-md'
+                          ? 'bg-cyan-500 text-black font-black shadow-md'
                           : 'bg-[#161b22] text-slate-400 hover:text-white border border-slate-800'
                       }`}
                     >
@@ -429,7 +438,7 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
                     value={config.authValue || ''}
                     onChange={(e) => setConfig({ ...config, authValue: e.target.value })}
                     placeholder={config.authType === 'bearer' ? 'Bearer eyJh...' : 'X-API-Key sk_live_...'}
-                    className="w-full p-2.5 rounded-xl bg-[#161b22] border border-slate-800 text-xs text-white placeholder-slate-600 focus:outline-none"
+                    className="w-full p-3 rounded-xl bg-[#161b22] border border-slate-800 text-xs text-white placeholder-slate-600 focus:outline-none"
                   />
                 )}
               </div>
@@ -441,17 +450,17 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
                 <textarea
                   value={config.bodyContent || ''}
                   onChange={(e) => setConfig({ ...config, bodyContent: e.target.value, bodyType: 'json' })}
-                  rows={5}
+                  rows={6}
                   placeholder='{\n  "query": "macbook pro",\n  "limit": 50\n}'
-                  className="w-full p-3 rounded-2xl bg-[#161b22] border border-slate-800 text-xs text-white placeholder-slate-600 focus:outline-none"
+                  className="w-full p-3 rounded-2xl bg-[#161b22] border border-slate-800 text-xs text-white placeholder-slate-600 focus:outline-none font-bold"
                 />
               </div>
             )}
           </div>
 
-          <div className="p-3 rounded-2xl bg-[#161b22] border border-slate-800 text-xs text-slate-300 flex items-center justify-between">
-            <span>Protocol: HTTP/2 Multiplexed</span>
-            <span className="text-emerald-400 font-bold">Est: ~{Math.round(config.virtualUsers * 2.5)} RPS</span>
+          <div className="p-3.5 rounded-2xl bg-[#161b22] border border-slate-800 text-xs text-slate-300 flex items-center justify-between">
+            <span className="font-bold text-slate-400">Protocol: HTTP/2 Multiplexed</span>
+            <span className="text-emerald-400 font-bold">Estimated Rate: ~{Math.round(config.virtualUsers * 2.5)} RPS</span>
           </div>
         </div>
       </div>
