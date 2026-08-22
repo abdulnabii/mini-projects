@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #050a12;
+  --bg-card: #09121d;
+  --accent-emerald: #10b981;
+  --accent-teal: #14b8a6;
+  --accent-cyan: #06b6d4;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background-color: var(--bg-primary);
+  color: #f8fafc;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.font-outfit {
+  font-family: var(--font-outfit), var(--font-sans), sans-serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.25);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.5);
+}
+
+/* Gradient Text */
+.gradient-text-emerald {
+  background: linear-gradient(135deg, #34d399 0%, #2dd4bf 50%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Grid Dots */
+.bg-grid-dots {
+  background-image: radial-gradient(circle, rgba(16, 185, 129, 0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
