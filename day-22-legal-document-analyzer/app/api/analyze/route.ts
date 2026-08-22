@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateLegalAnalysisWithGemini } from '@/lib/gemini';
+import { analyzeDocumentWithHeuristics } from '@/lib/heuristicAnalyzer';
 import { DocType, SupportedLanguage } from '@/types';
 import { SAMPLE_CONTRACTS } from '@/lib/sampleContracts';
 
@@ -8,7 +9,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { text, docType, docTitle, language, sampleId } = body;
 
-    // Check if sample preset requested or fallback
+    // Check if sample preset requested
     if (sampleId) {
       const match = SAMPLE_CONTRACTS.find((s) => s.id === sampleId);
       if (match) {
@@ -20,26 +21,29 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Document text is required' }, { status: 400 });
     }
 
+    const cleanDocType = (docType as DocType) || 'General Legal Contract';
+    const cleanDocTitle = docTitle || `${cleanDocType} Review`;
+    const cleanLanguage = (language as SupportedLanguage) || 'English';
+
     try {
       const analysis = await generateLegalAnalysisWithGemini(
         text,
-        (docType as DocType) || 'General Legal Contract',
-        docTitle || 'Legal Document Analysis',
-        (language as SupportedLanguage) || 'English'
+        cleanDocType,
+        cleanDocTitle,
+        cleanLanguage
       );
       return NextResponse.json(analysis);
     } catch (geminiError: any) {
-      console.warn('Gemini API call failed, providing intelligent fallback analysis:', geminiError);
+      console.warn('Gemini API call failed, falling back to intelligent heuristic analysis:', geminiError);
 
-      // Intelligent deterministic fallback
-      const fallbackPreset = SAMPLE_CONTRACTS[0];
-      return NextResponse.json({
-        ...fallbackPreset.analysis,
-        id: 'analysis_' + Date.now(),
-        docTitle: docTitle || 'Custom Document Analysis',
-        docType: docType || 'Employment Agreement',
-        rawText: text,
-      });
+      // Perform accurate heuristic analysis grounded in user's exact uploaded text
+      const heuristicAnalysis = analyzeDocumentWithHeuristics(
+        text,
+        cleanDocType,
+        cleanDocTitle,
+        cleanLanguage
+      );
+      return NextResponse.json(heuristicAnalysis);
     }
   } catch (error: any) {
     console.error('Analysis route error:', error);
