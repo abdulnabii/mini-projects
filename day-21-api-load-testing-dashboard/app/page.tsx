@@ -15,6 +15,11 @@ import {
   Server,
   Terminal,
   Loader2,
+  Gauge,
+  Clock,
+  Cpu,
+  Layers,
+  Users,
 } from 'lucide-react';
 
 export default function LoadStudioPage() {
@@ -34,14 +39,13 @@ export default function LoadStudioPage() {
     let totalReqs = 0;
     let failedReqs = 0;
 
-    // Simulate high-concurrency client/server load generation over durationSeconds
+    // High-concurrency load simulator loop
     const interval = setInterval(async () => {
       setProgressSec((prev) => {
         const nextSec = prev + 1;
         const rampProgress = Math.min(1, nextSec / (config.rampUpSeconds || 1));
         const activeVus = Math.round(config.virtualUsers * rampProgress);
-        
-        // Calculate simulated latency based on active VUs and endpoint
+
         const isDelayed = config.url.includes('delay');
         const baseLatency = isDelayed ? 1100 : 90;
         const concurrencyFactor = Math.pow(activeVus / 50, 1.4);
@@ -53,7 +57,6 @@ export default function LoadStudioPage() {
         const hasErrors = config.url.includes('429') || (activeVus > 150 && Math.random() > 0.6);
         const errorPercent = hasErrors ? Math.round(Math.random() * 8 * 10) / 10 : 0;
 
-        // Push latency batch
         for (let i = 0; i < Math.min(10, currentRps); i++) {
           latencies.push(currentP50 + Math.round(Math.random() * 60 - 30));
         }
@@ -111,13 +114,13 @@ export default function LoadStudioPage() {
       errorRate,
       avgRps,
       peakRps,
-      totalDataTransferMb: Math.round((totalReqs * 1.4) / 1024 * 10) / 10,
+      totalDataTransferMb: Math.round(((totalReqs * 1.4) / 1024) * 10) / 10,
       percentiles,
       statusCodes: [
         {
           code: errorRate > 0 ? (config.url.includes('429') ? 429 : 504) : 200,
           count: failedReqs,
-          description: errorRate > 0 ? 'Rate Limited / Timeout' : 'OK',
+          description: errorRate > 0 ? 'Rate Limited / Gateway Timeout' : 'OK',
           isError: errorRate > 0,
         },
         {
@@ -133,7 +136,7 @@ export default function LoadStudioPage() {
               {
                 timestamp: new Date().toLocaleTimeString(),
                 statusCode: config.url.includes('429') ? 429 : 504,
-                message: 'HTTP response exceeded SLA threshold or was throttled by origin.',
+                message: 'HTTP response exceeded SLA threshold or was throttled by origin host.',
               },
             ]
           : [],
@@ -161,26 +164,49 @@ export default function LoadStudioPage() {
   };
 
   return (
-    <div className="space-y-8 font-sans">
-      {/* Hero Banner */}
-      <div className="p-6 sm:p-10 rounded-3xl glass-card relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div className="relative z-10 space-y-2">
-          <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono text-xs font-bold flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-              Real-Time High-Concurrency Load Engine
-            </span>
+    <div className="space-y-10 font-sans">
+      {/* Hero Header */}
+      <div className="space-y-4 pt-2">
+        <div className="flex items-center gap-2">
+          <span className="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono text-xs font-bold flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+            HIGH-CONCURRENCY LOAD TESTING STUDIO
+          </span>
+        </div>
+
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white font-outfit tracking-tight leading-tight">
+          Stress Test APIs with <span className="gradient-text-cyan">LoadPulse.AI</span>
+        </h1>
+
+        <p className="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
+          Simulate up to 250 concurrent virtual users, inspect real-time P50/P95/P99 latency curves, and diagnose server bottlenecks with Gemini 1.5 Flash.
+        </p>
+
+        {/* 4 Feature Badges */}
+        <div className="flex items-center gap-3 flex-wrap pt-2">
+          <div className="px-3.5 py-1.5 rounded-xl bg-slate-900/80 border border-white/10 text-xs font-mono text-slate-300 flex items-center gap-2">
+            <Users className="w-3.5 h-3.5 text-cyan-400" />
+            <span>250 Virtual Users</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black text-white font-outfit tracking-tight">
-            Stress Test APIs with <span className="gradient-text-cyan">LoadPulse.AI</span>
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
-            Simulate up to 500 concurrent virtual users, inspect live P50/P95/P99 latency curves, and diagnose server bottlenecks with Gemini 1.5 Flash.
-          </p>
+
+          <div className="px-3.5 py-1.5 rounded-xl bg-slate-900/80 border border-white/10 text-xs font-mono text-slate-300 flex items-center gap-2">
+            <Gauge className="w-3.5 h-3.5 text-indigo-400" />
+            <span>P50 / P95 / P99 Telemetry</span>
+          </div>
+
+          <div className="px-3.5 py-1.5 rounded-xl bg-slate-900/80 border border-white/10 text-xs font-mono text-slate-300 flex items-center gap-2">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Gemini SRE Diagnostics</span>
+          </div>
+
+          <div className="px-3.5 py-1.5 rounded-xl bg-slate-900/80 border border-white/10 text-xs font-mono text-slate-300 flex items-center gap-2">
+            <Terminal className="w-3.5 h-3.5 text-amber-400" />
+            <span>k6 &amp; cURL Exporter</span>
+          </div>
         </div>
       </div>
 
-      {/* Live Runner Modal / Overlay */}
+      {/* Live Runner Modal */}
       {isRunning && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in duration-200">
           <div className="p-8 sm:p-10 rounded-3xl glass-card border-2 border-cyan-500/40 max-w-lg w-full text-center space-y-6 shadow-2xl">
