@@ -164,42 +164,42 @@ export default function LoadStudioPage() {
   };
 
   return (
-    <div className="space-y-10 font-sans">
+    <div className="space-y-8 font-sans w-full min-w-0">
       {/* Hero Header */}
-      <div className="space-y-4 pt-2">
+      <div className="space-y-3 pt-2">
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono text-xs font-bold flex items-center gap-2">
+          <span className="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono text-[11px] font-bold flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-            HIGH-CONCURRENCY LOAD TESTING STUDIO
+            HIGH-CONCURRENCY SRE LOAD TESTING STUDIO
           </span>
         </div>
 
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white font-outfit tracking-tight leading-tight">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white font-outfit tracking-tight leading-tight">
           Stress Test APIs with <span className="gradient-text-cyan">LoadPulse.AI</span>
         </h1>
 
-        <p className="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
+        <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
           Simulate up to 250 concurrent virtual users, inspect real-time P50/P95/P99 latency curves, and diagnose server bottlenecks with Gemini 1.5 Flash.
         </p>
 
         {/* 4 Feature Badges */}
-        <div className="flex items-center gap-3 flex-wrap pt-2">
-          <div className="px-3.5 py-1.5 rounded-xl bg-slate-900/80 border border-white/10 text-xs font-mono text-slate-300 flex items-center gap-2">
+        <div className="flex items-center gap-2.5 flex-wrap pt-1">
+          <div className="px-3 py-1 rounded-xl bg-slate-900/80 border border-white/10 text-[11px] font-mono text-slate-300 flex items-center gap-1.5">
             <Users className="w-3.5 h-3.5 text-cyan-400" />
-            <span>250 Virtual Users</span>
+            <span>250 VUs Concurrency</span>
           </div>
 
-          <div className="px-3.5 py-1.5 rounded-xl bg-slate-900/80 border border-white/10 text-xs font-mono text-slate-300 flex items-center gap-2">
+          <div className="px-3 py-1 rounded-xl bg-slate-900/80 border border-white/10 text-[11px] font-mono text-slate-300 flex items-center gap-1.5">
             <Gauge className="w-3.5 h-3.5 text-indigo-400" />
-            <span>P50 / P95 / P99 Telemetry</span>
+            <span>P50 / P95 / P99 SLA</span>
           </div>
 
-          <div className="px-3.5 py-1.5 rounded-xl bg-slate-900/80 border border-white/10 text-xs font-mono text-slate-300 flex items-center gap-2">
+          <div className="px-3 py-1 rounded-xl bg-slate-900/80 border border-white/10 text-[11px] font-mono text-slate-300 flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Gemini SRE Diagnostics</span>
+            <span>Gemini SRE Root-Cause</span>
           </div>
 
-          <div className="px-3.5 py-1.5 rounded-xl bg-slate-900/80 border border-white/10 text-xs font-mono text-slate-300 flex items-center gap-2">
+          <div className="px-3 py-1 rounded-xl bg-slate-900/80 border border-white/10 text-[11px] font-mono text-slate-300 flex items-center gap-1.5">
             <Terminal className="w-3.5 h-3.5 text-amber-400" />
             <span>k6 &amp; cURL Exporter</span>
           </div>
@@ -209,16 +209,16 @@ export default function LoadStudioPage() {
       {/* Live Runner Modal */}
       {isRunning && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in duration-200">
-          <div className="p-8 sm:p-10 rounded-3xl glass-card border-2 border-cyan-500/40 max-w-lg w-full text-center space-y-6 shadow-2xl">
-            <div className="w-16 h-16 rounded-2xl bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-cyan-400 mx-auto animate-spin">
-              <Loader2 className="w-8 h-8" />
+          <div className="p-8 rounded-3xl glass-card border-2 border-cyan-500/40 max-w-md w-full text-center space-y-6 shadow-2xl">
+            <div className="w-14 h-14 rounded-2xl bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-cyan-400 mx-auto animate-spin">
+              <Loader2 className="w-7 h-7" />
             </div>
 
             <div className="space-y-1">
               <span className="text-[10px] font-bold uppercase font-mono text-cyan-400 tracking-wider">
                 Generating Concurrent Virtual Traffic
               </span>
-              <h3 className="text-2xl font-black text-white font-outfit">
+              <h3 className="text-xl font-black text-white font-outfit">
                 Executing Load Benchmark...
               </h3>
               <p className="text-xs text-slate-400">
@@ -228,14 +228,14 @@ export default function LoadStudioPage() {
 
             {/* Live Stats */}
             <div className="grid grid-cols-2 gap-3 font-mono">
-              <div className="p-4 rounded-2xl bg-slate-950/80 border border-white/10 text-center">
-                <span className="text-2xl font-black text-cyan-400 block">{liveRps}</span>
-                <span className="text-[10px] text-slate-400 uppercase font-bold">Live RPS</span>
+              <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-white/10 text-center">
+                <span className="text-xl font-black text-cyan-400 block">{liveRps}</span>
+                <span className="text-[9px] text-slate-400 uppercase font-bold">Live RPS</span>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-950/80 border border-white/10 text-center">
-                <span className="text-2xl font-black text-indigo-400 block">{liveVus}</span>
-                <span className="text-[10px] text-slate-400 uppercase font-bold">Active VUs</span>
+              <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-white/10 text-center">
+                <span className="text-xl font-black text-indigo-400 block">{liveVus}</span>
+                <span className="text-[9px] text-slate-400 uppercase font-bold">Active VUs</span>
               </div>
             </div>
 
@@ -245,7 +245,7 @@ export default function LoadStudioPage() {
                 <span>Progress</span>
                 <span>{progressSec}s elapsed</span>
               </div>
-              <div className="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
+              <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-indigo-500 transition-all duration-500"
                   style={{ width: `${Math.min(100, (progressSec / 15) * 100)}%` }}

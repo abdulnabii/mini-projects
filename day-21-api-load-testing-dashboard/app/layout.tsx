@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${outfit.variable} dark`}>
       <body className="bg-[#030712] text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-cyan-500 selection:text-black">
         <Navbar />
-        <main className="flex-1 py-8 px-4 sm:px-6 max-w-7xl mx-auto w-full">
+        <main className="flex-1 py-8 px-4 sm:px-6 max-w-6xl mx-auto w-full min-w-0">
           {children}
         </main>
         <Footer />
