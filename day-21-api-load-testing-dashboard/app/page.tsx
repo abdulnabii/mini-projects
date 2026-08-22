@@ -165,61 +165,61 @@ export default function LoadStudioPage() {
   };
 
   return (
-    <div className="space-y-8 font-sans w-full min-w-0">
-      {/* Hero Header Command Center */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#071326] via-[#091b38] to-[#110c28] border-2 border-cyan-500/30 shadow-2xl space-y-4">
-        <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 font-mono text-[11px] font-bold border border-cyan-500/40 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-            HIGH-CONCURRENCY SRE LOAD TESTING STUDIO
+    <div className="space-y-10 font-sans w-full min-w-0">
+      {/* Centered Hero Header */}
+      <section className="text-center space-y-4 max-w-3xl mx-auto pt-2">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>CLOUD-SCALE SRE BENCHMARK STUDIO</span>
+        </div>
+
+        <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight font-outfit">
+          High-Concurrency Load Testing &amp; <br />
+          <span className="bg-gradient-to-r from-cyan-400 via-teal-400 to-blue-500 bg-clip-text text-transparent">
+            AI Performance Diagnostics
           </span>
-        </div>
+        </h1>
 
-        <div className="space-y-1">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white font-outfit tracking-tight">
-            Stress Test APIs with <span className="gradient-cyan">LoadPulse.AI</span>
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-            Simulate up to 250 concurrent virtual users, inspect real-time P50/P95/P99 latency curves, and diagnose server bottlenecks with Gemini 1.5 Flash.
-          </p>
-        </div>
+        <p className="text-xs sm:text-sm text-slate-400 font-mono max-w-2xl mx-auto leading-relaxed">
+          Simulate up to 250 concurrent virtual users, inspect real-time P50/P95/P99 latency distribution curves, and diagnose infrastructure bottlenecks with Gemini 1.5 Flash.
+        </p>
 
-        {/* 4 Multi-Colored Feature Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-          <div className="p-3.5 rounded-2xl bg-cyan-950/40 border border-cyan-500/30 space-y-1">
-            <span className="text-[10px] font-bold uppercase font-mono text-cyan-400 flex items-center gap-1.5">
+        {/* 4 Feature Metric Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 font-mono text-left">
+          <div className="p-3.5 rounded-2xl bg-[#090d16] border border-cyan-500/20 space-y-1">
+            <span className="text-[10px] text-cyan-400 font-bold uppercase flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5" /> Virtual Users
             </span>
-            <div className="text-lg font-black font-mono text-white">250 VUs Peak</div>
+            <div className="text-lg font-black text-white">250 VUs Peak</div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-indigo-950/40 border border-indigo-500/30 space-y-1">
-            <span className="text-[10px] font-bold uppercase font-mono text-indigo-400 flex items-center gap-1.5">
-              <Gauge className="w-3.5 h-3.5" /> Percentiles
+          <div className="p-3.5 rounded-2xl bg-[#090d16] border border-indigo-500/20 space-y-1">
+            <span className="text-[10px] text-indigo-400 font-bold uppercase flex items-center gap-1.5">
+              <Gauge className="w-3.5 h-3.5" /> SLA Percentiles
             </span>
-            <div className="text-lg font-black font-mono text-indigo-300">P50 / P95 / P99</div>
+            <div className="text-lg font-black text-indigo-300">P50 / P95 / P99</div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 space-y-1">
-            <span className="text-[10px] font-bold uppercase font-mono text-emerald-400 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" /> AI SRE Root Cause
+          <div className="p-3.5 rounded-2xl bg-[#090d16] border border-emerald-500/20 space-y-1">
+            <span className="text-[10px] text-emerald-400 font-bold uppercase flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" /> AI Diagnostics
             </span>
-            <div className="text-lg font-black font-mono text-emerald-300">Gemini 1.5 Flash</div>
+            <div className="text-lg font-black text-emerald-300">Gemini 1.5 SRE</div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-purple-950/40 border border-purple-500/30 space-y-1">
-            <span className="text-[10px] font-bold uppercase font-mono text-purple-400 flex items-center gap-1.5">
+          <div className="p-3.5 rounded-2xl bg-[#090d16] border border-purple-500/20 space-y-1">
+            <span className="text-[10px] text-purple-400 font-bold uppercase flex items-center gap-1.5">
               <Terminal className="w-3.5 h-3.5" /> Native Scripts
             </span>
-            <div className="text-lg font-black font-mono text-purple-300">k6.js &amp; cURL</div>
+            <div className="text-lg font-black text-purple-300">k6.js &amp; cURL</div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Live Runner Modal */}
       {isRunning && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in duration-200">
-          <div className="p-8 rounded-3xl bg-[#09152b] border-2 border-cyan-500/50 max-w-md w-full text-center space-y-6 shadow-2xl">
+          <div className="p-8 rounded-3xl bg-[#090d16] border-2 border-cyan-500/50 max-w-md w-full text-center space-y-6 shadow-2xl shadow-cyan-500/20">
             <div className="w-14 h-14 rounded-2xl bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-cyan-400 mx-auto animate-spin">
               <Loader2 className="w-7 h-7" />
             </div>
@@ -231,7 +231,7 @@ export default function LoadStudioPage() {
               <h3 className="text-xl font-black text-white font-outfit">
                 Executing Load Benchmark...
               </h3>
-              <p className="text-xs text-slate-300">
+              <p className="text-xs text-slate-400 font-mono">
                 Streaming live metrics to coordinator. Compiling statistical percentiles.
               </p>
             </div>
@@ -266,7 +266,7 @@ export default function LoadStudioPage() {
         </div>
       )}
 
-      {/* Test Configurator Studio */}
+      {/* Main Workflow Configurator */}
       <TestConfigurator onStartTest={handleStartTest} isRunning={isRunning} />
     </div>
   );

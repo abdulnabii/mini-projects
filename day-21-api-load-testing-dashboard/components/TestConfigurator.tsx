@@ -49,7 +49,7 @@ const LOAD_PROFILES: {
   {
     id: 'ramping_spike',
     label: 'Ramping Spike',
-    desc: 'Linear ramp to peak VUs, sustain plateau, then cooldown',
+    desc: 'Linear ramp to peak VUs, sustained plateau, followed by cooldown',
     themeColor: '#06b6d4',
     borderColor: 'border-cyan-500/50',
     bgActive: 'bg-cyan-950/40',
@@ -59,7 +59,7 @@ const LOAD_PROFILES: {
   {
     id: 'constant',
     label: 'Constant Load',
-    desc: 'Instant full concurrency maintained throughout',
+    desc: 'Instant full concurrency maintained steadily throughout duration',
     themeColor: '#10b981',
     borderColor: 'border-emerald-500/50',
     bgActive: 'bg-emerald-950/40',
@@ -68,8 +68,8 @@ const LOAD_PROFILES: {
   },
   {
     id: 'stress',
-    label: 'Stress / Breaking Point',
-    desc: 'Stair-step load escalation until saturation occurs',
+    label: 'Stress / Limit',
+    desc: 'Steep stair-step load escalation until server saturation occurs',
     themeColor: '#f43f5e',
     borderColor: 'border-rose-500/50',
     bgActive: 'bg-rose-950/40',
@@ -79,7 +79,7 @@ const LOAD_PROFILES: {
   {
     id: 'soak',
     label: 'Soak / Reliability',
-    desc: 'Extended endurance test for socket & memory leaks',
+    desc: 'Extended endurance test for detecting memory leaks & socket decay',
     themeColor: '#a855f7',
     borderColor: 'border-purple-500/50',
     bgActive: 'bg-purple-950/40',
@@ -115,7 +115,6 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
 
     const start = performance.now();
     try {
-      // Simulate quick preflight probe
       await new Promise((r) => setTimeout(r, 600));
       const elapsed = Math.round(performance.now() - start);
       setProbeLatency(elapsed);
@@ -173,133 +172,68 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
   };
 
   return (
-    <div className="space-y-10 font-sans w-full min-w-0">
-      {/* ======================================================== */}
-      {/* SECTION 1: QUICK TEMPLATE PRESETS (COMPACT CAROUSEL) */}
-      {/* ======================================================== */}
+    <div className="space-y-8 font-sans w-full min-w-0">
+      {/* Quick Templates Preset Bar */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 font-mono text-[10px] font-bold border border-cyan-500/30 uppercase">
+            <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 font-mono text-[10px] font-bold border border-cyan-500/30 uppercase">
               QUICK TEMPLATES
             </span>
-            <h3 className="text-sm font-bold text-slate-200 font-outfit uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-slate-300 font-mono uppercase tracking-wider">
               Verified Benchmark Scenarios
             </h3>
           </div>
           <span className="text-[11px] text-slate-400 font-mono">1-Click Autofill</span>
         </div>
 
-        {/* Collapses to 1-col on mobile, 3-col on desktop */}
+        {/* 3 Presets */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 min-w-0">
-          {/* Card 1: E-Commerce (Emerald) */}
-          <div
-            onClick={() => handleSelectPreset(BENCHMARK_PRESETS[0])}
-            className={`p-4 rounded-2xl cursor-pointer transition-all border flex flex-col justify-between space-y-2 relative overflow-hidden group ${
-              activePresetId === BENCHMARK_PRESETS[0].id
-                ? 'bg-emerald-950/40 border-emerald-400 shadow-xl shadow-emerald-500/15'
-                : 'bg-[#081524] border-emerald-500/20 hover:border-emerald-500/50 hover:bg-[#0a1c30]'
-            }`}
-          >
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">🛍️</span>
-                  <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono text-[9px] font-bold border border-emerald-500/30">
-                    High Read
-                  </span>
+          {BENCHMARK_PRESETS.map((preset) => {
+            const isSelected = activePresetId === preset.id;
+            return (
+              <div
+                key={preset.id}
+                onClick={() => handleSelectPreset(preset)}
+                className={`p-4 rounded-2xl cursor-pointer transition-all border flex flex-col justify-between space-y-2 relative overflow-hidden group ${
+                  isSelected
+                    ? 'bg-cyan-950/40 border-cyan-400 shadow-xl shadow-cyan-500/15'
+                    : 'bg-[#090d16] border-white/10 hover:border-cyan-500/40 hover:bg-[#0c1220]'
+                }`}
+              >
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{preset.icon}</span>
+                      <span className="px-2 py-0.5 rounded-md bg-cyan-500/10 text-cyan-300 font-mono text-[9px] font-bold border border-cyan-500/30">
+                        {preset.category}
+                      </span>
+                    </div>
+                    <span className="text-xs font-mono text-emerald-400 font-black">
+                      {preset.expectedRps}
+                    </span>
+                  </div>
+
+                  <h4 className="font-bold text-white text-sm font-outfit group-hover:text-cyan-300 transition-colors">
+                    {preset.name}
+                  </h4>
+                  <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                    {preset.description}
+                  </p>
                 </div>
-                <span className="text-xs font-mono text-emerald-400 font-black">~200 RPS</span>
-              </div>
 
-              <h4 className="font-bold text-white text-sm font-outfit group-hover:text-emerald-300 transition-colors">
-                E-Commerce Catalog API
-              </h4>
-              <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed">
-                Simulates high-traffic flash sale catalog queries with multi-filter load.
-              </p>
-            </div>
-
-            <div className="pt-2 border-t border-emerald-500/20 flex items-center justify-between text-[11px] font-mono">
-              <span className="text-emerald-400 font-bold">GET</span>
-              <span className="text-slate-300 truncate max-w-[170px]">https://dummyjson.com/products</span>
-            </div>
-          </div>
-
-          {/* Card 2: Database Lock (Amber) */}
-          <div
-            onClick={() => handleSelectPreset(BENCHMARK_PRESETS[1])}
-            className={`p-4 rounded-2xl cursor-pointer transition-all border flex flex-col justify-between space-y-2 relative overflow-hidden group ${
-              activePresetId === BENCHMARK_PRESETS[1].id
-                ? 'bg-amber-950/40 border-amber-400 shadow-xl shadow-amber-500/15'
-                : 'bg-[#1a1208] border-amber-500/20 hover:border-amber-500/50 hover:bg-[#241a0b]'
-            }`}
-          >
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">🐢</span>
-                  <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-mono text-[9px] font-bold border border-amber-500/30">
-                    DB Lock &amp; Timeout
-                  </span>
+                <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] font-mono">
+                  <span className="text-cyan-400 font-bold">{preset.config.method}</span>
+                  <span className="text-slate-400 truncate max-w-[170px]">{preset.config.url}</span>
                 </div>
-                <span className="text-xs font-mono text-amber-400 font-black">1.2s P50</span>
               </div>
-
-              <h4 className="font-bold text-white text-sm font-outfit group-hover:text-amber-300 transition-colors">
-                Database Contention Stress
-              </h4>
-              <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed">
-                Simulates unindexed queries and connection pool exhaustion.
-              </p>
-            </div>
-
-            <div className="pt-2 border-t border-amber-500/20 flex items-center justify-between text-[11px] font-mono">
-              <span className="text-amber-400 font-bold">GET</span>
-              <span className="text-slate-300 truncate max-w-[170px]">https://httpbin.org/delay/1</span>
-            </div>
-          </div>
-
-          {/* Card 3: Microservice Ping (Purple) */}
-          <div
-            onClick={() => handleSelectPreset(BENCHMARK_PRESETS[2])}
-            className={`p-4 rounded-2xl cursor-pointer transition-all border flex flex-col justify-between space-y-2 relative overflow-hidden group ${
-              activePresetId === BENCHMARK_PRESETS[2].id
-                ? 'bg-purple-950/40 border-purple-400 shadow-xl shadow-purple-500/15'
-                : 'bg-[#140b24] border-purple-500/20 hover:border-purple-500/50 hover:bg-[#1d1033]'
-            }`}
-          >
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">⚡</span>
-                  <span className="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 font-mono text-[9px] font-bold border border-purple-500/30">
-                    Ultra Low Latency
-                  </span>
-                </div>
-                <span className="text-xs font-mono text-purple-400 font-black">45ms P50</span>
-              </div>
-
-              <h4 className="font-bold text-white text-sm font-outfit group-hover:text-purple-300 transition-colors">
-                Microservice Gateway Ping
-              </h4>
-              <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed">
-                Sub-millisecond probe measuring reverse proxy TLS handshake lag.
-              </p>
-            </div>
-
-            <div className="pt-2 border-t border-purple-500/20 flex items-center justify-between text-[11px] font-mono">
-              <span className="text-purple-400 font-bold">GET</span>
-              <span className="text-slate-300 truncate max-w-[170px]">https://httpbin.org/get</span>
-            </div>
-          </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* ======================================================== */}
-      {/* SECTION 2: PRIMARY LOAD WORKSPACE STUDIO */}
-      {/* ======================================================== */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-[#071120] border-2 border-cyan-500/40 shadow-2xl space-y-8 min-w-0">
+      {/* Main Workflow Studio Card */}
+      <section className="rounded-3xl bg-[#090d16] border border-cyan-500/20 p-6 sm:p-8 shadow-2xl shadow-cyan-500/5 space-y-8 min-w-0">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-cyan-500/20 pb-5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
@@ -309,7 +243,7 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
               <h3 className="text-lg sm:text-xl font-black text-white font-outfit">
                 Scenario &amp; Workload Configurator
               </h3>
-              <p className="text-xs text-slate-300">
+              <p className="text-xs text-slate-400 font-mono">
                 Design custom high-concurrency benchmarks, payload bodies, and SLA boundaries
               </p>
             </div>
@@ -333,7 +267,6 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
               </label>
             </div>
 
-            {/* URL Validation State */}
             {!urlValid && config.url.length > 0 && (
               <span className="text-[11px] text-rose-400 font-mono flex items-center gap-1">
                 <AlertCircle className="w-3.5 h-3.5" />
@@ -342,7 +275,7 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
             )}
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch gap-2 p-2 rounded-2xl bg-slate-950 border border-cyan-500/30 shadow-inner">
+          <div className="flex flex-col sm:flex-row items-stretch gap-2 p-2 rounded-2xl bg-slate-950 border border-white/10 shadow-inner">
             <select
               value={config.method}
               onChange={(e) => setConfig({ ...config, method: e.target.value as HttpMethod })}
@@ -375,8 +308,7 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
               type="button"
               onClick={handleProbeConnection}
               disabled={!urlValid || probeStatus === 'probing'}
-              className="px-4 py-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 text-cyan-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-30 shrink-0"
-              title="Test pre-flight connectivity"
+              className="px-4 py-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 text-cyan-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-30 shrink-0 font-mono"
             >
               {probeStatus === 'probing' ? (
                 <>
@@ -405,23 +337,23 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
 
         {/* Step 2 & 3: Split Studio (Workload vs Parameters) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-w-0">
-          {/* Left Panel: Concurrency & Timeline (Cyan Theme) */}
-          <div className="p-6 rounded-3xl bg-[#09152b] border border-cyan-500/30 space-y-6 min-w-0">
-            <div className="flex items-center justify-between border-b border-cyan-500/20 pb-3">
+          {/* Left Panel: Concurrency & Timeline */}
+          <div className="p-6 rounded-2xl bg-slate-950 border border-white/10 space-y-6 min-w-0">
+            <div className="flex items-center justify-between border-b border-white/5 pb-3">
               <div className="flex items-center gap-2">
                 <span className="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-300 text-xs font-bold flex items-center justify-center font-mono border border-cyan-500/30">
                   02
                 </span>
-                <h4 className="text-xs font-bold text-cyan-300 uppercase font-mono tracking-wider flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5" />
+                <h4 className="text-xs font-bold text-slate-200 uppercase font-mono tracking-wider flex items-center gap-1.5">
+                  <Users className="w-3.5 h-3.5 text-cyan-400" />
                   Concurrency &amp; Traffic Profiles
                 </h4>
               </div>
               <span className="text-[11px] font-mono text-cyan-400 font-bold">{config.virtualUsers} VUs Peak</span>
             </div>
 
-            {/* Virtual Users Slider with Calibrated Labels */}
-            <div className="space-y-2.5 p-4 rounded-2xl bg-slate-950 border border-white/5">
+            {/* Virtual Users Slider */}
+            <div className="space-y-2.5 p-4 rounded-xl bg-[#090d16] border border-white/5">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-200 font-bold font-outfit">Virtual Users (VUs)</span>
                 <span className="font-mono font-black text-cyan-400 text-sm px-3 py-0.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30">
@@ -443,8 +375,8 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
               </div>
             </div>
 
-            {/* Duration Slider with Calibrated Labels */}
-            <div className="space-y-2.5 p-4 rounded-2xl bg-slate-950 border border-white/5">
+            {/* Duration Slider */}
+            <div className="space-y-2.5 p-4 rounded-xl bg-[#090d16] border border-white/5">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-200 font-bold font-outfit">Test Duration</span>
                 <span className="font-mono font-black text-indigo-400 text-sm px-3 py-0.5 rounded-lg bg-indigo-500/10 border border-indigo-500/30">
@@ -468,7 +400,7 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
 
             {/* 4 Multi-Colored Traffic Profile Cards */}
             <div className="space-y-2">
-              <span className="text-[11px] font-bold text-slate-300 uppercase font-mono tracking-wider block">
+              <span className="text-[11px] font-bold text-slate-400 uppercase font-mono tracking-wider block">
                 Traffic Generation Waveform
               </span>
 
@@ -483,7 +415,7 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
                       className={`p-3 rounded-2xl border text-left transition-all cursor-pointer space-y-1.5 ${
                         isSelected
                           ? `${prof.bgActive} ${prof.borderColor} shadow-md`
-                          : 'bg-slate-950 border-white/5 hover:border-white/20 text-slate-400'
+                          : 'bg-[#090d16] border-white/5 hover:border-white/20 text-slate-400'
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -497,7 +429,7 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
                           />
                         </svg>
                       </div>
-                      <span className="text-[10px] text-slate-300 block leading-tight line-clamp-1">
+                      <span className="text-[10px] text-slate-400 block leading-tight line-clamp-1">
                         {prof.desc}
                       </span>
                     </button>
@@ -507,22 +439,22 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
             </div>
           </div>
 
-          {/* Right Panel: Headers, Auth & Payloads (Purple Theme) */}
-          <div className="p-6 rounded-3xl bg-[#120a24] border border-purple-500/30 space-y-5 min-w-0 flex flex-col justify-between">
+          {/* Right Panel: Headers, Auth & Payloads */}
+          <div className="p-6 rounded-2xl bg-slate-950 border border-white/10 space-y-5 min-w-0 flex flex-col justify-between">
             <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-purple-500/20 pb-3">
+              <div className="flex items-center justify-between border-b border-white/5 pb-3">
                 <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-lg bg-purple-500/20 text-purple-300 text-xs font-bold flex items-center justify-center font-mono border border-purple-500/30">
+                  <span className="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-300 text-xs font-bold flex items-center justify-center font-mono border border-cyan-500/30">
                     03
                   </span>
-                  <h4 className="text-xs font-bold text-purple-300 uppercase font-mono tracking-wider flex items-center gap-1.5">
-                    <Code2 className="w-3.5 h-3.5" />
+                  <h4 className="text-xs font-bold text-slate-200 uppercase font-mono tracking-wider flex items-center gap-1.5">
+                    <Code2 className="w-3.5 h-3.5 text-cyan-400" />
                     Headers, Auth &amp; Payloads
                   </h4>
                 </div>
 
                 {/* Tab Pills */}
-                <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-white/5 text-xs">
+                <div className="flex items-center gap-1 bg-[#090d16] p-1 rounded-xl border border-white/5 text-xs">
                   {[
                     { id: 'headers', label: `Headers (${config.headers.length})` },
                     { id: 'auth', label: `Auth (${config.authType.toUpperCase()})` },
@@ -534,7 +466,7 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
                       onClick={() => setActiveTab(tab.id as any)}
                       className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer text-xs ${
                         activeTab === tab.id
-                          ? 'bg-purple-500/30 text-purple-200 border border-purple-500/40 shadow-sm'
+                          ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
                           : 'text-slate-400 hover:text-white'
                       }`}
                     >
@@ -553,24 +485,24 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
                         type="checkbox"
                         checked={h.enabled}
                         onChange={(e) => updateHeader(idx, 'enabled', e.target.checked)}
-                        className="accent-purple-400 w-4 h-4 cursor-pointer"
+                        className="accent-cyan-400 w-4 h-4 cursor-pointer"
                       />
                       <input
                         value={h.key}
                         onChange={(e) => updateHeader(idx, 'key', e.target.value)}
                         placeholder="Header Key (e.g. Accept)"
-                        className="flex-1 p-2.5 rounded-xl bg-slate-950 border border-purple-500/20 text-xs font-mono text-white placeholder-slate-500 focus:outline-none"
+                        className="flex-1 p-2.5 rounded-xl bg-[#090d16] border border-white/10 text-xs font-mono text-white placeholder-slate-500 focus:outline-none"
                       />
                       <input
                         value={h.value}
                         onChange={(e) => updateHeader(idx, 'value', e.target.value)}
                         placeholder="Value"
-                        className="flex-1 p-2.5 rounded-xl bg-slate-950 border border-purple-500/20 text-xs font-mono text-white placeholder-slate-500 focus:outline-none"
+                        className="flex-1 p-2.5 rounded-xl bg-[#090d16] border border-white/10 text-xs font-mono text-white placeholder-slate-500 focus:outline-none"
                       />
                       <button
                         type="button"
                         onClick={() => removeHeader(idx)}
-                        className="p-2.5 rounded-xl bg-slate-950 text-slate-400 hover:text-rose-400 border border-white/10 cursor-pointer"
+                        className="p-2.5 rounded-xl bg-[#090d16] text-slate-400 hover:text-rose-400 border border-white/10 cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -580,7 +512,7 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
                   <button
                     type="button"
                     onClick={addHeader}
-                    className="px-3.5 py-1.5 rounded-xl bg-purple-500/20 border border-purple-500/40 text-xs font-bold text-purple-300 hover:bg-purple-500/30 transition-all cursor-pointer flex items-center gap-1.5"
+                    className="px-3.5 py-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-xs font-bold text-cyan-300 hover:bg-cyan-500/20 transition-all cursor-pointer flex items-center gap-1.5 font-mono"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Add Request Header</span>
@@ -599,8 +531,8 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
                         onClick={() => setConfig({ ...config, authType: t })}
                         className={`px-3.5 py-1.5 rounded-xl text-xs font-bold capitalize transition-all cursor-pointer ${
                           config.authType === t
-                            ? 'bg-purple-500 text-white shadow-md'
-                            : 'bg-slate-950 text-slate-300 hover:text-white border border-white/5'
+                            ? 'bg-cyan-500 text-black font-extrabold shadow-md'
+                            : 'bg-[#090d16] text-slate-400 hover:text-white border border-white/5'
                         }`}
                       >
                         {t.replace('_', ' ')}
@@ -613,7 +545,7 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
                       value={config.authValue || ''}
                       onChange={(e) => setConfig({ ...config, authValue: e.target.value })}
                       placeholder={config.authType === 'bearer' ? 'Bearer eyJh...' : 'X-API-Key sk_live_...'}
-                      className="w-full p-3 rounded-xl bg-slate-950 border border-purple-500/30 text-xs font-mono text-white placeholder-slate-500 focus:outline-none"
+                      className="w-full p-3 rounded-xl bg-[#090d16] border border-white/10 text-xs font-mono text-white placeholder-slate-500 focus:outline-none"
                     />
                   )}
                 </div>
@@ -627,15 +559,15 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
                     onChange={(e) => setConfig({ ...config, bodyContent: e.target.value, bodyType: 'json' })}
                     rows={6}
                     placeholder='{\n  "query": "macbook pro",\n  "limit": 50\n}'
-                    className="w-full p-3.5 rounded-2xl bg-slate-950 border border-purple-500/30 text-xs font-mono text-white placeholder-slate-500 focus:outline-none font-bold"
+                    className="w-full p-3.5 rounded-2xl bg-[#090d16] border border-white/10 text-xs font-mono text-white placeholder-slate-500 focus:outline-none font-bold"
                   />
                 </div>
               )}
             </div>
 
             {/* Protocol Notice */}
-            <div className="p-3.5 rounded-2xl bg-purple-950/30 border border-purple-500/30 text-[11px] text-purple-300 font-mono flex items-center justify-between">
-              <span className="font-bold">Protocol: HTTP/2 Multiplexed</span>
+            <div className="p-3.5 rounded-2xl bg-[#090d16] border border-white/10 text-[11px] text-slate-300 font-mono flex items-center justify-between">
+              <span>Protocol: HTTP/2 Multiplexed</span>
               <span className="text-emerald-400 font-bold">Estimated Rate: ~{Math.round(config.virtualUsers * 2.5)} RPS</span>
             </div>
           </div>
@@ -647,13 +579,13 @@ export default function TestConfigurator({ onStartTest, isRunning }: Props) {
             type="button"
             onClick={() => onStartTest(config)}
             disabled={isRunning || !urlValid}
-            className="w-full py-4.5 rounded-2xl bg-gradient-to-r from-cyan-400 via-teal-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-black font-black text-base shadow-2xl shadow-cyan-500/30 hover:scale-[1.01] transition-all cursor-pointer flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full py-4.5 rounded-2xl bg-gradient-to-r from-cyan-400 via-teal-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-black font-black text-base shadow-2xl shadow-cyan-500/20 hover:scale-[1.01] transition-all cursor-pointer flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Play className="w-5 h-5 fill-black" />
             <span>Launch High-Concurrency Load Benchmark</span>
           </button>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

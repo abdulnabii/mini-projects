@@ -1,16 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --bg-main: #030712;
-  --bg-surface: #070e1c;
-  --bg-card: #0a1324;
+  --bg-main: #060a12;
+  --bg-surface: #090d16;
+  --bg-card: #0c1220;
   --accent-cyan: #06b6d4;
-  --accent-blue: #3b82f6;
+  --accent-teal: #14b8a6;
   --accent-indigo: #6366f1;
-  --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
-  --accent-rose: #f43f5e;
-  --accent-purple: #a855f7;
 }
 
 * {
@@ -23,16 +19,8 @@ html,
 body {
   width: 100%;
   min-height: 100vh;
-  background-color: #030712;
-  background-image: 
-    radial-gradient(at 10% 10%, rgba(6, 182, 212, 0.1) 0px, transparent 45%),
-    radial-gradient(at 90% 15%, rgba(168, 85, 247, 0.1) 0px, transparent 45%),
-    radial-gradient(at 50% 90%, rgba(16, 185, 129, 0.06) 0px, transparent 50%),
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
-  background-attachment: fixed;
-  color: #f8fafc;
+  background-color: #060a12;
+  color: #e2e8f0;
   font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   letter-spacing: -0.01em;
 }
@@ -43,13 +31,13 @@ body {
 
 /* Glass & Section Cards */
 .glass-card {
-  background: linear-gradient(145deg, rgba(10, 20, 38, 0.92) 0%, rgba(6, 13, 27, 0.96) 100%);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(145deg, rgba(12, 18, 32, 0.92) 0%, rgba(9, 13, 22, 0.96) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(6, 182, 212, 0.2);
   box-shadow: 
-    0 24px 48px -12px rgba(0, 0, 0, 0.75),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    0 20px 40px -15px rgba(0, 0, 0, 0.7),
+    0 0 20px -5px rgba(6, 182, 212, 0.05);
 }
 
 .glass-card-hover {
@@ -59,13 +47,12 @@ body {
 .glass-card-hover:hover {
   border-color: rgba(6, 182, 212, 0.4);
   box-shadow: 
-    0 24px 48px -12px rgba(0, 0, 0, 0.85),
-    0 0 25px 0 rgba(6, 182, 212, 0.15),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+    0 20px 40px -15px rgba(0, 0, 0, 0.8),
+    0 0 25px 0 rgba(6, 182, 212, 0.12);
   transform: translateY(-2px);
 }
 
-/* Custom Sliders */
+/* Range Slider Styling */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -118,29 +105,4 @@ input[type="range"]::-moz-range-thumb {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(6, 182, 212, 0.6);
-}
-
-/* Gradients */
-.gradient-cyan {
-  background: linear-gradient(135deg, #38bdf8 0%, #22d3ee 45%, #818cf8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.gradient-emerald {
-  background: linear-gradient(135deg, #34d399 0%, #10b981 50%, #06b6d4 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Animated Neural Pulse */
-@keyframes neuralPulse {
-  0%, 100% { opacity: 0.7; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); filter: drop-shadow(0 0 12px rgba(6, 182, 212, 0.6)); }
-}
-
-.animate-neural-pulse {
-  animation: neuralPulse 2s ease-in-out infinite;
 }
