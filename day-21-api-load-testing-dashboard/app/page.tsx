@@ -20,10 +20,9 @@ import {
   Cpu,
   Layers,
   Users,
-  Flame,
 } from 'lucide-react';
 
-export default function LoadStudioPage() {
+export default function Home() {
   const router = useRouter();
   const [isRunning, setIsRunning] = useState(false);
   const [progressSec, setProgressSec] = useState(0);
@@ -165,79 +164,77 @@ export default function LoadStudioPage() {
   };
 
   return (
-    <div className="space-y-10 font-sans w-full min-w-0">
-      {/* Centered Hero Header */}
-      <section className="text-center space-y-4 max-w-3xl mx-auto pt-2">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold">
+    <div className="space-y-10 font-mono w-full min-w-0">
+      {/* Header Title (Project 9 Style) */}
+      <div className="text-center space-y-3 max-w-3xl mx-auto">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>CLOUD-SCALE SRE BENCHMARK STUDIO</span>
+          <span>AI LOAD TESTING &amp; SRE DIAGNOSTIC ENGINE</span>
         </div>
-
-        <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight font-outfit">
-          High-Concurrency Load Testing &amp; <br />
-          <span className="bg-gradient-to-r from-cyan-400 via-teal-400 to-blue-500 bg-clip-text text-transparent">
-            AI Performance Diagnostics
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight font-outfit">
+          Analyze &amp; Stress Test Any{' '}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-sky-400">
+            API Endpoint
           </span>
         </h1>
-
-        <p className="text-xs sm:text-sm text-slate-400 font-mono max-w-2xl mx-auto leading-relaxed">
+        <p className="text-slate-400 text-xs sm:text-sm font-mono max-w-2xl mx-auto leading-relaxed">
           Simulate up to 250 concurrent virtual users, inspect real-time P50/P95/P99 latency distribution curves, and diagnose infrastructure bottlenecks with Gemini 1.5 Flash.
         </p>
+      </div>
 
-        {/* 4 Feature Metric Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 font-mono text-left">
-          <div className="p-3.5 rounded-2xl bg-[#090d16] border border-cyan-500/20 space-y-1">
-            <span className="text-[10px] text-cyan-400 font-bold uppercase flex items-center gap-1.5">
-              <Users className="w-3.5 h-3.5" /> Virtual Users
-            </span>
-            <div className="text-lg font-black text-white">250 VUs Peak</div>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-[#090d16] border border-indigo-500/20 space-y-1">
-            <span className="text-[10px] text-indigo-400 font-bold uppercase flex items-center gap-1.5">
-              <Gauge className="w-3.5 h-3.5" /> SLA Percentiles
-            </span>
-            <div className="text-lg font-black text-indigo-300">P50 / P95 / P99</div>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-[#090d16] border border-emerald-500/20 space-y-1">
-            <span className="text-[10px] text-emerald-400 font-bold uppercase flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" /> AI Diagnostics
-            </span>
-            <div className="text-lg font-black text-emerald-300">Gemini 1.5 SRE</div>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-[#090d16] border border-purple-500/20 space-y-1">
-            <span className="text-[10px] text-purple-400 font-bold uppercase flex items-center gap-1.5">
-              <Terminal className="w-3.5 h-3.5" /> Native Scripts
-            </span>
-            <div className="text-lg font-black text-purple-300">k6.js &amp; cURL</div>
-          </div>
+      {/* 4 Feature Metric Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 max-w-5xl mx-auto font-mono text-left">
+        <div className="p-4 rounded-2xl bg-[#0d1117] border border-cyan-500/20 space-y-1 shadow-lg">
+          <span className="text-[10px] text-cyan-400 font-bold uppercase flex items-center gap-1.5">
+            <Users className="w-3.5 h-3.5" /> Virtual Users
+          </span>
+          <div className="text-lg font-black text-white">250 VUs Peak</div>
         </div>
-      </section>
+
+        <div className="p-4 rounded-2xl bg-[#0d1117] border border-indigo-500/20 space-y-1 shadow-lg">
+          <span className="text-[10px] text-indigo-400 font-bold uppercase flex items-center gap-1.5">
+            <Gauge className="w-3.5 h-3.5" /> SLA Percentiles
+          </span>
+          <div className="text-lg font-black text-indigo-300">P50 / P95 / P99</div>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#0d1117] border border-emerald-500/20 space-y-1 shadow-lg">
+          <span className="text-[10px] text-emerald-400 font-bold uppercase flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5" /> AI Diagnostics
+          </span>
+          <div className="text-lg font-black text-emerald-300">Gemini 1.5 SRE</div>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#0d1117] border border-purple-500/20 space-y-1 shadow-lg">
+          <span className="text-[10px] text-purple-400 font-bold uppercase flex items-center gap-1.5">
+            <Terminal className="w-3.5 h-3.5" /> Native Scripts
+          </span>
+          <div className="text-lg font-black text-purple-300">k6.js &amp; cURL</div>
+        </div>
+      </div>
 
       {/* Live Runner Modal */}
       {isRunning && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in duration-200">
-          <div className="p-8 rounded-3xl bg-[#090d16] border-2 border-cyan-500/50 max-w-md w-full text-center space-y-6 shadow-2xl shadow-cyan-500/20">
+          <div className="p-8 rounded-3xl bg-[#0d1117] border-2 border-cyan-500/50 max-w-md w-full text-center space-y-6 shadow-2xl shadow-cyan-500/20 font-mono">
             <div className="w-14 h-14 rounded-2xl bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-cyan-400 mx-auto animate-spin">
               <Loader2 className="w-7 h-7" />
             </div>
 
             <div className="space-y-1">
-              <span className="text-[10px] font-bold uppercase font-mono text-cyan-400 tracking-wider">
+              <span className="text-[10px] font-bold uppercase text-cyan-400 tracking-wider">
                 Generating Concurrent Virtual Traffic
               </span>
               <h3 className="text-xl font-black text-white font-outfit">
                 Executing Load Benchmark...
               </h3>
-              <p className="text-xs text-slate-400 font-mono">
+              <p className="text-xs text-slate-400">
                 Streaming live metrics to coordinator. Compiling statistical percentiles.
               </p>
             </div>
 
             {/* Live Stats */}
-            <div className="grid grid-cols-2 gap-3 font-mono">
+            <div className="grid grid-cols-2 gap-3">
               <div className="p-4 rounded-2xl bg-slate-950 border border-cyan-500/30 text-center">
                 <span className="text-2xl font-black text-cyan-400 block">{liveRps}</span>
                 <span className="text-[10px] text-slate-400 uppercase font-bold">Live RPS</span>
@@ -251,7 +248,7 @@ export default function LoadStudioPage() {
 
             {/* Progress Bar */}
             <div className="space-y-1.5">
-              <div className="flex justify-between text-xs font-mono text-slate-400">
+              <div className="flex justify-between text-xs text-slate-400">
                 <span>Progress</span>
                 <span className="text-cyan-400 font-bold">{progressSec}s elapsed</span>
               </div>
@@ -266,7 +263,7 @@ export default function LoadStudioPage() {
         </div>
       )}
 
-      {/* Main Workflow Configurator */}
+      {/* Main Test Configurator */}
       <TestConfigurator onStartTest={handleStartTest} isRunning={isRunning} />
     </div>
   );

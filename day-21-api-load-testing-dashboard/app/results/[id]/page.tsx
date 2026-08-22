@@ -66,7 +66,7 @@ export default function TestResultPage() {
 
   if (!result) {
     return (
-      <div className="p-16 text-center space-y-4 font-sans">
+      <div className="p-16 text-center space-y-4 font-mono">
         <div className="w-8 h-8 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin mx-auto" />
         <p className="text-sm text-slate-300">Loading benchmark telemetry...</p>
       </div>
@@ -76,7 +76,7 @@ export default function TestResultPage() {
   const p = result.percentiles;
 
   return (
-    <div className="space-y-8 font-sans w-full min-w-0">
+    <div className="space-y-8 font-mono w-full min-w-0">
       {/* Top Navigation & Action Controls */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <Link
@@ -90,7 +90,7 @@ export default function TestResultPage() {
         <div className="flex items-center gap-2.5 flex-wrap">
           <button
             onClick={() => setIsExportOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 border border-white/10 hover:border-cyan-500/40 text-xs font-bold text-white transition-all cursor-pointer shadow-sm"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-500/40 text-xs font-bold text-white transition-all cursor-pointer shadow-sm"
           >
             <FileText className="w-4 h-4 text-cyan-400" />
             <span>Export Executive Report</span>
@@ -98,7 +98,7 @@ export default function TestResultPage() {
 
           <Link
             href="/"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-400 via-cyan-500 to-blue-600 hover:from-cyan-300 hover:to-blue-500 text-black font-extrabold text-xs shadow-lg shadow-cyan-500/20 hover:scale-105 transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-400 via-teal-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-black font-extrabold text-xs shadow-lg shadow-cyan-500/20 hover:scale-105 transition-all"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Rerun Benchmark</span>
@@ -107,40 +107,38 @@ export default function TestResultPage() {
       </div>
 
       {/* Main Results Header Banner */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-[#09152b] border-2 border-cyan-500/30 shadow-2xl space-y-4 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
-
+      <div className="p-6 sm:p-8 rounded-3xl bg-[#0d1117] border border-cyan-500/30 shadow-2xl space-y-4 relative overflow-hidden">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
           <div className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-mono text-[10px] font-bold border border-cyan-500/30 uppercase">
+              <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-bold border border-cyan-500/30 uppercase">
                 {result.config.method}
               </span>
-              <span className="text-xs text-slate-300 font-mono">
+              <span className="text-xs text-slate-300">
                 {result.config.virtualUsers} Virtual Users • {result.config.durationSeconds}s Duration • {result.config.loadProfile.replace('_', ' ')}
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black text-white font-outfit">
               {result.config.title}
             </h2>
-            <p className="text-xs font-mono text-slate-300 break-all">{result.config.url}</p>
+            <p className="text-xs text-slate-400 break-all">{result.config.url}</p>
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            <div className="p-3.5 px-5 rounded-2xl bg-slate-950 border border-white/10 text-center">
-              <span className="text-2xl sm:text-3xl font-black font-mono text-cyan-400 leading-none">
+            <div className="p-3.5 px-5 rounded-2xl bg-slate-950 border border-slate-800 text-center">
+              <span className="text-2xl sm:text-3xl font-black text-cyan-400 leading-none">
                 {result.avgRps}
               </span>
-              <span className="text-[9px] font-bold text-slate-300 uppercase tracking-wider block mt-1">
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mt-1">
                 Avg Throughput
               </span>
             </div>
 
-            <div className="p-3.5 px-5 rounded-2xl bg-slate-950 border border-white/10 text-center">
-              <span className="text-2xl sm:text-3xl font-black font-mono text-emerald-400 leading-none">
+            <div className="p-3.5 px-5 rounded-2xl bg-slate-950 border border-slate-800 text-center">
+              <span className="text-2xl sm:text-3xl font-black text-emerald-400 leading-none">
                 {p.p50}ms
               </span>
-              <span className="text-[9px] font-bold text-slate-300 uppercase tracking-wider block mt-1">
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mt-1">
                 P50 Median
               </span>
             </div>
@@ -148,9 +146,9 @@ export default function TestResultPage() {
         </div>
       </div>
 
-      {/* 4 Summary Telemetry Cards (Responsive 1-col on mobile, 2-col on tablet, 4-col on desktop) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
-        <div className="p-5 rounded-2xl bg-slate-950/80 border border-white/10 space-y-1">
+      {/* 4 Summary Telemetry Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="p-5 rounded-2xl bg-[#0d1117] border border-cyan-500/20 space-y-1 shadow-lg">
           <span className="text-[10px] font-bold text-slate-400 uppercase">Total Requests</span>
           <div className="text-2xl font-black text-white">
             {result.totalRequests.toLocaleString()}
@@ -160,7 +158,7 @@ export default function TestResultPage() {
           </span>
         </div>
 
-        <div className="p-5 rounded-2xl bg-slate-950/80 border border-white/10 space-y-1">
+        <div className="p-5 rounded-2xl bg-[#0d1117] border border-cyan-500/20 space-y-1 shadow-lg">
           <span className="text-[10px] font-bold text-slate-400 uppercase">Peak Throughput</span>
           <div className="text-2xl font-black text-cyan-400">
             {result.peakRps} <span className="text-xs font-normal text-slate-400">RPS</span>
@@ -168,7 +166,7 @@ export default function TestResultPage() {
           <span className="text-[11px] text-slate-300">Avg: {result.avgRps} RPS</span>
         </div>
 
-        <div className="p-5 rounded-2xl bg-slate-950/80 border border-white/10 space-y-1">
+        <div className="p-5 rounded-2xl bg-[#0d1117] border border-cyan-500/20 space-y-1 shadow-lg">
           <span className="text-[10px] font-bold text-slate-400 uppercase">P99 Tail Latency</span>
           <div className="text-2xl font-black text-amber-400">
             {p.p99} <span className="text-xs font-normal text-slate-400">ms</span>
@@ -176,7 +174,7 @@ export default function TestResultPage() {
           <span className="text-[11px] text-slate-300">P95 SLA: {p.p95}ms</span>
         </div>
 
-        <div className="p-5 rounded-2xl bg-slate-950/80 border border-white/10 space-y-1">
+        <div className="p-5 rounded-2xl bg-[#0d1117] border border-cyan-500/20 space-y-1 shadow-lg">
           <span className="text-[10px] font-bold text-slate-400 uppercase">Error Rate</span>
           <div className={`text-2xl font-black ${result.errorRate > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
             {result.errorRate}%
@@ -188,12 +186,12 @@ export default function TestResultPage() {
       </div>
 
       {/* Segmented View Tabs */}
-      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-950 border border-white/10 text-xs w-fit flex-wrap">
+      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-[#0d1117] border border-slate-800 text-xs w-fit flex-wrap">
         <button
           onClick={() => handleSelectTab('metrics')}
           className={`px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'metrics'
-              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-md'
+              ? 'bg-cyan-500 text-black shadow-md'
               : 'text-slate-300 hover:text-white'
           }`}
         >
@@ -205,11 +203,11 @@ export default function TestResultPage() {
           onClick={() => handleSelectTab('diagnostic')}
           className={`px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'diagnostic'
-              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-md'
+              ? 'bg-cyan-500 text-black shadow-md'
               : 'text-slate-300 hover:text-white'
           }`}
         >
-          <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+          <Sparkles className="w-3.5 h-3.5" />
           <span>AI SRE Diagnostic</span>
         </button>
 
@@ -217,7 +215,7 @@ export default function TestResultPage() {
           onClick={() => handleSelectTab('export')}
           className={`px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'export'
-              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-md'
+              ? 'bg-cyan-500 text-black shadow-md'
               : 'text-slate-300 hover:text-white'
           }`}
         >
@@ -249,7 +247,7 @@ export default function TestResultPage() {
         </div>
       )}
 
-      {/* Tab 2: AI Diagnostic with Streaming State */}
+      {/* Tab 2: AI Diagnostic */}
       {activeTab === 'diagnostic' && (
         <div className="animate-in fade-in duration-200">
           <AIBottleneckDiagnostic analysis={result.aiAnalysis} isLoading={isAiLoading} />
