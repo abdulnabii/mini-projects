@@ -4,8 +4,9 @@ import {
   LinkedInPost,
   LinkedInCarousel,
   HookVariant,
-  VoiceProfile,
   EngagementRadar,
+  VoiceProfile,
+  LinkedInTone,
 } from '@/types';
 
 function getGenAI(): GoogleGenerativeAI | null {
@@ -16,86 +17,95 @@ function getGenAI(): GoogleGenerativeAI | null {
 
 export async function generateTwitterThreadWithGemini(
   topic: string,
-  voiceProfile?: VoiceProfile
+  voiceProfile?: VoiceProfile | null
 ): Promise<TwitterThread> {
   const genAI = getGenAI();
 
   const voiceInstruction = voiceProfile
-    ? `Write matching this calibrated voice profile: Tone: ${voiceProfile.tone}, Emoji Density: ${voiceProfile.emojiDensity}, Signature Keywords: ${voiceProfile.signatureKeywords.join(', ')}.`
-    : `Write in a sharp, authentic "Build in Public" developer voice. Concrete numbers, zero corporate fluff, conversational and engaging.`;
+    ? `Voice Guidelines: Tone is "${voiceProfile.tone}". Average sentence length ~${voiceProfile.avgSentenceLength} words. Emoji density is ${voiceProfile.emojiDensity}. Signature keywords: ${voiceProfile.signatureKeywords.join(', ')}.`
+    : 'Voice Guidelines: Authentic, technical, build-in-public software engineer/founder. Punchy, high-signal, zero fluff.';
 
   if (!genAI) {
-    // Offline / fallback mock thread
     return {
       id: 'thread_' + Date.now(),
       topic,
       tweets: [
         {
           number: 1,
-          text: `I built and shipped a full-stack AI application in 48 hours.\n\nNo huge team. No venture capital. Just Next.js 16 + Gemini API.\n\nHere is the exact architecture and the 5 lessons that saved me 20 hours: 🧵👇`,
           type: 'hook',
-          characterCount: 198,
+          text: `Most developers spend 40 hours building features that could be shipped in 4.\n\nHere is the exact architecture breakdown I used to ship a production AI app in 48 hours 🧵👇`,
+          characterCount: 184,
         },
         {
           number: 2,
-          text: `1/ The biggest bottleneck isn't the AI model.\n\nIt's state synchronization between streaming server components and client UI.\n\nHere's how I handled zero-flicker streaming:`,
           type: 'content',
-          characterCount: 172,
+          text: `1/ The Stack Strategy:\n\n• Frontend: Next.js 16 App Router + Turbopack\n• AI Engine: Gemini 1.5 Flash (1M context)\n• Styling: Tailwind CSS\n• State: LocalStorage with typed schemas\n\nNo bloated backend servers. Zero cold-start latency.`,
+          characterCount: 242,
         },
         {
           number: 3,
-          text: `2/ Prompt Engineering Rule #1:\n\nAlways ask the LLM for structured JSON with strict schema validation rather than free-form text.\n\nThis eliminated 99% of UI parsing errors.`,
           type: 'content',
-          characterCount: 174,
+          text: `2/ The Biggest Bottleneck:\n\nPrompt drift. When extracting JSON schemas, LLMs love adding conversational markdown wrapping.\n\nFix: Set responseMimeType to 'application/json' in generationConfig. 100% reliable schema parsing.`,
+          characterCount: 226,
         },
         {
           number: 4,
-          text: `3/ Edge Caching Matters.\n\nUsing stale-while-revalidate on static generated routes cut database query latency from 340ms to 18ms.`,
           type: 'content',
-          characterCount: 135,
+          text: `3/ Real-Time Performance:\n\nTurbopack compilation in Next.js 16 is under 800ms on hot-reload.\n\nPairing edge serverless routes with client-side optimistic UI makes the entire app feel instantaneous.`,
+          characterCount: 206,
         },
         {
           number: 5,
-          text: `4/ What's the #1 tool in your modern developer stack right now?\n\nDrop your stack below — curious what everyone is building with! 👇`,
-          type: 'engagement',
-          characterCount: 142,
+          type: 'content',
+          text: `4/ The 3 Golden Rules We Learned:\n\n1. Cache heavy AI evaluations on-device\n2. Always provide fallback offline heuristics\n3. Keep your UI feedback loops under 100ms\n\nUsers don't care about your architecture—they care about speed.`,
+          characterCount: 239,
         },
         {
           number: 6,
-          text: `If you found this breakdown useful:\n\n1. Follow @abdulnabii for daily engineering breakdowns\n2. Retweet the 1st tweet to share with other builders\n\nKeep shipping! 🚀 #BuildInPublic #WebDev`,
+          type: 'engagement',
+          text: `5/ Quick question for fellow builders:\n\nAre you using streaming server actions or REST endpoints for your AI apps in 2026? Drop your setup below 👇`,
+          characterCount: 153,
+        },
+        {
+          number: 7,
           type: 'cta',
-          characterCount: 194,
+          text: `If you found this breakdown valuable:\n\n1. Follow @abdulnabi for daily full-stack AI engineering breakdowns\n2. Retweet the first tweet to share with fellow developers 🚀`,
+          characterCount: 174,
         },
       ],
       hooks: [
         {
-          style: 'Contrarian Take',
-          text: 'Most developers over-engineer AI apps with 10 tools when 1 API call + Next.js is all you need.',
-          predictedCTR: '5.8%',
-          formulaExplanation: 'Challenges industry complexity and offers simple clarity.',
+          style: 'Contrarian Debate',
+          text: 'Stop over-engineering your AI SaaS stack. 95% of apps do not need microservices or Kafka.',
+          predictedCTR: '8.4%',
+          formulaExplanation: 'Challenges industry consensus with extreme clarity.',
         },
         {
-          style: 'Bold Statistic',
-          text: '78% of AI wrappers fail because of poor latency, not bad models. Here is how I hit 18ms responses.',
-          predictedCTR: '4.9%',
-          formulaExplanation: 'Hard metric triggers instant curiosity.',
+          style: 'Bold Numbers / Metrics',
+          text: 'From 0 to 10,000 active requests in 48 hours with $0 in cloud bills. Here is the blueprint:',
+          predictedCTR: '9.2%',
+          formulaExplanation: 'Highlights concrete data points and instant ROI.',
         },
       ],
-      hashtags: ['#BuildInPublic', '#NextJS', '#AI', '#WebDev'],
+      hashtags: ['#buildinpublic', '#nextjs', '#ai', '#webdev'],
       engagementRadar: {
-        score: 88,
+        score: 95,
         grade: 'VIRAL',
-        hookStrength: 92,
-        readability: 95,
-        emotionalResonance: 84,
-        formattingSpacing: 90,
+        hookStrength: 96,
+        readability: 94,
+        emotionalResonance: 92,
+        formattingSpacing: 98,
+        predictedImpressions: '42,000 - 68,000',
+        bookmarkRatio: '14.8% (Top 2%)',
+        retweetVelocity: '3.4x Avg',
+        readabilityGrade: 'Grade 6.1 (Optimal Viral)',
         tips: [
-          'Strong curiosity gap in Tweet 1',
-          'Clean 1-sentence spacing prevents reader fatigue',
-          'Clear engagement question placed before final CTA',
+          'Opening hook creates strong curiosity loop',
+          'Numbered list format improves mobile readability',
+          'Ending CTA has high conversion for bookmarks & follows',
         ],
       },
-      postingTime: 'Tuesday 9:00 AM EST (Peak Tech Twitter Window)',
+      postingTime: 'Tuesday 8:30 AM EST (Peak Tech Engagement)',
       createdAt: new Date().toISOString(),
     };
   }
@@ -104,134 +114,116 @@ export async function generateTwitterThreadWithGemini(
     model: 'gemini-1.5-flash',
     generationConfig: {
       responseMimeType: 'application/json',
-      temperature: 0.3,
+      temperature: 0.7,
     },
   });
 
   const prompt = `
-You are a world-class viral tech ghostwriter and content strategist for developers and tech founders on Twitter/X.
+You are a World-Class Viral Twitter Ghostwriter.
+TOPIC: ${topic}
 ${voiceInstruction}
 
-TOPIC: "${topic}"
-
-Generate a high-converting 6-to-10 tweet Twitter Thread in valid JSON matching this schema:
+Generate an 8-10 tweet viral thread.
+Schema:
 {
   "tweets": [
     {
       "number": 1,
-      "text": "Hook tweet text. Max 240 chars. Create high curiosity or a bold claim with 🧵 or 👇",
-      "type": "hook"
-    },
-    {
-      "number": 2,
-      "text": "Body tweet text with clean double spacing and 1 idea per tweet",
-      "type": "content"
-    },
-    {
-      "number": 5,
-      "text": "Engagement question asking readers their thoughts or experience",
-      "type": "engagement"
-    },
-    {
-      "number": 6,
-      "text": "Call to action tweet with follow recommendation and 2-3 hashtags",
-      "type": "cta"
+      "text": "Tweet copy (strictly under 280 chars)",
+      "type": "hook" | "content" | "engagement" | "cta",
+      "characterCount": 180
     }
   ],
   "hooks": [
     {
-      "style": "Contrarian Take",
-      "text": "Hook text...",
-      "predictedCTR": "5.4%",
-      "formulaExplanation": "Why this hook works"
-    },
-    {
-      "style": "Shocking Metric",
-      "text": "Hook text...",
-      "predictedCTR": "4.8%",
-      "formulaExplanation": "Why this hook works"
+      "style": "Contrarian" | "Bold Metric" | "Personal Story" | "Step-by-Step" | "Question",
+      "text": "Alternative hook opening line",
+      "predictedCTR": "9.4%",
+      "formulaExplanation": "Why this hook converts"
     }
   ],
-  "hashtags": ["#Tag1", "#Tag2"],
+  "hashtags": ["#buildinpublic", "#ai"],
   "engagementRadar": {
-    "score": 88,
+    "score": 94,
     "grade": "VIRAL",
-    "hookStrength": 90,
+    "hookStrength": 95,
     "readability": 92,
-    "emotionalResonance": 85,
-    "formattingSpacing": 94,
+    "emotionalResonance": 90,
+    "formattingSpacing": 96,
+    "predictedImpressions": "35,000 - 60,000",
+    "bookmarkRatio": "13.5% (Top 4%)",
+    "retweetVelocity": "3.1x Avg",
+    "readabilityGrade": "Grade 6.2 (High Retention)",
     "tips": ["Tip 1", "Tip 2"]
   },
-  "postingTime": "Tuesday 9:00 AM EST (Peak Tech Engagement)"
+  "postingTime": "Tuesday 8:30 AM EST"
 }
 `;
 
   try {
     const res = await model.generateContent(prompt);
     const parsed = JSON.parse(res.response.text());
-
-    const tweets = (parsed.tweets || []).map((tw: any, idx: number) => ({
-      number: idx + 1,
-      text: tw.text || '',
-      type: tw.type || 'content',
-      characterCount: (tw.text || '').length,
-    }));
-
     return {
       id: 'thread_' + Date.now(),
       topic,
-      tweets,
-      hooks: parsed.hooks || [],
-      hashtags: parsed.hashtags || ['#BuildInPublic', '#Tech'],
-      engagementRadar: parsed.engagementRadar || {
-        score: 85,
-        grade: 'VIRAL',
-        hookStrength: 88,
-        readability: 90,
-        emotionalResonance: 82,
-        formattingSpacing: 90,
-        tips: ['Great rhythm and spacing'],
-      },
-      postingTime: parsed.postingTime || 'Tuesday 9:00 AM EST',
+      ...parsed,
       createdAt: new Date().toISOString(),
     };
-  } catch (error) {
-    console.error('Gemini Twitter thread generation failed:', error);
-    throw error;
+  } catch (e) {
+    console.error('Thread generation failed:', e);
+    throw e;
   }
 }
 
 export async function generateLinkedInPostWithGemini(
   topic: string,
   format: 'story' | 'framework' | 'contrarian' | 'case_study' = 'story',
-  voiceProfile?: VoiceProfile
+  voiceProfile?: VoiceProfile | null,
+  tone: LinkedInTone = 'storyteller_founder'
 ): Promise<LinkedInPost> {
   const genAI = getGenAI();
 
+  const toneInstructionMap: Record<LinkedInTone, string> = {
+    executive: 'Tone: Strategic, high-level C-Suite thought leadership, ROI and business impact.',
+    technical_architect: 'Tone: Deep engineering rigor, system architecture trade-offs, and benchmarks.',
+    storyteller_founder: 'Tone: Vulnerable build-in-public founder story with raw lessons and takeaways.',
+    data_driven: 'Tone: Analytical, statistical proof points, percentages, and metrics-first framing.',
+    contrarian: 'Tone: Bold industry critique challenging conventional wisdom with constructive alternatives.',
+  };
+
+  const selectedToneDesc = toneInstructionMap[tone] || toneInstructionMap.storyteller_founder;
+
   if (!genAI) {
+    const defaultFullText = `Most developers believe building an AI application takes a 5-person team and 3 months of runway.\n\n48 hours ago, I decided to test that assumption.\n\nHere is what I learned shipping a full-stack AI platform solo:\n\n1. Architectural Simplicity Wins\nInstead of spinning up Redis queues and multi-region Kubernetes clusters, I used Next.js 16 with client-side reactive state. Build speed went 5x.\n\n2. The Token Efficiency Rule\n90% of prompt latency is caused by returning unneeded markdown prose. Constraining generation to structured JSON dropped response latency from 3.2s to 420ms.\n\n3. User Feedback Loops Matter More Than Model Size\nFast models (Gemini 1.5 Flash) with instant UI micro-interactions beat slow giant models every single time.\n\nKey Takeaway:\nStop waiting for the "perfect architecture." Ship the simple version today, get real user data tomorrow.\n\n---\n\nWhat is your biggest bottleneck when shipping AI products in 2026? Let's discuss in the comments 👇\n\n#BuildingInPublic #ArtificialIntelligence #SoftwareEngineering #Nextjs #Founder`;
+
     return {
-      id: 'li_' + Date.now(),
+      id: 'post_' + Date.now(),
       topic,
       format,
-      hookLine: 'Most engineering teams waste 40% of their sprints building features nobody uses.',
-      body: `Here is the framework we used to fix it:\n\n1. The 1-Page PRD Rule:\nIf you can't explain the business impact and user problem in 1 page, the feature isn't ready for code.\n\n2. Rapid Throwaway Prototypes:\nSpend 4 hours validating with mock data before touching production database schemas.\n\n3. Continuous Feedback Loops:\nDeploy behind feature flags to 5 beta users on Day 2, not Day 30.\n\nThe result?\nEngineering velocity increased by 2.4x and rework dropped to near zero.`,
-      closingQuestion: 'How does your team decide when a feature is truly ready to build?',
-      hashtags: ['#SoftwareEngineering', '#ProductManagement', '#Leadership', '#TechTrends'],
-      fullText: `Most engineering teams waste 40% of their sprints building features nobody uses.\n\nHere is the framework we used to fix it:\n\n1. The 1-Page PRD Rule:\nIf you can't explain the business impact and user problem in 1 page, the feature isn't ready for code.\n\n2. Rapid Throwaway Prototypes:\nSpend 4 hours validating with mock data before touching production database schemas.\n\n3. Continuous Feedback Loops:\nDeploy behind feature flags to 5 beta users on Day 2, not Day 30.\n\nThe result?\nEngineering velocity increased by 2.4x and rework dropped to near zero.\n\nHow does your team decide when a feature is truly ready to build?\n\n#SoftwareEngineering #ProductManagement #Leadership #TechTrends`,
+      tone,
+      hookLine: 'Most developers believe building an AI application takes a 5-person team.',
+      body: defaultFullText,
+      closingQuestion: "What is your biggest bottleneck when shipping AI products in 2026? Let's discuss in the comments 👇",
+      hashtags: ['#BuildingInPublic', '#ArtificialIntelligence', '#SoftwareEngineering', '#Nextjs'],
+      fullText: defaultFullText,
       engagementRadar: {
-        score: 91,
+        score: 96,
         grade: 'VIRAL',
-        hookStrength: 94,
-        readability: 96,
-        emotionalResonance: 88,
-        formattingSpacing: 92,
+        hookStrength: 97,
+        readability: 95,
+        emotionalResonance: 93,
+        formattingSpacing: 98,
+        predictedImpressions: '48,000 - 80,000',
+        bookmarkRatio: '16.2% (Top 1%)',
+        retweetVelocity: '4.1x Avg',
+        readabilityGrade: 'Grade 6.0 (High Retention)',
         tips: [
-          'Hook line creates high curiosity before "see more" cutoff',
-          'Numbered points make skimming easy for executive readers',
-          'Open question at the bottom drives comment section algorithm boost',
+          'High "See More" click propensity in opening 2 lines',
+          'Bulleted whitespace prevents wall-of-text fatigue',
+          'Closing open-ended question triggers algorithm reply boosts',
         ],
       },
-      postingTime: 'Wednesday 8:30 AM EST (Peak LinkedIn Professional Window)',
+      postingTime: 'Wednesday 9:00 AM EST (Peak LinkedIn Professional Window)',
       createdAt: new Date().toISOString(),
     };
   }
@@ -240,159 +232,156 @@ export async function generateLinkedInPostWithGemini(
     model: 'gemini-1.5-flash',
     generationConfig: {
       responseMimeType: 'application/json',
-      temperature: 0.3,
+      temperature: 0.65,
     },
   });
 
   const prompt = `
-You are a premier LinkedIn thought leadership ghostwriter for tech executives, senior engineers, and startup founders.
+You are a Top 1% LinkedIn Authority Ghostwriter.
+TOPIC: ${topic}
+FORMAT: ${format}
+TONE: ${selectedToneDesc}
 
-TOPIC: "${topic}"
-FORMAT STYLE: "${format}"
+Write a high-converting LinkedIn post.
+Ensure the first 2 lines stop the scroll before the "...see more" fold.
 
-Generate an algorithm-optimized LinkedIn post in valid JSON matching this schema:
+Schema:
 {
-  "hookLine": "1-2 sentence powerful hook that forces user to click '...see more' (Max 140 chars)",
-  "body": "The body of the post with formatted single/double line spacing, bullet points, and high value",
-  "closingQuestion": "A thoughtful engagement question that prompts developers/executives to comment",
-  "hashtags": ["#Tag1", "#Tag2", "#Tag3"],
+  "hookLine": "Opening 1-2 line scroll-stopping hook",
+  "fullText": "Complete formatted post with bulleted takeaways and whitespace",
+  "closingQuestion": "Closing debate question",
+  "hashtags": ["#buildinpublic", "#ai"],
   "engagementRadar": {
-    "score": 90,
+    "score": 95,
     "grade": "VIRAL",
-    "hookStrength": 92,
+    "hookStrength": 96,
     "readability": 94,
-    "emotionalResonance": 86,
-    "formattingSpacing": 92,
+    "emotionalResonance": 92,
+    "formattingSpacing": 98,
+    "predictedImpressions": "45,000 - 75,000",
+    "bookmarkRatio": "15.4% (Top 2%)",
+    "retweetVelocity": "3.8x Avg",
+    "readabilityGrade": "Grade 6.3 (High Retention)",
     "tips": ["Tip 1", "Tip 2"]
   },
-  "postingTime": "Wednesday 8:30 AM EST"
+  "postingTime": "Wednesday 9:00 AM EST"
 }
 `;
 
   try {
     const res = await model.generateContent(prompt);
     const parsed = JSON.parse(res.response.text());
-
-    const fullText = `${parsed.hookLine}\n\n${parsed.body}\n\n${parsed.closingQuestion}\n\n${(
-      parsed.hashtags || []
-    ).join(' ')}`;
-
     return {
-      id: 'li_' + Date.now(),
+      id: 'post_' + Date.now(),
       topic,
       format,
-      hookLine: parsed.hookLine || '',
-      body: parsed.body || '',
-      closingQuestion: parsed.closingQuestion || '',
-      hashtags: parsed.hashtags || [],
-      fullText,
-      engagementRadar: parsed.engagementRadar || {
-        score: 88,
-        grade: 'VIRAL',
-        hookStrength: 90,
-        readability: 92,
-        emotionalResonance: 85,
-        formattingSpacing: 90,
-        tips: ['Strong scroll-stopping hook'],
-      },
-      postingTime: parsed.postingTime || 'Wednesday 8:30 AM EST',
+      tone,
+      ...parsed,
       createdAt: new Date().toISOString(),
     };
-  } catch (error) {
-    console.error('Gemini LinkedIn generation failed:', error);
-    throw error;
+  } catch (e) {
+    console.error('LinkedIn generation failed:', e);
+    throw e;
   }
 }
 
 export async function generateCarouselWithGemini(
   topic: string,
-  voiceProfile?: VoiceProfile
+  voiceProfile?: VoiceProfile | null
 ): Promise<LinkedInCarousel> {
   const genAI = getGenAI();
 
   if (!genAI) {
     return {
-      id: 'car_' + Date.now(),
+      id: 'carousel_' + Date.now(),
       topic,
+      theme: 'midnight_obsidian',
       totalSlides: 6,
       slides: [
         {
           slideNumber: 1,
-          title: '7 Architecture Rules Every Senior Developer Follows',
-          subtitle: 'Swipe to avoid production disasters ➡️',
-          bulletPoints: ['Tested in high-scale systems', 'Zero fluff, pure actionable rules'],
-          visualCue: '⚡ Title Card',
+          layoutType: 'hook',
+          title: 'How to Build & Ship an AI App in 48 Hours',
+          subtitle: 'The Zero-Bloat Full Stack Architecture Guide',
+          bulletPoints: ['No heavy servers', 'Instant deployment', 'Production-ready in 2 days'],
+          visualCue: '⚡',
           accentColor: '#10b981',
         },
         {
           slideNumber: 2,
-          title: 'Rule 01: Decouple Reads From Writes',
-          subtitle: 'CQRS Principle',
-          bulletPoints: [
-            'Separate heavy analytics queries from fast OLTP database transactions.',
-            'Prevents database lockups during traffic spikes.',
-          ],
-          visualCue: '📊 Architecture Diagram',
-          accentColor: '#06b6d4',
+          layoutType: 'big_stat',
+          title: 'The Hidden Bottleneck',
+          statNumber: '78%',
+          statLabel: 'of developer time is lost to over-engineering cloud DBs and auth before shipping.',
+          bulletPoints: ['Keep state local until user scale demands it', 'Validate demand in hours, not weeks'],
+          visualCue: '🛑',
+          accentColor: '#f43f5e',
         },
         {
           slideNumber: 3,
-          title: 'Rule 02: Design for Failure First',
-          subtitle: 'Resilience Patterns',
+          layoutType: 'framework',
+          title: 'Step 1: The Modern Speed Stack',
           bulletPoints: [
-            'Every external API call must have a timeout & circuit breaker.',
-            'Degrade gracefully: Return cached fallback data instead of 500 errors.',
+            'Next.js 16 + Turbopack for sub-second hot reloads',
+            'Tailwind CSS v4 for zero-runtime utility styling',
+            'Gemini 1.5 Flash for high-speed structured JSON',
           ],
-          visualCue: '🛡️ Shield Pattern',
-          accentColor: '#8b5cf6',
+          visualCue: '🚀',
+          accentColor: '#06b6d4',
         },
         {
           slideNumber: 4,
-          title: 'Rule 03: Make Idempotency Mandatory',
-          subtitle: 'Data Consistency',
+          layoutType: 'checklist',
+          title: 'Step 2: Prompt Optimization',
           bulletPoints: [
-            'Never assume a webhook or payment request is sent only once.',
-            'Use unique idempotency keys on every mutating transaction.',
+            'Constrain output format to strict JSON schema',
+            'Eliminate conversational filler tokens',
+            'Enforce fallback heuristics for zero offline downtime',
           ],
-          visualCue: '🔑 Key Validator',
-          accentColor: '#f59e0b',
+          visualCue: '🧠',
+          accentColor: '#a855f7',
         },
         {
           slideNumber: 5,
-          title: 'Rule 04: Log Context, Not Just Errors',
-          subtitle: 'Observability',
+          layoutType: 'framework',
+          title: 'Step 3: Rapid User Distribution',
           bulletPoints: [
-            'Include correlationId, userId, and input payload size in every log.',
-            'Makes debugging distributed microservices 10x faster.',
+            'Post the build log directly on X & LinkedIn',
+            'Share open-source repo for developer credibility',
+            'Capture early feedback in first 4 hours',
           ],
-          visualCue: '🔍 Trace Telemetry',
-          accentColor: '#ec4899',
+          visualCue: '📈',
+          accentColor: '#3b82f6',
         },
         {
           slideNumber: 6,
+          layoutType: 'cta',
           title: 'Summary & Next Steps',
-          subtitle: 'Save this post for your next system design review 🔖',
+          subtitle: 'Save this deck for your next sprint!',
           bulletPoints: [
-            'Follow @abdulnabii for weekly system architecture breakdowns.',
-            'Which rule do you see violated most often? Comment below! 👇',
+            'Follow @abdulnabi for daily developer guides',
+            'Repost to help fellow builders ship faster 🚀',
           ],
-          visualCue: '🚀 Final CTA Slide',
+          visualCue: '✨',
           accentColor: '#10b981',
         },
       ],
-      captionText: `System design isn't about knowing 50 different databases.\n\nIt's about following consistent architectural principles that prevent outages.\n\nSwipe through the carousel to see the 7 rules our team uses in production. ➡️\n\n#SystemDesign #SoftwareEngineering #Architecture #WebDev`,
-      hashtags: ['#SystemDesign', '#SoftwareEngineering', '#Architecture', '#WebDev'],
+      captionText: 'Swipe through for the exact 48-hour AI application blueprint ➡️ #buildinpublic #ai',
+      hashtags: ['#ai', '#webdev', '#nextjs', '#founders'],
       engagementRadar: {
-        score: 93,
+        score: 97,
         grade: 'VIRAL',
-        hookStrength: 95,
+        hookStrength: 98,
         readability: 96,
-        emotionalResonance: 90,
-        formattingSpacing: 94,
+        emotionalResonance: 94,
+        formattingSpacing: 99,
+        predictedImpressions: '52,000 - 88,000',
+        bookmarkRatio: '18.4% (Top 1%)',
+        retweetVelocity: '4.5x Avg',
+        readabilityGrade: 'Grade 5.8 (Ultra High Retention)',
         tips: [
-          'High visual retention with 6 punchy, swipeable slides',
-          'Bold contrasting accent colors on each concept',
-          'Clear save & bookmark prompt on final slide',
+          'Visual slide format maximizes swipe completion rate',
+          'High save/bookmark rate on LinkedIn document posts',
         ],
       },
       createdAt: new Date().toISOString(),
@@ -403,37 +392,45 @@ export async function generateCarouselWithGemini(
     model: 'gemini-1.5-flash',
     generationConfig: {
       responseMimeType: 'application/json',
-      temperature: 0.3,
+      temperature: 0.65,
     },
   });
 
   const prompt = `
-You are a world-class LinkedIn Carousel Designer and visual educator.
+You are a LinkedIn Carousel & Slide Deck Designer.
+TOPIC: ${topic}
 
-TOPIC: "${topic}"
-
-Generate a 6-to-8 slide LinkedIn PDF Carousel in valid JSON matching this schema:
+Generate a 6-slide high-retention visual carousel.
+Schema:
 {
+  "totalSlides": 6,
   "slides": [
     {
       "slideNumber": 1,
-      "title": "Eye-catching Title for Slide 1",
-      "subtitle": "Swipe indicator or short premise",
-      "bulletPoints": ["Key takeaway 1", "Key takeaway 2"],
-      "visualCue": "Icon or visual note",
+      "layoutType": "hook" | "big_stat" | "framework" | "checklist" | "cta",
+      "title": "Slide Title",
+      "subtitle": "Optional Subtitle",
+      "statNumber": "74%",
+      "statLabel": "Statistic context if big_stat",
+      "bulletPoints": ["Point 1", "Point 2"],
+      "visualCue": "🚀",
       "accentColor": "#10b981"
     }
   ],
-  "captionText": "Accompanying LinkedIn post text explaining why to swipe",
-  "hashtags": ["#Tag1", "#Tag2"],
+  "captionText": "Accompanying LinkedIn post caption",
+  "hashtags": ["#buildinpublic", "#ai"],
   "engagementRadar": {
-    "score": 92,
+    "score": 96,
     "grade": "VIRAL",
-    "hookStrength": 94,
-    "readability": 96,
-    "emotionalResonance": 88,
-    "formattingSpacing": 94,
-    "tips": ["Tip 1", "Tip 2"]
+    "hookStrength": 97,
+    "readability": 95,
+    "emotionalResonance": 93,
+    "formattingSpacing": 98,
+    "predictedImpressions": "50,000 - 85,000",
+    "bookmarkRatio": "17.1% (Top 1%)",
+    "retweetVelocity": "4.2x Avg",
+    "readabilityGrade": "Grade 5.9 (Ultra High Retention)",
+    "tips": ["Slide progression drives 90%+ swipe completion"]
   }
 }
 `;
@@ -441,65 +438,55 @@ Generate a 6-to-8 slide LinkedIn PDF Carousel in valid JSON matching this schema
   try {
     const res = await model.generateContent(prompt);
     const parsed = JSON.parse(res.response.text());
-
     return {
-      id: 'car_' + Date.now(),
+      id: 'carousel_' + Date.now(),
       topic,
-      totalSlides: parsed.slides?.length || 6,
-      slides: parsed.slides || [],
-      captionText: parsed.captionText || '',
-      hashtags: parsed.hashtags || [],
-      engagementRadar: parsed.engagementRadar || {
-        score: 90,
-        grade: 'VIRAL',
-        hookStrength: 92,
-        readability: 94,
-        emotionalResonance: 88,
-        formattingSpacing: 92,
-        tips: ['High swipe retention'],
-      },
+      theme: 'midnight_obsidian',
+      ...parsed,
       createdAt: new Date().toISOString(),
     };
-  } catch (error) {
-    console.error('Gemini carousel generation failed:', error);
-    throw error;
+  } catch (e) {
+    console.error('Carousel generation failed:', e);
+    throw e;
   }
 }
 
-export async function generateHookVariantsWithGemini(topic: string): Promise<HookVariant[]> {
+export async function generateHookVariantsWithGemini(
+  topic: string
+): Promise<HookVariant[]> {
   const genAI = getGenAI();
 
   if (!genAI) {
     return [
       {
-        style: '1. Contrarian Hot Take',
-        text: 'Stop building complex microservices for early startups. A monolith will get you to $1M ARR 3x faster.',
-        predictedCTR: '6.2%',
-        formulaExplanation: 'Directly challenges common dogma to trigger emotional debate.',
+        style: 'Contrarian Debate',
+        text: 'Stop over-engineering your AI SaaS stack. 95% of apps do not need microservices or Kafka.',
+        predictedCTR: '8.4%',
+        formulaExplanation: 'Challenges industry consensus with extreme clarity.',
       },
       {
-        style: '2. Shocking Data & Statistic',
-        text: '83% of developer burnout is caused by ambiguous PR reviews, not bad managers. Here is the fix:',
-        predictedCTR: '5.7%',
-        formulaExplanation: 'Hard metric provides instant credibility and urgency.',
+        style: 'Bold Numbers / Metrics',
+        text: 'From 0 to 10,000 active requests in 48 hours with $0 in cloud bills. Here is the blueprint:',
+        predictedCTR: '9.2%',
+        formulaExplanation: 'Highlights concrete data points and instant ROI.',
       },
       {
-        style: '3. Vulnerable Founder Story',
-        text: 'I lost $14,000 in AWS cloud credits in 1 night due to a single infinite recursive loop. Here is what I learned:',
-        predictedCTR: '6.8%',
-        formulaExplanation: 'High empathy storytelling creates strong human connection.',
+        style: 'Personal Founder Story',
+        text: '48 hours ago, my production deployment crashed with 4,000 users live. Here is how we recovered in 8 minutes:',
+        predictedCTR: '8.9%',
+        formulaExplanation: 'High-stakes personal vulnerability creates intense hook retention.',
       },
       {
-        style: '4. Provocative Question',
-        text: 'If your tech stack disappeared tomorrow, which framework would you rewrite your entire product in?',
-        predictedCTR: '4.9%',
-        formulaExplanation: 'Low friction prompt invites instant comment participation.',
+        style: 'Step-by-Step Blueprint',
+        text: 'The 4-step framework I used to ship a production AI app in a single weekend (with zero backend servers):',
+        predictedCTR: '7.8%',
+        formulaExplanation: 'Signals high actionable value and structured takeaway.',
       },
       {
-        style: '5. Step-by-Step Blueprint',
-        text: 'The exact 5-step checklist I used to scale our API from 1,000 to 1,000,000 daily requests (Save this):',
-        predictedCTR: '5.4%',
-        formulaExplanation: 'Clear value proposition with immediate bookmark utility.',
+        style: 'Provocative Question',
+        text: 'Why are 80% of software teams still writing boilerplate CRUD APIs by hand in 2026?',
+        predictedCTR: '8.1%',
+        formulaExplanation: 'Triggers defensive curiosity and comment engagement.',
       },
     ];
   }
@@ -508,53 +495,39 @@ export async function generateHookVariantsWithGemini(topic: string): Promise<Hoo
     model: 'gemini-1.5-flash',
     generationConfig: {
       responseMimeType: 'application/json',
-      temperature: 0.3,
+      temperature: 0.7,
     },
   });
 
   const prompt = `
-Generate 5 distinct viral opening hook styles for TOPIC: "${topic}".
-1. Contrarian Hot Take
-2. Shocking Data & Statistic
-3. Vulnerable Story
-4. Provocative Question
-5. Step-by-Step Blueprint
-
-Return valid JSON:
-{
-  "hooks": [
-    {
-      "style": "Hook Style Name",
-      "text": "Hook copy text (max 180 chars)",
-      "predictedCTR": "5.8%",
-      "formulaExplanation": "Why this formula drives high click-through"
-    }
-  ]
-}
+Generate 5 viral hook variations for this topic: "${topic}".
+Include predicted CTR and formula explanation.
+Output valid JSON array of objects with keys: style, text, predictedCTR, formulaExplanation.
 `;
 
   try {
     const res = await model.generateContent(prompt);
-    const parsed = JSON.parse(res.response.text());
-    return parsed.hooks || [];
-  } catch (error) {
-    console.error('Gemini hook generation failed:', error);
-    throw error;
+    return JSON.parse(res.response.text());
+  } catch (e) {
+    console.error('Hook variant generation failed:', e);
+    throw e;
   }
 }
 
-export async function calibrateVoiceWithGemini(samplePosts: string[]): Promise<VoiceProfile> {
+export async function calibrateVoiceWithGemini(
+  samples: string[]
+): Promise<VoiceProfile> {
   const genAI = getGenAI();
 
   if (!genAI) {
     return {
       id: 'voice_' + Date.now(),
-      name: 'Authentic Builder',
-      tone: 'Direct, technical, empathetic, builder-centric',
+      name: 'Calibrated Founder Voice',
+      tone: 'Punchy, transparent, technical, and build-in-public focused',
       avgSentenceLength: 12,
       emojiDensity: 'minimal',
-      signatureKeywords: ['shipped', 'architecture', 'latency', 'lesson', 'builder'],
-      rawSamples: samplePosts,
+      signatureKeywords: ['shipped', 'architecture', 'latency', 'breakdown', 'blueprint'],
+      rawSamples: samples,
     };
   }
 
@@ -567,16 +540,16 @@ export async function calibrateVoiceWithGemini(samplePosts: string[]): Promise<V
   });
 
   const prompt = `
-Analyze the writing style of these sample posts written by a developer/creator:
-${JSON.stringify(samplePosts)}
+Analyze these writing samples and calibrate a Voice Profile:
+${samples.join('\n---\n')}
 
-Return a calibrated voice profile in valid JSON:
+Return JSON:
 {
-  "name": "Persona Name (e.g. Pragmatic Architect, High-Energy Founder)",
-  "tone": "Descriptive tone keywords",
+  "name": "Calibrated Voice Name",
+  "tone": "Description of tone",
   "avgSentenceLength": 12,
   "emojiDensity": "none" | "minimal" | "moderate" | "expressive",
-  "signatureKeywords": ["keyword1", "keyword2", "keyword3", "keyword4"]
+  "signatureKeywords": ["keyword1", "keyword2"]
 }
 `;
 
@@ -585,15 +558,11 @@ Return a calibrated voice profile in valid JSON:
     const parsed = JSON.parse(res.response.text());
     return {
       id: 'voice_' + Date.now(),
-      name: parsed.name || 'Custom Voice',
-      tone: parsed.tone || 'Conversational Tech',
-      avgSentenceLength: parsed.avgSentenceLength || 14,
-      emojiDensity: parsed.emojiDensity || 'minimal',
-      signatureKeywords: parsed.signatureKeywords || [],
-      rawSamples: samplePosts,
+      ...parsed,
+      rawSamples: samples,
     };
-  } catch (error) {
-    console.error('Gemini voice calibration failed:', error);
-    throw error;
+  } catch (e) {
+    console.error('Voice calibration failed:', e);
+    throw e;
   }
 }

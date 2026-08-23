@@ -20,6 +20,11 @@ import PrescriptionScanner from '@/components/PrescriptionScanner';
 import AdherenceDashboard from '@/components/AdherenceDashboard';
 import MissedDoseAdvisor from '@/components/MissedDoseAdvisor';
 import AddMedicationModal from '@/components/AddMedicationModal';
+import AccessibilityControls, {
+  AccessibilitySettings,
+  TRANSLATIONS,
+} from '@/components/AccessibilityControls';
+import PrivacyComplianceBanner from '@/components/PrivacyComplianceBanner';
 import {
   Pill,
   ShieldCheck,
@@ -41,6 +46,14 @@ export default function DashboardPage() {
   const [doseLogs, setDoseLogs] = useState<DoseLog[]>([]);
   const [interactionReport, setInteractionReport] = useState<InteractionReport | null>(null);
   const [isCheckingInteractions, setIsCheckingInteractions] = useState(false);
+  const [isSpeakingAll, setIsSpeakingAll] = useState(false);
+
+  // Accessibility state
+  const [accessibility, setAccessibility] = useState<AccessibilitySettings>({
+    lang: 'en',
+    textSize: 'normal',
+    highContrast: false,
+  });
 
   // Modals state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -114,24 +127,64 @@ export default function DashboardPage() {
     setActiveTab('timeline');
   };
 
+  // Voice Assistant reads all due medications
+  const handleReadEntireSchedule = () => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+
+    if (isSpeakingAll) {
+      window.speechSynthesis.cancel();
+      setIsSpeakingAll(false);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    setIsSpeakingAll(true);
+
+    const medSummary = medications
+      .map((m) => `${m.name} ${m.dosage}, take at ${m.scheduledTimes.join(' and ')}. ${m.instructions}.`)
+      .join(' Next medication: ');
+
+    let fullScript = `Hello. Here is your daily medication schedule from MediGuard AI. You have ${medications.length} active prescriptions today. ${medSummary}. Please remember to drink plenty of water.`;
+
+    if (accessibility.lang === 'ur') {
+      fullScript = `السلام علیکم۔ میڈی گارڈ کے مطابق آج آپ کے شیڈول میں ${medications.length} ادویات شامل ہیں۔ وقت پر دوائی لیں اور صحت کا خیال رکھیں۔`;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(fullScript);
+    utterance.rate = 0.92;
+    utterance.pitch = 1.0;
+    utterance.onend = () => setIsSpeakingAll(false);
+    utterance.onerror = () => setIsSpeakingAll(false);
+    window.speechSynthesis.speak(utterance);
+  };
+
   const adherenceStats = calculateAdherenceStats(medications, doseLogs);
+  const t = TRANSLATIONS[accessibility.lang];
 
   return (
-    <div className="space-y-10 font-mono w-full min-w-0">
+    <div className={`space-y-8 font-mono w-full min-w-0 ${accessibility.highContrast ? 'contrast-125' : ''}`}>
+      {/* Top Accessibility & Language Toolbar */}
+      <AccessibilityControls
+        settings={accessibility}
+        onUpdateSettings={setAccessibility}
+        onReadEntireSchedule={handleReadEntireSchedule}
+        isSpeaking={isSpeakingAll}
+      />
+
       {/* Centered Hero Header */}
       <div className="text-center space-y-3 max-w-3xl mx-auto">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs">
           <HeartPulse className="w-3.5 h-3.5" />
-          <span>AI PATIENT MEDICATION SAFETY &amp; ADHERENCE INTELLIGENCE</span>
+          <span>{t.heroPill}</span>
         </div>
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight font-outfit">
-          Smart Medication Schedule &amp;{' '}
+        <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight font-outfit">
+          {t.heroTitle.split('&')[0]} &amp;{' '}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400">
-            Clinical Safety Guardian
+            {t.heroTitle.split('&')[1] || 'Clinical Safety Guardian'}
           </span>
         </h1>
         <p className="text-slate-400 text-xs sm:text-sm font-mono max-w-2xl mx-auto leading-relaxed">
-          Manage complex chronic disease regimens with real-time dosing reminders, Gemini-powered drug interaction detection, adherence telemetry, and prescription OCR scanning.
+          {t.heroSub}
         </p>
       </div>
 
@@ -187,7 +240,7 @@ export default function DashboardPage() {
             }`}
           >
             <Pill className="w-4 h-4" />
-            <span>Today's Dosing Timeline</span>
+            <span>{t.timelineTab}</span>
           </button>
 
           <button
@@ -200,7 +253,7 @@ export default function DashboardPage() {
             }`}
           >
             <ShieldCheck className="w-4 h-4" />
-            <span>Drug Interaction Radar</span>
+            <span>{t.radarTab}</span>
             {interactionReport && interactionReport.interactions.length > 0 && (
               <span className="px-1.5 py-0.2 rounded-full bg-rose-950 border border-rose-500/40 text-rose-300 text-[9px]">
                 {interactionReport.interactions.length}
@@ -218,7 +271,7 @@ export default function DashboardPage() {
             }`}
           >
             <Camera className="w-4 h-4" />
-            <span>Prescription OCR</span>
+            <span>{t.scannerTab}</span>
           </button>
 
           <button
@@ -231,7 +284,7 @@ export default function DashboardPage() {
             }`}
           >
             <Activity className="w-4 h-4" />
-            <span>Compliance Analytics</span>
+            <span>{t.adherenceTab}</span>
           </button>
         </div>
 
@@ -281,6 +334,7 @@ export default function DashboardPage() {
             <DoseTimeline
               medications={medications}
               doseLogs={doseLogs}
+              accessibility={accessibility}
               onTakeDose={handleTakeDose}
               onOpenMissedAdvisor={(med, time) => {
                 setMissedAdvisorData({ med, time, isOpen: true });
@@ -314,6 +368,9 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Trust & Privacy Compliance Center */}
+      <PrivacyComplianceBanner />
 
       {/* Missed Dose Advisor Modal */}
       <MissedDoseAdvisor

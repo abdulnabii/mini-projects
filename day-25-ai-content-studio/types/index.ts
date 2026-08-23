@@ -7,6 +7,19 @@ export type ContentStyle =
   | 'framework'
   | 'case_study';
 
+export type LinkedInTone =
+  | 'executive'
+  | 'technical_architect'
+  | 'storyteller_founder'
+  | 'data_driven'
+  | 'contrarian';
+
+export type CarouselTheme =
+  | 'midnight_obsidian'
+  | 'cyberpunk_neon'
+  | 'clean_minimal'
+  | 'deep_ocean';
+
 export interface Tweet {
   number: number;
   text: string;
@@ -28,7 +41,19 @@ export interface EngagementRadar {
   readability: number; // 0 - 100
   emotionalResonance: number; // 0 - 100
   formattingSpacing: number; // 0 - 100
+  predictedImpressions: string; // e.g. "35k - 60k"
+  bookmarkRatio: string; // e.g. "14.2% (Top 3%)"
+  retweetVelocity: string; // e.g. "3.2x Average"
+  readabilityGrade: string; // e.g. "Grade 6.1 (Optimal Viral)"
   tips: string[];
+}
+
+export interface ReviewComment {
+  id: string;
+  author: string;
+  role: string;
+  text: string;
+  createdAt: string;
 }
 
 export interface TwitterThread {
@@ -46,6 +71,7 @@ export interface LinkedInPost {
   id: string;
   topic: string;
   format: 'story' | 'framework' | 'contrarian' | 'case_study';
+  tone?: LinkedInTone;
   hookLine: string;
   body: string;
   closingQuestion: string;
@@ -58,9 +84,12 @@ export interface LinkedInPost {
 
 export interface CarouselSlide {
   slideNumber: number;
+  layoutType?: 'hook' | 'big_stat' | 'framework' | 'checklist' | 'cta';
   title: string;
   subtitle?: string;
   bulletPoints: string[];
+  statNumber?: string;
+  statLabel?: string;
   visualCue: string;
   accentColor: string;
 }
@@ -68,6 +97,7 @@ export interface CarouselSlide {
 export interface LinkedInCarousel {
   id: string;
   topic: string;
+  theme?: CarouselTheme;
   totalSlides: number;
   slides: CarouselSlide[];
   captionText: string;
@@ -93,6 +123,8 @@ export interface ScheduledDraft {
   contentSummary: string;
   scheduledDate?: string;
   status: 'draft' | 'scheduled' | 'published';
+  approvalStatus?: 'draft' | 'review_requested' | 'approved';
+  reviewComments?: ReviewComment[];
   fullData: any;
   createdAt: string;
 }

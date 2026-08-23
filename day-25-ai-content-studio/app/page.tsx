@@ -9,6 +9,7 @@ import {
   HookVariant,
   VoiceProfile,
   ScheduledDraft,
+  LinkedInTone,
 } from '@/types';
 import { STARTER_IDEAS, StarterIdea } from '@/lib/sampleTemplates';
 import {
@@ -27,6 +28,7 @@ import VoiceCalibrator from '@/components/VoiceCalibrator';
 import RepurposerStudio from '@/components/RepurposerStudio';
 import TrendingTopicsRadar, { TrendingTopic } from '@/components/TrendingTopicsRadar';
 import RewriteStudio from '@/components/RewriteStudio';
+import CollaborationModal from '@/components/CollaborationModal';
 import { TwitterIcon, LinkedInIcon } from '@/components/PlatformIcons';
 import {
   Sparkles,
@@ -42,6 +44,8 @@ import {
   PenTool,
   Repeat,
   Compass,
+  Users,
+  Briefcase,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -54,17 +58,21 @@ export default function ContentStudioPage() {
   const [linkedInFormat, setLinkedInFormat] = useState<
     'story' | 'framework' | 'contrarian' | 'case_study'
   >('story');
+  const [linkedInTone, setLinkedInTone] = useState<LinkedInTone>('storyteller_founder');
 
   const [isLoading, setIsLoading] = useState(false);
   const [activeVoice, setActiveVoice] = useState<VoiceProfile | null>(null);
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
 
-  // Rewriter State
+  // Rewriter & Collaboration State
   const [rewriteData, setRewriteData] = useState<{
     text: string;
     isOpen: boolean;
     targetType: 'tweet' | 'post' | 'hook';
   }>({ text: '', isOpen: false, targetType: 'tweet' });
+
+  const [collabDraft, setCollabDraft] = useState<ScheduledDraft | null>(null);
+  const [isCollabOpen, setIsCollabOpen] = useState(false);
 
   // Generated Content State
   const [generatedThread, setGeneratedThread] = useState<TwitterThread | null>(null);
@@ -103,6 +111,7 @@ export default function ContentStudioPage() {
           body: JSON.stringify({
             topic: topicInput,
             format: linkedInFormat,
+            tone: linkedInTone,
             voiceProfile: activeVoice,
           }),
         });
@@ -184,8 +193,10 @@ export default function ContentStudioPage() {
           ? `${(contentData as LinkedInPost).fullText.length} chars`
           : `${(contentData as LinkedInCarousel).slides.length} Slides`,
       status: 'scheduled',
+      approvalStatus: 'review_requested',
       scheduledDate: new Date(Date.now() + 86400000 * 2).toISOString(),
       fullData: contentData,
+      reviewComments: [],
       createdAt: new Date().toISOString(),
     };
     const updated = saveDraft(newDraft);
@@ -392,24 +403,52 @@ export default function ContentStudioPage() {
                 className="w-full p-4 rounded-2xl bg-[#161b22] border border-slate-800 text-xs sm:text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 leading-relaxed font-sans"
               />
 
-              {/* LinkedIn Format Selector */}
+              {/* LinkedIn Format & Tone Selector */}
               {platform === 'linkedin' && (
-                <div className="flex items-center gap-2 pt-1 flex-wrap">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase">Format:</span>
-                  {(['story', 'framework', 'contrarian', 'case_study'] as const).map((fmt) => (
-                    <button
-                      key={fmt}
-                      type="button"
-                      onClick={() => setLinkedInFormat(fmt)}
-                      className={`px-3 py-1 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer ${
-                        linkedInFormat === fmt
-                          ? 'bg-blue-500 text-white font-black'
-                          : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      {fmt.replace('_', ' ')}
-                    </button>
-                  ))}
+                <div className="space-y-2 pt-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase">Format:</span>
+                    {(['story', 'framework', 'contrarian', 'case_study'] as const).map((fmt) => (
+                      <button
+                        key={fmt}
+                        type="button"
+                        onClick={() => setLinkedInFormat(fmt)}
+                        className={`px-3 py-1 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer ${
+                          linkedInFormat === fmt
+                            ? 'bg-blue-500 text-white font-black'
+                            : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        {fmt.replace('_', ' ')}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-wrap pt-1">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase">Tone:</span>
+                    {(['storyteller_founder', 'executive', 'technical_architect', 'data_driven', 'contrarian'] as const).map((tn) => (
+                      <button
+                        key={tn}
+                        type="button"
+                        onClick={() => setLinkedInTone(tn)}
+                        className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                          linkedInTone === tn
+                            ? 'bg-cyan-500 text-black font-black'
+                            : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        {tn === 'storyteller_founder'
+                          ? 'Founder'
+                          : tn === 'executive'
+                          ? 'Executive'
+                          : tn === 'technical_architect'
+                          ? 'Tech Architect'
+                          : tn === 'data_driven'
+                          ? 'Data Metrics'
+                          : 'Contrarian'}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -538,7 +577,7 @@ export default function ContentStudioPage() {
                 Scheduled Posts &amp; Draft Pipeline ({savedDrafts.length})
               </h3>
               <p className="text-xs text-slate-400">
-                Track your active social drafts and upcoming posting dates
+                Track your active social drafts, team approvals, and upcoming posting dates
               </p>
             </div>
 
@@ -566,27 +605,52 @@ export default function ContentStudioPage() {
                   className="p-6 rounded-3xl bg-[#0d1117] border border-slate-800 space-y-4 shadow-xl flex flex-col justify-between"
                 >
                   <div className="space-y-2">
-                    <span className="px-2.5 py-0.5 rounded-full border text-[10px] font-bold uppercase text-emerald-400 border-emerald-500/30 bg-emerald-500/10">
-                      {d.platform} • {d.status}
-                    </span>
+                    <div className="flex items-center justify-between">
+                      <span className="px-2.5 py-0.5 rounded-full border text-[10px] font-bold uppercase text-emerald-400 border-emerald-500/30 bg-emerald-500/10">
+                        {d.platform} • {d.status}
+                      </span>
+                      <span
+                        className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase ${
+                          d.approvalStatus === 'approved'
+                            ? 'bg-emerald-500/20 text-emerald-300'
+                            : 'bg-amber-500/20 text-amber-300'
+                        }`}
+                      >
+                        {d.approvalStatus || 'Draft'}
+                      </span>
+                    </div>
+
                     <h4 className="font-bold text-white text-sm font-outfit line-clamp-2">
                       {d.title}
                     </h4>
                     <p className="text-xs text-slate-400 font-sans">{d.contentSummary}</p>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-slate-800 text-[10px] text-slate-500">
-                    <span>{new Date(d.createdAt).toLocaleDateString()}</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const updated = deleteDraft(d.id);
-                        setSavedDrafts(updated);
-                      }}
-                      className="text-rose-400 hover:underline cursor-pointer"
-                    >
-                      Delete
-                    </button>
+                  <div className="space-y-2 pt-3 border-t border-slate-800 text-[10px]">
+                    <div className="flex items-center justify-between">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCollabDraft(d);
+                          setIsCollabOpen(true);
+                        }}
+                        className="px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                      >
+                        <Users className="w-3 h-3" />
+                        <span>Team Review ({d.reviewComments?.length || 0})</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = deleteDraft(d.id);
+                          setSavedDrafts(updated);
+                        }}
+                        className="text-rose-400 hover:underline cursor-pointer"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -621,6 +685,18 @@ export default function ContentStudioPage() {
           } else if (rewriteData.targetType === 'post' && generatedLinkedIn) {
             setGeneratedLinkedIn({ ...generatedLinkedIn, fullText: newText });
           }
+        }}
+      />
+
+      {/* Team Collaboration Modal */}
+      <CollaborationModal
+        draft={collabDraft}
+        isOpen={isCollabOpen}
+        onClose={() => setIsCollabOpen(false)}
+        onUpdateDraft={(updated) => {
+          const newDrafts = saveDraft(updated);
+          setSavedDrafts(newDrafts);
+          setCollabDraft(updated);
         }}
       />
     </div>

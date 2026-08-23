@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { LinkedInPost } from '@/types';
+import { LinkedInPost, LinkedInTone } from '@/types';
 import {
   Copy,
   Check,
@@ -10,6 +10,8 @@ import {
   Sparkles,
   Eye,
   Edit3,
+  Users,
+  Briefcase,
 } from 'lucide-react';
 import { LinkedInIcon } from './PlatformIcons';
 import confetti from 'canvas-confetti';
@@ -18,12 +20,22 @@ interface Props {
   post: LinkedInPost;
   onUpdatePost: (updated: LinkedInPost) => void;
   onSaveToSchedule: (post: LinkedInPost) => void;
+  onOpenCollaboration?: () => void;
 }
+
+const TONE_OPTIONS: { id: LinkedInTone; label: string; desc: string }[] = [
+  { id: 'storyteller_founder', label: '🚀 Founder Story', desc: 'Vulnerable build-in-public lessons' },
+  { id: 'executive', label: '👔 Executive / C-Suite', desc: 'Strategic ROI & market vision' },
+  { id: 'technical_architect', label: '📐 Technical Deep Dive', desc: 'Architecture trade-offs & scale' },
+  { id: 'data_driven', label: '📊 Data & Metrics', desc: 'Numbers, percentages & statistics' },
+  { id: 'contrarian', label: '⚡ Contrarian Leader', desc: 'Debate-starting counter-narrative' },
+];
 
 export default function LinkedInStudio({
   post,
   onUpdatePost,
   onSaveToSchedule,
+  onOpenCollaboration,
 }: Props) {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isFoldExpanded, setIsFoldExpanded] = useState(false);
@@ -31,6 +43,10 @@ export default function LinkedInStudio({
 
   const handleTextChange = (text: string) => {
     onUpdatePost({ ...post, fullText: text });
+  };
+
+  const handleToneSelect = (tone: LinkedInTone) => {
+    onUpdatePost({ ...post, tone });
   };
 
   const copyFullPost = () => {
@@ -53,7 +69,7 @@ export default function LinkedInStudio({
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/30 text-[10px] font-bold uppercase">
-              LINKEDIN AUTHORITY POST
+              LINKEDIN AUTHORITY STUDIO
             </span>
             <span className="text-xs text-slate-500 font-bold uppercase">
               Format: {post.format}
@@ -100,6 +116,34 @@ export default function LinkedInStudio({
             <Calendar className="w-3.5 h-3.5" />
             <span>Save to Queue</span>
           </button>
+        </div>
+      </div>
+
+      {/* Tone Preset Filter Bar */}
+      <div className="p-4 rounded-2xl bg-[#0d1117] border border-slate-800 space-y-2">
+        <span className="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1.5">
+          <Briefcase className="w-3.5 h-3.5 text-blue-400" />
+          <span>Professional Voice &amp; Authority Tone Preset:</span>
+        </span>
+        <div className="flex items-center gap-2 flex-wrap">
+          {TONE_OPTIONS.map((t) => {
+            const isSelected = (post.tone || 'storyteller_founder') === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => handleToneSelect(t.id)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  isSelected
+                    ? 'bg-blue-600 text-white font-black shadow-md'
+                    : 'bg-[#161b22] border border-slate-800 text-slate-400 hover:text-white'
+                }`}
+                title={t.desc}
+              >
+                <span>{t.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
