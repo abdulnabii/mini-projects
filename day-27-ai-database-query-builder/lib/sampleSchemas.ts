@@ -1,0 +1,171 @@
+import { DatabaseSchema } from '@/types';
+
+export const SAMPLE_SCHEMAS: DatabaseSchema[] = [
+  {
+    id: 'schema_ecommerce',
+    name: 'E-Commerce Store & Global Orders',
+    category: 'E-Commerce & Retail',
+    dialect: 'postgres',
+    description: 'Relational schema for customer accounts, shopping carts, checkout orders, and product inventories.',
+    tables: [
+      {
+        name: 'customers',
+        description: 'Registered shopper profiles and geo data',
+        rowCountEstimate: 45000,
+        columns: [
+          { name: 'id', type: 'UUID', isPrimary: true, description: 'Unique customer identifier' },
+          { name: 'name', type: 'VARCHAR(100)', description: 'Full name' },
+          { name: 'email', type: 'VARCHAR(255)', description: 'Customer email' },
+          { name: 'country', type: 'VARCHAR(50)', description: 'Billing country (e.g. Pakistan, US, UK)' },
+          { name: 'created_at', type: 'TIMESTAMP', description: 'Registration timestamp' },
+        ],
+      },
+      {
+        name: 'orders',
+        description: 'Customer order transactions and fulfillment status',
+        rowCountEstimate: 120000,
+        columns: [
+          { name: 'id', type: 'UUID', isPrimary: true, description: 'Order ID' },
+          { name: 'customer_id', type: 'UUID', isForeignKey: true, references: 'customers.id', description: 'Foreign key to customers' },
+          { name: 'total_amount', type: 'DECIMAL(10,2)', description: 'Total checkout price in USD' },
+          { name: 'status', type: 'VARCHAR(20)', description: 'completed | pending | refunded | cancelled' },
+          { name: 'created_at', type: 'TIMESTAMP', description: 'Checkout date and time' },
+        ],
+      },
+      {
+        name: 'order_items',
+        description: 'Individual line items inside each checkout order',
+        rowCountEstimate: 340000,
+        columns: [
+          { name: 'id', type: 'UUID', isPrimary: true, description: 'Line item ID' },
+          { name: 'order_id', type: 'UUID', isForeignKey: true, references: 'orders.id', description: 'Parent order' },
+          { name: 'product_id', type: 'UUID', isForeignKey: true, references: 'products.id', description: 'Purchased product' },
+          { name: 'quantity', type: 'INTEGER', description: 'Number of units' },
+          { name: 'unit_price', type: 'DECIMAL(10,2)', description: 'Price per unit' },
+        ],
+      },
+      {
+        name: 'products',
+        description: 'Product catalog, pricing, inventory stock, and categories',
+        rowCountEstimate: 3200,
+        columns: [
+          { name: 'id', type: 'UUID', isPrimary: true, description: 'Product ID' },
+          { name: 'name', type: 'VARCHAR(150)', description: 'Product title' },
+          { name: 'category', type: 'VARCHAR(50)', description: 'Electronics, Apparel, Home, etc.' },
+          { name: 'price', type: 'DECIMAL(10,2)', description: 'Retail price' },
+          { name: 'stock_quantity', type: 'INTEGER', description: 'Current warehouse stock' },
+        ],
+      },
+    ],
+    sampleQuestions: [
+      'Show me top 10 customers by total revenue in Q1 2026, only from Pakistan with completed orders',
+      'Which 5 product categories have the highest average order value and more than 50 total sales?',
+      'Find customers who registered in the last 30 days but have never placed an order',
+      'Calculate month-over-month revenue growth for the past 6 months',
+    ],
+  },
+  {
+    id: 'schema_fintech',
+    name: 'Fintech Wallet & Transaction Ledger',
+    category: 'Fintech & Banking',
+    dialect: 'postgres',
+    description: 'High-throughput double-entry transaction ledger and digital wallet accounts.',
+    tables: [
+      {
+        name: 'users',
+        description: 'Verified digital banking accounts',
+        rowCountEstimate: 85000,
+        columns: [
+          { name: 'id', type: 'UUID', isPrimary: true },
+          { name: 'full_name', type: 'VARCHAR(100)' },
+          { name: 'tier', type: 'VARCHAR(20)', description: 'standard | premium | business' },
+          { name: 'kyc_status', type: 'VARCHAR(20)', description: 'verified | pending | rejected' },
+          { name: 'joined_at', type: 'TIMESTAMP' },
+        ],
+      },
+      {
+        name: 'wallets',
+        description: 'Multi-currency balances and credit accounts',
+        rowCountEstimate: 92000,
+        columns: [
+          { name: 'id', type: 'UUID', isPrimary: true },
+          { name: 'user_id', type: 'UUID', isForeignKey: true, references: 'users.id' },
+          { name: 'currency', type: 'VARCHAR(3)', description: 'USD, EUR, GBP, PKR' },
+          { name: 'balance', type: 'DECIMAL(14,2)' },
+          { name: 'is_frozen', type: 'BOOLEAN' },
+        ],
+      },
+      {
+        name: 'transactions',
+        description: 'Ledger debit and credit events',
+        rowCountEstimate: 850000,
+        columns: [
+          { name: 'id', type: 'UUID', isPrimary: true },
+          { name: 'wallet_id', type: 'UUID', isForeignKey: true, references: 'wallets.id' },
+          { name: 'type', type: 'VARCHAR(20)', description: 'transfer | deposit | withdrawal | merchant_pay' },
+          { name: 'amount', type: 'DECIMAL(12,2)' },
+          { name: 'fee', type: 'DECIMAL(8,2)' },
+          { name: 'status', type: 'VARCHAR(20)', description: 'success | failed | flagged' },
+          { name: 'timestamp', type: 'TIMESTAMP' },
+        ],
+      },
+    ],
+    sampleQuestions: [
+      'Find all flagged transactions over $5,000 in the past 7 days with user full name and wallet currency',
+      'What is the total fee revenue generated per transaction type this month?',
+      'List the top 10 highest balance wallets belonging to verified business tier users',
+    ],
+  },
+  {
+    id: 'schema_saas',
+    name: 'SaaS Multi-Tenant Billing & Usage',
+    category: 'Cloud & B2B SaaS',
+    dialect: 'postgres',
+    description: 'Tenant subscriptions, metered usage events, seats, and monthly recurring revenue.',
+    tables: [
+      {
+        name: 'organizations',
+        description: 'Tenant companies and workspaces',
+        rowCountEstimate: 1400,
+        columns: [
+          { name: 'id', type: 'UUID', isPrimary: true },
+          { name: 'company_name', type: 'VARCHAR(100)' },
+          { name: 'plan_tier', type: 'VARCHAR(30)', description: 'starter | growth | enterprise' },
+          { name: 'seat_count', type: 'INTEGER' },
+          { name: 'created_at', type: 'TIMESTAMP' },
+        ],
+      },
+      {
+        name: 'invoices',
+        description: 'Monthly and annual subscription billing records',
+        rowCountEstimate: 16800,
+        columns: [
+          { name: 'id', type: 'UUID', isPrimary: true },
+          { name: 'org_id', type: 'UUID', isForeignKey: true, references: 'organizations.id' },
+          { name: 'amount_due', type: 'DECIMAL(10,2)' },
+          { name: 'paid', type: 'BOOLEAN' },
+          { name: 'billing_period_start', type: 'DATE' },
+          { name: 'billing_period_end', type: 'DATE' },
+        ],
+      },
+      {
+        name: 'api_usage_events',
+        description: 'Metered AI API call logs per tenant',
+        rowCountEstimate: 2400000,
+        columns: [
+          { name: 'id', type: 'BIGINT', isPrimary: true },
+          { name: 'org_id', type: 'UUID', isForeignKey: true, references: 'organizations.id' },
+          { name: 'endpoint', type: 'VARCHAR(100)' },
+          { name: 'tokens_consumed', type: 'INTEGER' },
+          { name: 'latency_ms', type: 'INTEGER' },
+          { name: 'timestamp', type: 'TIMESTAMP' },
+        ],
+      },
+    ],
+    sampleQuestions: [
+      'Calculate the Monthly Recurring Revenue (MRR) grouped by plan tier for all paid enterprise invoices',
+      'Which organizations consumed more than 1,000,000 tokens this week? Sort by highest usage',
+      'Show average API latency by endpoint across all organizations in the last 24 hours',
+    ],
+  },
+];
