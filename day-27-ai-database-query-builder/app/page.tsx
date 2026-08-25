@@ -28,6 +28,11 @@ import {
   CheckCircle2,
   Code2,
   Activity,
+  ChevronDown,
+  ChevronUp,
+  ChevronRight,
+  AlertCircle,
+  Info,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -37,8 +42,12 @@ export default function QueryStudioPage() {
   const [dialect, setDialect] = useState<DatabaseDialect>('postgres');
   const [activeWorkspaceTab, setActiveWorkspaceTab] = useState<'editor' | 'plan' | 'chart' | 'schema'>('editor');
 
+  // Auto-collapse hero density state
+  const [isHeroCollapsed, setIsHeroCollapsed] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
+  const [queryError, setQueryError] = useState<string | null>(null);
 
   const [generatedQuery, setGeneratedQuery] = useState<GeneratedQuery | null>(null);
   const [executionResult, setExecutionResult] = useState<ExecutionResult | null>(null);
@@ -52,6 +61,7 @@ export default function QueryStudioPage() {
     if (!questionText.trim()) return;
 
     setIsLoading(true);
+    setQueryError(null);
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
@@ -64,13 +74,21 @@ export default function QueryStudioPage() {
       });
 
       const data = await res.json();
+      if (data.error) {
+        setQueryError(data.error);
+        return;
+      }
+
       if (data.generatedQuery) {
         setGeneratedQuery(data.generatedQuery);
+        // Auto-collapse hero overview after generation to maximize focus on results
+        setIsHeroCollapsed(true);
         // Auto execute mock result on generation
         handleExecute(data.generatedQuery.query);
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error('Failed to generate query:', e);
+      setQueryError('Failed to generate query. Please verify your query syntax and try again.');
     } finally {
       setIsLoading(false);
     }
@@ -119,89 +137,114 @@ export default function QueryStudioPage() {
   };
 
   const handleColumnClick = (tableName: string, columnName: string) => {
-    // Append clicked column name to prompt
     handleGenerate(`Show me records from ${tableName} with column ${columnName} and calculate aggregates`);
     setActiveWorkspaceTab('editor');
   };
 
   return (
-    <div className="space-y-10 font-mono w-full min-w-0">
-      {/* Centered Hero Header */}
-      <div className="text-center space-y-3 max-w-3xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs">
-          <Database className="w-3.5 h-3.5" />
-          <span>NATURAL LANGUAGE DATABASE QUERY BUILDER &amp; ORM TRANSLATOR</span>
-        </div>
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight font-outfit">
-          Ask in Plain English.{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400">
-            Get Production SQL &amp; ORM
-          </span>
-        </h1>
-        <p className="text-slate-400 text-xs sm:text-sm font-mono max-w-2xl mx-auto leading-relaxed">
-          Translate plain text questions into PostgreSQL, MySQL, MongoDB, SQLite, Prisma, and Drizzle ORM queries with index optimization tips and auto-visualized data charts.
-        </p>
-      </div>
+    <div className="space-y-6 font-mono w-full min-w-0">
+      {/* COLLAPSIBLE HERO SECTION */}
+      {!isHeroCollapsed ? (
+        <div className="space-y-6 animate-in fade-in duration-200">
+          {/* Centered Hero Header */}
+          <div className="text-center space-y-2.5 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold">
+              <Database className="w-3.5 h-3.5" />
+              <span>AI DATABASE QUERY ENGINE &amp; ORM TRANSLATOR</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight font-mono">
+              Ask in Plain English.{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500">
+                Get Production SQL &amp; ORM
+              </span>
+            </h1>
+            <p className="text-slate-400 text-xs font-mono max-w-2xl mx-auto leading-relaxed prose-text">
+              Translate plain text questions into PostgreSQL, MySQL, MongoDB, SQLite, Prisma, and Drizzle ORM queries with index optimization tips and auto-visualized data charts.
+            </p>
+          </div>
 
-      {/* 4 Quick Metric Badges */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 max-w-5xl mx-auto font-mono text-left">
-        <div className="p-4 rounded-2xl bg-[#0d1117] border border-emerald-500/20 space-y-1 shadow-lg">
-          <span className="text-[10px] text-emerald-400 font-bold uppercase flex items-center gap-1.5">
-            <Terminal className="w-3.5 h-3.5" /> Multi-Dialect
-          </span>
-          <div className="text-lg font-black text-white">6 DB Engines</div>
-        </div>
+          {/* 4 Stat Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-5xl mx-auto font-mono text-left">
+            <div className="p-3.5 rounded-xl bg-[#0d1117] border border-slate-800 space-y-1 hover:border-emerald-500/30 transition-colors">
+              <span className="text-[10px] text-emerald-400 font-bold uppercase flex items-center gap-1.5 font-mono">
+                <Terminal className="w-3.5 h-3.5" /> Multi-Dialect
+              </span>
+              <div className="text-base font-bold text-white font-mono">6 DB Engines</div>
+            </div>
 
-        <div className="p-4 rounded-2xl bg-[#0d1117] border border-cyan-500/20 space-y-1 shadow-lg">
-          <span className="text-[10px] text-cyan-400 font-bold uppercase flex items-center gap-1.5">
-            <Database className="w-3.5 h-3.5" /> Active Schema
-          </span>
-          <div className="text-lg font-black text-cyan-300 truncate">
-            {activeSchema.name.split('&')[0]}
+            <div className="p-3.5 rounded-xl bg-[#0d1117] border border-slate-800 space-y-1 hover:border-cyan-500/30 transition-colors">
+              <span className="text-[10px] text-cyan-400 font-bold uppercase flex items-center gap-1.5 font-mono">
+                <Database className="w-3.5 h-3.5" /> Active Schema
+              </span>
+              <div className="text-base font-bold text-cyan-300 truncate font-mono">
+                {activeSchema.name.split('&')[0]}
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-[#0d1117] border border-slate-800 space-y-1 hover:border-purple-500/30 transition-colors">
+              <span className="text-[10px] text-purple-400 font-bold uppercase flex items-center gap-1.5 font-mono">
+                <Play className="w-3.5 h-3.5" /> Sandbox Latency
+              </span>
+              <div className="text-base font-bold text-purple-300 font-mono">
+                {executionResult ? `${executionResult.executionTimeMs}ms Latency` : 'Instant Exec'}
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-[#0d1117] border border-slate-800 space-y-1 hover:border-amber-500/30 transition-colors">
+              <span className="text-[10px] text-amber-400 font-bold uppercase flex items-center gap-1.5 font-mono">
+                <BarChart2 className="w-3.5 h-3.5" /> Auto-Charts
+              </span>
+              <div className="text-base font-bold text-amber-300 font-mono">Instant Viz Engine</div>
+            </div>
+          </div>
+
+          {/* Schema Selector */}
+          <div className="p-3.5 rounded-xl bg-[#0d1117] border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono">
+            <div className="flex items-center gap-2">
+              <Database className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="text-slate-400 font-bold uppercase text-[10px]">Database Domain:</span>
+            </div>
+
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {schemas.map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setActiveSchema(s)}
+                  className={`px-3 py-1 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
+                    activeSchema.id === s.id
+                      ? 'bg-emerald-500 text-black font-bold shadow-sm'
+                      : 'bg-[#161b22] border border-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <span>{s.category}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-
-        <div className="p-4 rounded-2xl bg-[#0d1117] border border-purple-500/20 space-y-1 shadow-lg">
-          <span className="text-[10px] text-purple-400 font-bold uppercase flex items-center gap-1.5">
-            <Play className="w-3.5 h-3.5" /> Live Sandbox
-          </span>
-          <div className="text-lg font-black text-purple-300">
-            {executionResult ? `${executionResult.executionTimeMs}ms Latency` : 'Instant Exec'}
+      ) : (
+        /* COMPACT COLLAPSED HERO TOOLBAR */
+        <div className="p-3 rounded-xl bg-[#0d1117] border border-slate-800 flex items-center justify-between gap-3 text-xs font-mono shadow-md animate-in fade-in duration-150">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">
+              SCHEMA: {activeSchema.name.toUpperCase()}
+            </span>
+            <span className="text-slate-400 text-[11px] hidden sm:inline">
+              ({activeSchema.tables.length} Tables Registered • Dialect: {dialect.toUpperCase()})
+            </span>
           </div>
-        </div>
 
-        <div className="p-4 rounded-2xl bg-[#0d1117] border border-amber-500/20 space-y-1 shadow-lg">
-          <span className="text-[10px] text-amber-400 font-bold uppercase flex items-center gap-1.5">
-            <BarChart2 className="w-3.5 h-3.5" /> Auto-Charts
-          </span>
-          <div className="text-lg font-black text-amber-300">Instant Viz Engine</div>
+          <button
+            type="button"
+            onClick={() => setIsHeroCollapsed(false)}
+            className="px-2.5 py-1 rounded-lg bg-[#161b22] border border-slate-800 hover:border-emerald-500/40 text-slate-300 hover:text-white text-xs font-mono font-medium flex items-center gap-1 cursor-pointer transition-colors"
+          >
+            <span>Expand Overview</span>
+            <ChevronDown className="w-3.5 h-3.5" />
+          </button>
         </div>
-      </div>
-
-      {/* Schema Quick Switcher Dropdown */}
-      <div className="p-4 rounded-2xl bg-[#0d1117] border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-2">
-          <Database className="w-4 h-4 text-emerald-400" />
-          <span className="text-slate-400 font-bold uppercase text-[10px]">Select Database Domain:</span>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          {schemas.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => setActiveSchema(s)}
-              className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
-                activeSchema.id === s.id
-                  ? 'bg-emerald-500 text-black font-black shadow-md'
-                  : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
-              }`}
-            >
-              <span>{s.category}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      )}
 
       {/* Natural Language Query Input Form */}
       <QueryInput
@@ -212,66 +255,79 @@ export default function QueryStudioPage() {
         isLoading={isLoading}
       />
 
-      {/* Studio View Navigation Tabs */}
-      <div className="flex items-center justify-center">
-        <div className="p-1.5 rounded-2xl bg-[#0d1117] border border-slate-800 flex items-center gap-1.5 max-w-full overflow-x-auto shadow-xl">
-          <button
-            type="button"
-            onClick={() => setActiveWorkspaceTab('editor')}
-            className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-              activeWorkspaceTab === 'editor'
-                ? 'bg-emerald-500 text-black font-black shadow-md'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Code2 className="w-4 h-4" />
-            <span>Generated Query &amp; Table</span>
-          </button>
+      {/* ERROR STATE BANNER IF APPLICABLE */}
+      {queryError && (
+        <div className="p-4 rounded-xl bg-rose-950/30 border border-rose-500/50 flex items-start gap-3 text-xs font-mono text-rose-200 shadow-md">
+          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <h4 className="font-bold text-white">Query Generation Notice</h4>
+            <p>{queryError}</p>
+          </div>
+        </div>
+      )}
 
-          <button
-            type="button"
-            onClick={() => setActiveWorkspaceTab('plan')}
-            className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-              activeWorkspaceTab === 'plan'
-                ? 'bg-cyan-500 text-black font-black shadow-md'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Activity className="w-4 h-4" />
-            <span>Execution Plan (EXPLAIN)</span>
-          </button>
+      {/* Studio View Navigation Tabs with Visible Scroll Affordance */}
+      <div className="relative">
+        <div className="flex items-center justify-center overflow-x-auto pb-1 scrollbar-none">
+          <div className="p-1 rounded-xl bg-[#0d1117] border border-slate-800 flex items-center gap-1 max-w-full shadow-lg font-mono text-xs">
+            <button
+              type="button"
+              onClick={() => setActiveWorkspaceTab('editor')}
+              className={`px-3.5 py-2 rounded-lg text-xs font-mono font-medium transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                activeWorkspaceTab === 'editor'
+                  ? 'bg-emerald-500 text-black font-bold shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Code2 className="w-3.5 h-3.5" />
+              <span>Generated Query &amp; Table</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveWorkspaceTab('chart')}
-            className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-              activeWorkspaceTab === 'chart'
-                ? 'bg-purple-500 text-black font-black shadow-md'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <BarChart2 className="w-4 h-4" />
-            <span>Data Visualization Studio</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => setActiveWorkspaceTab('plan')}
+              className={`px-3.5 py-2 rounded-lg text-xs font-mono font-medium transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                activeWorkspaceTab === 'plan'
+                  ? 'bg-emerald-500 text-black font-bold shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Activity className="w-3.5 h-3.5" />
+              <span>Execution Plan (EXPLAIN)</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveWorkspaceTab('schema')}
-            className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-              activeWorkspaceTab === 'schema'
-                ? 'bg-amber-500 text-black font-black shadow-md'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Database className="w-4 h-4" />
-            <span>Schema Explorer</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => setActiveWorkspaceTab('chart')}
+              className={`px-3.5 py-2 rounded-lg text-xs font-mono font-medium transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                activeWorkspaceTab === 'chart'
+                  ? 'bg-emerald-500 text-black font-bold shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <BarChart2 className="w-3.5 h-3.5" />
+              <span>Data Visualization Studio</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveWorkspaceTab('schema')}
+              className={`px-3.5 py-2 rounded-lg text-xs font-mono font-medium transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                activeWorkspaceTab === 'schema'
+                  ? 'bg-emerald-500 text-black font-bold shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Database className="w-3.5 h-3.5" />
+              <span>Schema Explorer</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* TAB 1: CODE EDITOR & RESULT TABLE */}
       {activeWorkspaceTab === 'editor' && (
-        <div className="space-y-8 animate-in fade-in duration-200">
+        <div className="space-y-6 animate-in fade-in duration-200">
           {generatedQuery && (
             <QueryOutput
               queryData={generatedQuery}
@@ -291,7 +347,9 @@ export default function QueryStudioPage() {
           {generatedQuery ? (
             <QueryExecutionPlan queryData={generatedQuery} />
           ) : (
-            <p className="text-center text-slate-500 py-12">Please generate a query first.</p>
+            <div className="p-12 rounded-2xl bg-[#0d1117] border border-slate-800 text-center text-slate-500 font-mono text-xs">
+              Please generate a query to view its relational execution plan.
+            </div>
           )}
         </div>
       )}
@@ -302,7 +360,9 @@ export default function QueryStudioPage() {
           {executionResult ? (
             <AutoChart result={executionResult} />
           ) : (
-            <p className="text-center text-slate-500 py-12">Execute a query to visualize data.</p>
+            <div className="p-12 rounded-2xl bg-[#0d1117] border border-slate-800 text-center text-slate-500 font-mono text-xs">
+              Execute a query to visualize data.
+            </div>
           )}
         </div>
       )}
