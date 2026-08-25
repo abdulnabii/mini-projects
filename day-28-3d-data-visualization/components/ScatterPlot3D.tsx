@@ -8,24 +8,47 @@ interface Props {
   points?: Scatter3DPoint[];
   colorScheme: ColorScheme;
   isAutoRotate: boolean;
+  zoomLevel: number;
+  resetViewTrigger: number;
 }
 
 export default function ScatterPlot3D({
   points = [],
   colorScheme,
   isAutoRotate,
+  zoomLevel,
+  resetViewTrigger,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const swarmGroupRef = useRef<THREE.Group | null>(null);
+
+  // Handle Zoom
+  useEffect(() => {
+    if (cameraRef.current) {
+      const baseDist = 150;
+      cameraRef.current.position.z = baseDist / (zoomLevel / 100);
+    }
+  }, [zoomLevel]);
+
+  // Handle Reset View
+  useEffect(() => {
+    if (swarmGroupRef.current && cameraRef.current) {
+      swarmGroupRef.current.rotation.set(0, 0, 0);
+      cameraRef.current.position.set(0, 0, 150);
+    }
+  }, [resetViewTrigger]);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
     const width = containerRef.current.clientWidth;
-    const height = containerRef.current.clientHeight || 520;
+    const height = containerRef.current.clientHeight || 540;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
-    camera.position.set(0, 0, 150);
+    camera.position.set(0, 0, 150 / (zoomLevel / 100));
+    cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
     renderer.setSize(width, height);
@@ -33,6 +56,7 @@ export default function ScatterPlot3D({
     containerRef.current.replaceChildren(renderer.domElement);
 
     const swarmGroup = new THREE.Group();
+    swarmGroupRef.current = swarmGroup;
 
     // 3D Bounding Spatial Box
     const boxGeo = new THREE.BoxGeometry(80, 80, 80);
@@ -44,12 +68,16 @@ export default function ScatterPlot3D({
     });
     scene.add(new THREE.Mesh(boxGeo, boxMat));
 
-    // Particle Colors
-    const palette = [0x10b981, 0x06b6d4, 0xa855f7, 0xf59e0b, 0xef4444];
+    // Standardized Layer Color Map
+    const layerColors: Record<string, number> = {
+      'Troposphere': 0x10b981, // Emerald: Low altitude
+      'Stratosphere': 0x06b6d4, // Cyan: Mid altitude
+      'Mesosphere': 0xa855f7, // Purple: High altitude
+    };
 
-    points.forEach((p, idx) => {
+    points.forEach((p) => {
       const geo = new THREE.SphereGeometry(p.size * 0.45, 16, 16);
-      const col = palette[idx % palette.length];
+      const col = layerColors[p.category] || 0x10b981;
 
       const mat = new THREE.MeshPhongMaterial({
         color: col,
@@ -62,7 +90,7 @@ export default function ScatterPlot3D({
       mesh.position.set(p.x, p.y, p.z);
       swarmGroup.add(mesh);
 
-      // Trailing ring
+      // Trailing halo ring
       const ringGeo = new THREE.RingGeometry(p.size * 0.5, p.size * 0.7, 16);
       const ringMat = new THREE.MeshBasicMaterial({
         color: col,
@@ -97,7 +125,7 @@ export default function ScatterPlot3D({
     };
 
     const onMouseMove = (e: MouseEvent) => {
-      if (isDragging) {
+      if (isDragging && swarmGroup) {
         const dx = e.clientX - prevX;
         const dy = e.clientY - prevY;
         swarmGroup.rotation.y += dx * 0.007;
@@ -116,12 +144,10 @@ export default function ScatterPlot3D({
 
     // Animation Loop
     let animId: number;
-    let clock = 0;
     const animate = () => {
       animId = requestAnimationFrame(animate);
-      clock += 0.02;
 
-      if (isAutoRotate && !isDragging) {
+      if (isAutoRotate && !isDragging && swarmGroup) {
         swarmGroup.rotation.y += 0.003;
         swarmGroup.rotation.z += 0.001;
       }
@@ -134,7 +160,7 @@ export default function ScatterPlot3D({
     const handleResize = () => {
       if (!containerRef.current) return;
       const w = containerRef.current.clientWidth;
-      const h = containerRef.current.clientHeight || 520;
+      const h = containerRef.current.clientHeight || 540;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
@@ -153,19 +179,8 @@ export default function ScatterPlot3D({
   }, [points, colorScheme, isAutoRotate]);
 
   return (
-    <div className="relative w-full h-[520px] rounded-2xl bg-[#04080e] overflow-hidden border border-slate-800 flex items-center justify-center font-mono">
+    <div className="relative w-full h-[540px] rounded-2xl bg-[#04080e] overflow-hidden border border-slate-800 flex items-center justify-center font-mono">
       <div ref={containerRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
-
-      {/* Orbit Hint */}
-      <div className="absolute bottom-4 left-4 p-3 rounded-xl bg-[#0d1117]/80 backdrop-blur-md border border-slate-800 text-[10px] text-slate-300 space-y-1">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
-          <span>3D Particle Scatter Swarm • {points.length} Multi-Axis Sensing Nodes</span>
-        </div>
-        <div className="text-slate-500">
-          X/Y/Z = Spatial Coordinate Space • Particle Radius = Sensing Magnitude
-        </div>
-      </div>
     </div>
   );
 }

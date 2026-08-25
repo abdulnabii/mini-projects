@@ -27,14 +27,15 @@ export default function ThreeDataVizPage() {
   const [colorScheme, setColorScheme] = useState<ColorScheme>('EMERALD');
   const [isAutoRotate, setIsAutoRotate] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const handleSelectDataset = (dataset: DatasetAnalysis) => {
     setActiveDataset(dataset);
     setColorScheme(dataset.colorScheme || 'EMERALD');
+    setUploadError(null);
   };
 
   const handleChartTypeChange = (type: VisualizationType) => {
-    // Switch to corresponding dataset preset or update chart type
     const matchingPreset = SAMPLE_DATASETS.find((d) => d.chartType === type);
     if (matchingPreset) {
       setActiveDataset(matchingPreset);
@@ -46,6 +47,7 @@ export default function ThreeDataVizPage() {
 
   const handleUploadCSV = async (csvText: string, title: string) => {
     setIsLoading(true);
+    setUploadError(null);
     try {
       const res = await fetch('/api/analyze', {
         method: 'POST',
@@ -53,12 +55,17 @@ export default function ThreeDataVizPage() {
         body: JSON.stringify({ csvText, title }),
       });
       const data = await res.json();
+      if (data.error) {
+        setUploadError(data.error);
+        return;
+      }
       if (data.analysis) {
         setActiveDataset(data.analysis);
         setColorScheme(data.analysis.colorScheme || 'EMERALD');
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error('Failed to analyze CSV:', e);
+      setUploadError('Failed to parse CSV dataset. Please verify format and headers.');
     } finally {
       setIsLoading(false);
     }
@@ -77,67 +84,41 @@ export default function ThreeDataVizPage() {
   };
 
   return (
-    <div className="space-y-8 font-mono w-full min-w-0">
-      {/* Centered Hero Header */}
-      <div className="text-center space-y-3 max-w-3xl mx-auto">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold">
-          <Globe className="w-3.5 h-3.5" />
-          <span>3D WEBGL DATA VISUALIZATION &amp; SPATIAL NARRATIVE ENGINE</span>
-        </div>
-        <h1 className="text-3xl sm:text-5xl font-bold text-white tracking-tight font-mono">
-          Transform Raw Datasets into{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400">
-            Living 3D Worlds
-          </span>
-        </h1>
-        <p className="text-slate-400 text-xs sm:text-sm font-mono max-w-2xl mx-auto leading-relaxed prose-text">
-          Interactive Three.js 3D Earth globes, force-directed network graphs, animated isometric bar matrices, and particle scatter clouds powered by Gemini 1.5 Flash spatial storytelling.
-        </p>
-      </div>
-
-      {/* 4 Stat Metrics */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-5xl mx-auto font-mono text-left">
-        <div className="p-3.5 rounded-xl bg-[#0d1117] border border-slate-800 space-y-1 hover:border-emerald-500/30 transition-colors">
-          <span className="text-[10px] text-emerald-400 font-bold uppercase flex items-center gap-1 font-mono">
-            <Box className="w-3.5 h-3.5" /> 3D Projections
-          </span>
-          <div className="text-base font-bold text-white font-mono">4 WebGL Types</div>
-        </div>
-
-        <div className="p-3.5 rounded-xl bg-[#0d1117] border border-slate-800 space-y-1 hover:border-cyan-500/30 transition-colors">
-          <span className="text-[10px] text-cyan-400 font-bold uppercase flex items-center gap-1 font-mono">
-            <Globe className="w-3.5 h-3.5" /> Active Projection
-          </span>
-          <div className="text-base font-bold text-cyan-300 truncate font-mono">
-            {activeDataset.chartType.replace('_', ' ')}
+    <div className="space-y-6 font-mono w-full min-w-0">
+      {/* Streamlined Hero Header */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold font-mono">
+            <Globe className="w-3 h-3" />
+            <span>3D WEBGL SPATIAL DATA PLATFORM</span>
           </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-mono">
+            OmniData<span className="text-emerald-400">.3D</span> Visual Intelligence
+          </h1>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-[#0d1117] border border-slate-800 space-y-1 hover:border-purple-500/30 transition-colors">
-          <span className="text-[10px] text-purple-400 font-bold uppercase flex items-center gap-1 font-mono">
-            <Sparkles className="w-3.5 h-3.5" /> AI Storyteller
+        <div className="flex items-center gap-2 text-xs">
+          <span className="px-2.5 py-1 rounded-lg bg-[#0d1117] border border-slate-800 text-slate-400 text-[11px]">
+            Engine: <strong className="text-emerald-300">Three.js WebGL</strong>
           </span>
-          <div className="text-base font-bold text-purple-300 font-mono">Gemini 1.5 Flash</div>
-        </div>
-
-        <div className="p-3.5 rounded-xl bg-[#0d1117] border border-slate-800 space-y-1 hover:border-amber-500/30 transition-colors">
-          <span className="text-[10px] text-amber-400 font-bold uppercase flex items-center gap-1 font-mono">
-            <Video className="w-3.5 h-3.5" /> Video Export
+          <span className="px-2.5 py-1 rounded-lg bg-[#0d1117] border border-slate-800 text-slate-400 text-[11px]">
+            AI: <strong className="text-cyan-300">Gemini 1.5 Flash</strong>
           </span>
-          <div className="text-base font-bold text-amber-300 font-mono">4K Canvas Capture</div>
         </div>
       </div>
 
-      {/* Dataset Uploader & Preset Switcher */}
+      {/* Dataset Uploader & Spatial Projection Toolbar (Above Viewport) */}
       <DatasetUploader
         activeDataset={activeDataset}
         onSelectDataset={handleSelectDataset}
         onUploadCSV={handleUploadCSV}
         onChartTypeChange={handleChartTypeChange}
         isLoading={isLoading}
+        uploadError={uploadError}
+        onClearError={() => setUploadError(null)}
       />
 
-      {/* 3D WebGL Canvas Viewport */}
+      {/* 3D WebGL Canvas Viewport (PRIMARY HERO ELEMENT) */}
       <Viewport3D
         analysis={activeDataset}
         colorScheme={colorScheme}
@@ -146,7 +127,7 @@ export default function ThreeDataVizPage() {
         onSaveToGallery={handleSaveToGallery}
       />
 
-      {/* AI Spatial Story Narrative & Anomaly Panel */}
+      {/* AI Spatial Story Narrative & Anomaly Intelligence Panel */}
       <NarrativePanel
         analysis={activeDataset}
         onSaveToGallery={handleSaveToGallery}

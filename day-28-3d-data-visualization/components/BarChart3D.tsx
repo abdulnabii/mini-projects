@@ -8,25 +8,50 @@ interface Props {
   bars?: Bar3DPoint[];
   colorScheme: ColorScheme;
   isAutoRotate: boolean;
+  zoomLevel: number;
+  resetViewTrigger: number;
 }
 
 export default function BarChart3D({
   bars = [],
   colorScheme,
   isAutoRotate,
+  zoomLevel,
+  resetViewTrigger,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const barGroupRef = useRef<THREE.Group | null>(null);
+
+  // Handle Zoom
+  useEffect(() => {
+    if (cameraRef.current) {
+      const scale = zoomLevel / 100;
+      cameraRef.current.position.set(100 / scale, 110 / scale, 140 / scale);
+    }
+  }, [zoomLevel]);
+
+  // Handle Reset View
+  useEffect(() => {
+    if (barGroupRef.current && cameraRef.current) {
+      barGroupRef.current.rotation.set(0, 0, 0);
+      cameraRef.current.position.set(100, 110, 140);
+      cameraRef.current.lookAt(0, 15, 0);
+    }
+  }, [resetViewTrigger]);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
     const width = containerRef.current.clientWidth;
-    const height = containerRef.current.clientHeight || 520;
+    const height = containerRef.current.clientHeight || 540;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-    camera.position.set(100, 110, 140);
+    const scale = zoomLevel / 100;
+    camera.position.set(100 / scale, 110 / scale, 140 / scale);
     camera.lookAt(0, 15, 0);
+    cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
     renderer.setSize(width, height);
@@ -34,19 +59,20 @@ export default function BarChart3D({
     containerRef.current.replaceChildren(renderer.domElement);
 
     const barGroup = new THREE.Group();
+    barGroupRef.current = barGroup;
 
     // 3D Floor Grid
     const gridHelper = new THREE.GridHelper(100, 10, 0x10b981, 0x1e293b);
     gridHelper.position.y = 0;
     scene.add(gridHelper);
 
-    // Color mapper
-    const barPrimaryColor =
-      colorScheme === 'HEAT'
-        ? 0xf97316
-        : colorScheme === 'CYBERPUNK'
-        ? 0x06b6d4
-        : 0x10b981;
+    // Standardized Category Color Mapping
+    const regionColors: Record<string, number> = {
+      'Americas': 0x10b981,
+      'Europe': 0x06b6d4,
+      'Asia': 0xa855f7,
+      'Middle East': 0xf59e0b,
+    };
 
     // Render 3D Voxel Pillars
     const numCols = 5;
@@ -60,13 +86,14 @@ export default function BarChart3D({
       const posX = col * spacing - offset;
       const posZ = row * spacing - offset;
       const barHeight = Math.max(4, (b.value / 110) * 50);
+      const barColor = regionColors[b.category || ''] || 0x10b981;
 
       const boxGeo = new THREE.BoxGeometry(10, barHeight, 10);
       boxGeo.translate(0, barHeight / 2, 0);
 
       const boxMat = new THREE.MeshPhongMaterial({
-        color: barPrimaryColor,
-        emissive: barPrimaryColor,
+        color: barColor,
+        emissive: barColor,
         emissiveIntensity: 0.35,
         shininess: 90,
       });
@@ -106,7 +133,7 @@ export default function BarChart3D({
     };
 
     const onMouseMove = (e: MouseEvent) => {
-      if (isDragging) {
+      if (isDragging && barGroup) {
         const dx = e.clientX - prevX;
         const dy = e.clientY - prevY;
         barGroup.rotation.y += dx * 0.006;
@@ -126,7 +153,7 @@ export default function BarChart3D({
     let animId: number;
     const animate = () => {
       animId = requestAnimationFrame(animate);
-      if (isAutoRotate && !isDragging) {
+      if (isAutoRotate && !isDragging && barGroup) {
         barGroup.rotation.y += 0.003;
       }
       renderer.render(scene, camera);
@@ -137,7 +164,7 @@ export default function BarChart3D({
     const handleResize = () => {
       if (!containerRef.current) return;
       const w = containerRef.current.clientWidth;
-      const h = containerRef.current.clientHeight || 520;
+      const h = containerRef.current.clientHeight || 540;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
@@ -156,19 +183,8 @@ export default function BarChart3D({
   }, [bars, colorScheme, isAutoRotate]);
 
   return (
-    <div className="relative w-full h-[520px] rounded-2xl bg-[#04080e] overflow-hidden border border-slate-800 flex items-center justify-center font-mono">
+    <div className="relative w-full h-[540px] rounded-2xl bg-[#04080e] overflow-hidden border border-slate-800 flex items-center justify-center font-mono">
       <div ref={containerRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
-
-      {/* Orbit Hint */}
-      <div className="absolute bottom-4 left-4 p-3 rounded-xl bg-[#0d1117]/80 backdrop-blur-md border border-slate-800 text-[10px] text-slate-300 space-y-1">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>3D Isometric Voxel Bar Matrix • {bars.length} Voxel Columns</span>
-        </div>
-        <div className="text-slate-500">
-          X = Cloud Region • Z = Fiscal Quarter • Y-Elevation = Recurring Revenue Density
-        </div>
-      </div>
     </div>
   );
 }

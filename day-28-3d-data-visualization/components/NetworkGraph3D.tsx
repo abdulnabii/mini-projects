@@ -9,6 +9,8 @@ interface Props {
   links?: GraphLink[];
   colorScheme: ColorScheme;
   isAutoRotate: boolean;
+  zoomLevel: number;
+  resetViewTrigger: number;
 }
 
 export default function NetworkGraph3D({
@@ -16,18 +18,39 @@ export default function NetworkGraph3D({
   links = [],
   colorScheme,
   isAutoRotate,
+  zoomLevel,
+  resetViewTrigger,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const graphGroupRef = useRef<THREE.Group | null>(null);
+
+  // Handle Zoom
+  useEffect(() => {
+    if (cameraRef.current) {
+      const baseDist = 160;
+      cameraRef.current.position.z = baseDist / (zoomLevel / 100);
+    }
+  }, [zoomLevel]);
+
+  // Handle Reset View
+  useEffect(() => {
+    if (graphGroupRef.current && cameraRef.current) {
+      graphGroupRef.current.rotation.set(0, 0, 0);
+      cameraRef.current.position.set(0, 0, 160);
+    }
+  }, [resetViewTrigger]);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
     const width = containerRef.current.clientWidth;
-    const height = containerRef.current.clientHeight || 520;
+    const height = containerRef.current.clientHeight || 540;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
-    camera.position.set(0, 0, 160);
+    camera.position.set(0, 0, 160 / (zoomLevel / 100));
+    cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
     renderer.setSize(width, height);
@@ -35,10 +58,23 @@ export default function NetworkGraph3D({
     containerRef.current.replaceChildren(renderer.domElement);
 
     const graphGroup = new THREE.Group();
+    graphGroupRef.current = graphGroup;
 
-    // Map 3D positions for nodes in an organic spherical cluster
+    // Standardized Category Color Mapping
+    const groupColorMap: Record<string, number> = {
+      'VC': 0x10b981, // Emerald: Investors
+      'AI Lab': 0x06b6d4, // Cyan: Core AI
+      'Accelerator': 0xa855f7, // Purple: Incubators
+      'Data Infra': 0xf59e0b, // Amber: Infrastructure
+      'Dev Platform': 0xec4899, // Rose: Developer Platforms
+      'Database': 0x06b6d4,
+      'DevTool': 0xec4899,
+      'Agent Infra': 0xa855f7,
+      'Search Engine': 0x10b981,
+    };
+
+    // Map 3D positions for nodes in a clustered spherical lattice
     const nodePositions: Record<string, THREE.Vector3> = {};
-    const nodeColors = [0x10b981, 0x06b6d4, 0xa855f7, 0xf59e0b, 0xec4899];
 
     nodes.forEach((n, idx) => {
       const phi = Math.acos(-1 + (2 * idx) / nodes.length);
@@ -54,12 +90,12 @@ export default function NetworkGraph3D({
 
       const nodeSize = Math.max(3, (n.val / 100) * 6.5);
       const nodeGeo = new THREE.SphereGeometry(nodeSize, 24, 24);
-      const nodeColor = nodeColors[idx % nodeColors.length];
+      const nodeColor = groupColorMap[n.group] || 0x10b981;
 
       const nodeMat = new THREE.MeshPhongMaterial({
         color: nodeColor,
         emissive: nodeColor,
-        emissiveIntensity: 0.4,
+        emissiveIntensity: 0.45,
         shininess: 80,
       });
 
@@ -89,7 +125,7 @@ export default function NetworkGraph3D({
         const lineMat = new THREE.LineBasicMaterial({
           color: 0x06b6d4,
           transparent: true,
-          opacity: 0.45,
+          opacity: 0.5,
         });
         const line = new THREE.Line(lineGeo, lineMat);
         graphGroup.add(line);
@@ -118,7 +154,7 @@ export default function NetworkGraph3D({
     };
 
     const onMouseMove = (e: MouseEvent) => {
-      if (isDragging) {
+      if (isDragging && graphGroup) {
         const dx = e.clientX - prevX;
         const dy = e.clientY - prevY;
         graphGroup.rotation.y += dx * 0.007;
@@ -139,7 +175,7 @@ export default function NetworkGraph3D({
     let animId: number;
     const animate = () => {
       animId = requestAnimationFrame(animate);
-      if (isAutoRotate && !isDragging) {
+      if (isAutoRotate && !isDragging && graphGroup) {
         graphGroup.rotation.y += 0.003;
         graphGroup.rotation.x += 0.001;
       }
@@ -151,7 +187,7 @@ export default function NetworkGraph3D({
     const handleResize = () => {
       if (!containerRef.current) return;
       const w = containerRef.current.clientWidth;
-      const h = containerRef.current.clientHeight || 520;
+      const h = containerRef.current.clientHeight || 540;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
@@ -170,19 +206,8 @@ export default function NetworkGraph3D({
   }, [nodes, links, colorScheme, isAutoRotate]);
 
   return (
-    <div className="relative w-full h-[520px] rounded-2xl bg-[#04080e] overflow-hidden border border-slate-800 flex items-center justify-center font-mono">
+    <div className="relative w-full h-[540px] rounded-2xl bg-[#04080e] overflow-hidden border border-slate-800 flex items-center justify-center font-mono">
       <div ref={containerRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
-
-      {/* Orbit Hint */}
-      <div className="absolute bottom-4 left-4 p-3 rounded-xl bg-[#0d1117]/80 backdrop-blur-md border border-slate-800 text-[10px] text-slate-300 space-y-1">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-          <span>3D Force-Directed Network Graph • {nodes.length} Nodes &amp; {links.length} Links</span>
-        </div>
-        <div className="text-slate-500">
-          Node Radius = Valuation/AUM • Co-Investment Syndicate Edges
-        </div>
-      </div>
     </div>
   );
 }

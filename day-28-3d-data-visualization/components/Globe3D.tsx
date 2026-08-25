@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { GeoDataPoint, GeoArcConnection, ColorScheme } from '@/types';
 
@@ -9,7 +9,79 @@ interface Props {
   arcs?: GeoArcConnection[];
   colorScheme: ColorScheme;
   isAutoRotate: boolean;
+  zoomLevel: number;
+  resetViewTrigger: number;
   onSelectPoint?: (point: GeoDataPoint) => void;
+}
+
+// Procedural Earth Continents Canvas Texture Generator
+function createEarthContinentTexture(): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  if (ctx) {
+    // Deep ocean base
+    ctx.fillStyle = '#060e14';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw continent landmass silhouettes (Approximated geo polygon contours)
+    ctx.fillStyle = '#10b98126'; // Faint emerald continent fill
+    ctx.strokeStyle = '#10b98180'; // Glowing land contour border
+    ctx.lineWidth = 2;
+
+    // North America
+    ctx.beginPath();
+    ctx.ellipse(280, 160, 110, 70, -0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // South America
+    ctx.beginPath();
+    ctx.ellipse(340, 320, 60, 100, 0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Europe
+    ctx.beginPath();
+    ctx.ellipse(540, 150, 65, 45, 0.1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Africa
+    ctx.beginPath();
+    ctx.ellipse(550, 270, 75, 95, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Asia
+    ctx.beginPath();
+    ctx.ellipse(730, 170, 140, 85, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Australia & Oceania
+    ctx.beginPath();
+    ctx.ellipse(840, 350, 60, 45, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Continent Grid Dots Overlay
+    ctx.fillStyle = '#10b98155';
+    for (let x = 0; x < canvas.width; x += 16) {
+      for (let y = 0; y < canvas.height; y += 16) {
+        if (ctx.isPointInPath(x, y)) {
+          ctx.fillRect(x - 1, y - 1, 2, 2);
+        }
+      }
+    }
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+  return texture;
 }
 
 export default function Globe3D({
@@ -17,10 +89,29 @@ export default function Globe3D({
   arcs = [],
   colorScheme,
   isAutoRotate,
+  zoomLevel,
+  resetViewTrigger,
   onSelectPoint,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [hoveredPoint, setHoveredPoint] = useState<GeoDataPoint | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const globeGroupRef = useRef<THREE.Group | null>(null);
+
+  // Handle Zoom adjustments
+  useEffect(() => {
+    if (cameraRef.current) {
+      const baseDistance = 180;
+      cameraRef.current.position.z = baseDistance / (zoomLevel / 100);
+    }
+  }, [zoomLevel]);
+
+  // Handle Reset View
+  useEffect(() => {
+    if (globeGroupRef.current && cameraRef.current) {
+      globeGroupRef.current.rotation.set(0, 0, 0);
+      cameraRef.current.position.set(0, 0, 180);
+    }
+  }, [resetViewTrigger]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -31,51 +122,55 @@ export default function Globe3D({
     // Scene, Camera, Renderer
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-    camera.position.z = 180;
+    camera.position.z = 180 / (zoomLevel / 100);
+    cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     containerRef.current.replaceChildren(renderer.domElement);
 
-    // Primary Globe Sphere
+    const mainGlobeGroup = new THREE.Group();
+    globeGroupRef.current = mainGlobeGroup;
+
+    // Primary Globe Sphere with Procedural Earth Continents
     const globeRadius = 50;
     const globeGeometry = new THREE.SphereGeometry(globeRadius, 64, 64);
-    
-    // Theme color palette
-    const baseColor = colorScheme === 'HEAT' ? 0x1f140e : colorScheme === 'CYBERPUNK' ? 0x0a101f : 0x06140e;
+    const continentTexture = createEarthContinentTexture();
+
     const wireColor = colorScheme === 'HEAT' ? 0xf97316 : colorScheme === 'CYBERPUNK' ? 0x06b6d4 : 0x10b981;
-    const spikeColor = colorScheme === 'HEAT' ? 0xef4444 : colorScheme === 'CYBERPUNK' ? 0xa855f7 : 0x10b981;
+    const spikeColor = colorScheme === 'HEAT' ? 0xef4444 : colorScheme === 'CYBERPUNK' ? 0x06b6d4 : 0x10b981;
 
     const globeMaterial = new THREE.MeshPhongMaterial({
-      color: baseColor,
+      map: continentTexture,
+      color: 0x08131e,
       emissive: 0x04080e,
       wireframe: false,
-      shininess: 40,
+      shininess: 50,
     });
     const globe = new THREE.Mesh(globeGeometry, globeMaterial);
-    scene.add(globe);
+    mainGlobeGroup.add(globe);
 
-    // Wireframe Grid Mesh Overlay
-    const wireframeGeo = new THREE.SphereGeometry(globeRadius + 0.2, 32, 32);
+    // Wireframe Latitude/Longitude Grid Mesh Overlay
+    const wireframeGeo = new THREE.SphereGeometry(globeRadius + 0.25, 36, 36);
     const wireframeMat = new THREE.MeshBasicMaterial({
       color: wireColor,
       wireframe: true,
       transparent: true,
-      opacity: 0.15,
+      opacity: 0.18,
     });
     const wireframeMesh = new THREE.Mesh(wireframeGeo, wireframeMat);
-    scene.add(wireframeMesh);
+    mainGlobeGroup.add(wireframeMesh);
 
     // Atmosphere Glow Shield
-    const atmosGeo = new THREE.SphereGeometry(globeRadius * 1.15, 32, 32);
+    const atmosGeo = new THREE.SphereGeometry(globeRadius * 1.14, 32, 32);
     const atmosMat = new THREE.MeshBasicMaterial({
       color: wireColor,
       transparent: true,
-      opacity: 0.06,
+      opacity: 0.08,
       side: THREE.BackSide,
     });
-    scene.add(new THREE.Mesh(atmosGeo, atmosMat));
+    mainGlobeGroup.add(new THREE.Mesh(atmosGeo, atmosMat));
 
     // Convert Lat/Lng to Vector3 on Sphere
     const latLngToVector = (lat: number, lng: number, radius: number) => {
@@ -88,24 +183,33 @@ export default function Globe3D({
       );
     };
 
-    // Add Geographic Spike Beacons
-    const spikeGroup = new THREE.Group();
-    const pointMeshes: { mesh: THREE.Mesh; pointData: GeoDataPoint }[] = [];
+    // Category Color Mapping for Consistent Encoding
+    const categoryColors: Record<string, number> = {
+      'North America': 0x10b981,
+      'Europe': 0x06b6d4,
+      'Asia': 0xa855f7,
+      'Middle East': 0xf59e0b,
+      'South America': 0x10b981,
+      'Oceania': 0xec4899,
+      'Africa': 0xf59e0b,
+    };
 
+    // Add Geographic Spike Beacons
     points.forEach((p) => {
       const pos = latLngToVector(p.lat, p.lng, globeRadius);
-      const spikeHeight = Math.max(4, (p.value / 100) * 20);
+      const spikeHeight = Math.max(4, (p.value / 100) * 22);
+      const col = categoryColors[p.category || ''] || spikeColor;
 
       // Spike cylinder
-      const cylinderGeo = new THREE.CylinderGeometry(0.5, 1.2, spikeHeight, 8);
+      const cylinderGeo = new THREE.CylinderGeometry(0.4, 1.2, spikeHeight, 8);
       cylinderGeo.translate(0, spikeHeight / 2, 0);
       cylinderGeo.rotateX(Math.PI / 2);
 
       const cylinderMat = new THREE.MeshPhongMaterial({
-        color: spikeColor,
-        emissive: spikeColor,
+        color: col,
+        emissive: col,
         emissiveIntensity: 0.6,
-        shininess: 60,
+        shininess: 80,
       });
 
       const spike = new THREE.Mesh(cylinderGeo, cylinderMat);
@@ -118,15 +222,11 @@ export default function Globe3D({
       const head = new THREE.Mesh(headGeo, headMat);
       head.position.copy(latLngToVector(p.lat, p.lng, globeRadius + spikeHeight));
 
-      spikeGroup.add(spike);
-      spikeGroup.add(head);
-      pointMeshes.push({ mesh: head, pointData: p });
+      mainGlobeGroup.add(spike);
+      mainGlobeGroup.add(head);
     });
 
-    scene.add(spikeGroup);
-
     // Add Flight Path Orbital Arcs
-    const arcGroup = new THREE.Group();
     arcs.forEach((arc) => {
       const start = latLngToVector(arc.fromLat, arc.fromLng, globeRadius);
       const end = latLngToVector(arc.toLat, arc.toLng, globeRadius);
@@ -139,22 +239,22 @@ export default function Globe3D({
       const curvePoints = curve.getPoints(32);
       const curveGeo = new THREE.BufferGeometry().setFromPoints(curvePoints);
       const curveMat = new THREE.LineBasicMaterial({
-        color: wireColor,
+        color: 0x06b6d4,
         transparent: true,
-        opacity: 0.6,
+        opacity: 0.7,
       });
 
       const line = new THREE.Line(curveGeo, curveMat);
-      arcGroup.add(line);
+      mainGlobeGroup.add(line);
     });
 
-    scene.add(arcGroup);
+    scene.add(mainGlobeGroup);
 
     // Ambient & Directional Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.3);
     scene.add(ambientLight);
 
-    const dirLight1 = new THREE.DirectionalLight(0xffffff, 2.0);
+    const dirLight1 = new THREE.DirectionalLight(0xffffff, 2.2);
     dirLight1.position.set(100, 100, 100);
     scene.add(dirLight1);
 
@@ -174,17 +274,11 @@ export default function Globe3D({
     };
 
     const onMouseMove = (e: MouseEvent) => {
-      if (isDragging) {
+      if (isDragging && mainGlobeGroup) {
         const deltaX = e.clientX - prevMouseX;
         const deltaY = e.clientY - prevMouseY;
-        globe.rotation.y += deltaX * 0.006;
-        globe.rotation.x += deltaY * 0.006;
-        wireframeMesh.rotation.y = globe.rotation.y;
-        wireframeMesh.rotation.x = globe.rotation.x;
-        spikeGroup.rotation.y = globe.rotation.y;
-        spikeGroup.rotation.x = globe.rotation.x;
-        arcGroup.rotation.y = globe.rotation.y;
-        arcGroup.rotation.x = globe.rotation.x;
+        mainGlobeGroup.rotation.y += deltaX * 0.006;
+        mainGlobeGroup.rotation.x += deltaY * 0.006;
         prevMouseX = e.clientX;
         prevMouseY = e.clientY;
       }
@@ -202,11 +296,8 @@ export default function Globe3D({
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
 
-      if (isAutoRotate && !isDragging) {
-        globe.rotation.y += 0.003;
-        wireframeMesh.rotation.y += 0.003;
-        spikeGroup.rotation.y += 0.003;
-        arcGroup.rotation.y += 0.003;
+      if (isAutoRotate && !isDragging && mainGlobeGroup) {
+        mainGlobeGroup.rotation.y += 0.003;
       }
 
       renderer.render(scene, camera);
@@ -236,19 +327,8 @@ export default function Globe3D({
   }, [points, arcs, colorScheme, isAutoRotate]);
 
   return (
-    <div className="relative w-full h-[520px] rounded-2xl bg-[#04080e] overflow-hidden border border-slate-800 flex items-center justify-center">
+    <div className="relative w-full h-[540px] rounded-2xl bg-[#04080e] overflow-hidden border border-slate-800 flex items-center justify-center font-mono">
       <div ref={containerRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
-
-      {/* Orbit Hint & Legend Overlay */}
-      <div className="absolute bottom-4 left-4 p-3 rounded-xl bg-[#0d1117]/80 backdrop-blur-md border border-slate-800 text-[10px] font-mono text-slate-300 space-y-1">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>Interactive 3D Earth Sphere • Drag to Orbit / Rotate</span>
-        </div>
-        <div className="text-slate-500">
-          Spike Height = Metric Magnitude • Arcs = Global Flightpaths
-        </div>
-      </div>
     </div>
   );
 }
