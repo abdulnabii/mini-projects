@@ -10,7 +10,15 @@ import {
   ArrowRight,
   Loader2,
   HelpCircle,
+  Mic,
+  MicOff,
+  Flame,
+  DollarSign,
+  Users,
+  AlertTriangle,
+  Clock,
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 interface Props {
   schema: DatabaseSchema;
@@ -29,6 +37,43 @@ const DIALECT_OPTIONS: { id: DatabaseDialect; label: string; icon: string }[] = 
   { id: 'drizzle', label: 'Drizzle ORM', icon: '💧' },
 ];
 
+const CATEGORIZED_PROMPTS = [
+  {
+    category: '💰 Revenue & Sales',
+    icon: DollarSign,
+    prompts: [
+      'Show me the top 10 customers by total revenue in Q1 2026, only from Pakistan with completed orders',
+      'Calculate month-over-month revenue growth rate for the past 6 months',
+      'Which product categories generate more than $20,000 in monthly sales with average rating > 4.5?',
+    ],
+  },
+  {
+    category: '👥 Users & Retention',
+    icon: Users,
+    prompts: [
+      'Find all registered users who created an account in the last 30 days but never placed an order',
+      'Calculate 30-day user retention rate grouped by sign-up country',
+      'List top 5 power users who completed more than 15 transactions this week',
+    ],
+  },
+  {
+    category: '🚨 Risk & Audit',
+    icon: AlertTriangle,
+    prompts: [
+      'Find all flagged transactions over $5,000 in the past 7 days with user full name and wallet currency',
+      'List suspicious orders where checkout total exceeds $1,000 and billing country differs from shipping country',
+    ],
+  },
+  {
+    category: '⚡ Performance Audit',
+    icon: Clock,
+    prompts: [
+      'Show the 5 slowest API endpoints with average latency > 500ms and request volume > 10,000',
+      'Find tenant organizations consuming more than 1,000,000 tokens per week',
+    ],
+  },
+];
+
 export default function QueryInput({
   schema,
   dialect,
@@ -39,6 +84,8 @@ export default function QueryInput({
   const [question, setQuestion] = useState(
     'Show me the top 10 customers by total revenue in Q1 2026, only from Pakistan with completed orders'
   );
+  const [isListening, setIsListening] = useState(false);
+  const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +96,41 @@ export default function QueryInput({
   const handleSelectSample = (sample: string) => {
     setQuestion(sample);
     onGenerate(sample);
+  };
+
+  // Web Speech recognition for voice queries
+  const handleVoiceInput = () => {
+    if (typeof window === 'undefined') return;
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert('Speech Recognition is not supported on this browser. Please type your query.');
+      return;
+    }
+
+    if (isListening) {
+      setIsListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setQuestion(transcript);
+      setIsListening(false);
+      onGenerate(transcript);
+    };
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+
+    recognition.start();
   };
 
   return (
@@ -100,7 +182,22 @@ export default function QueryInput({
               <Zap className="w-3.5 h-3.5 text-amber-400" />
               <span>Ask in Plain English:</span>
             </label>
-            <span className="text-[10px] text-slate-500">{question.length} characters</span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleVoiceInput}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  isListening
+                    ? 'bg-rose-500 text-white animate-pulse'
+                    : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-emerald-400'
+                }`}
+                title="Voice Dictation: Speak your query"
+              >
+                {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+                <span>{isListening ? 'Listening...' : 'Voice Input'}</span>
+              </button>
+              <span className="text-[10px] text-slate-500">{question.length} chars</span>
+            </div>
           </div>
 
           <textarea
@@ -112,28 +209,43 @@ export default function QueryInput({
           />
         </div>
 
-        {/* Sample Prompt Chips */}
-        {schema.sampleQuestions && schema.sampleQuestions.length > 0 && (
-          <div className="space-y-1.5">
-            <span className="text-[10px] text-slate-500 uppercase font-bold flex items-center gap-1">
-              <HelpCircle className="w-3 h-3 text-cyan-400" /> Suggested Schema Questions:
-            </span>
-            <div className="flex items-center gap-2 flex-wrap">
-              {schema.sampleQuestions.map((sq, i) => (
+        {/* Categorized Prompt Explorer Matrix */}
+        <div className="space-y-2 pt-1">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+            {CATEGORIZED_PROMPTS.map((cat, idx) => {
+              const isSelected = activeCategoryIndex === idx;
+              return (
                 <button
-                  key={i}
+                  key={cat.category}
                   type="button"
-                  onClick={() => handleSelectSample(sq)}
-                  className="px-3 py-1 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/40 text-slate-300 hover:text-white text-[11px] transition-all flex items-center gap-1.5 cursor-pointer text-left"
+                  onClick={() => setActiveCategoryIndex(idx)}
+                  className={`px-3 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-slate-800 text-cyan-300 border border-cyan-500/40'
+                      : 'text-slate-500 hover:text-slate-300'
+                  }`}
                 >
-                  <span className="truncate max-w-xs">{sq}</span>
+                  {cat.category}
                 </button>
-              ))}
-            </div>
+              );
+            })}
           </div>
-        )}
 
-        {/* Submit */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {CATEGORIZED_PROMPTS[activeCategoryIndex].prompts.map((sq, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => handleSelectSample(sq)}
+                className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/40 text-slate-300 hover:text-white text-[11px] transition-all flex items-center gap-1.5 cursor-pointer text-left"
+              >
+                <span className="truncate max-w-xs sm:max-w-md">{sq}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Submit Bar */}
         <div className="flex items-center justify-between pt-2 border-t border-slate-800">
           <span className="text-[10px] text-slate-500 hidden sm:inline">
             Translates natural language to typed {dialect.toUpperCase()} queries via Gemini 1.5 Flash

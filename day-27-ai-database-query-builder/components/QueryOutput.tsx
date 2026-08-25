@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { GeneratedQuery } from '@/types';
+import { GeneratedQuery, DatabaseDialect } from '@/types';
+import SqlValidatorBadge from './SqlValidatorBadge';
 import {
   Copy,
   Check,
@@ -14,6 +15,9 @@ import {
   CheckCircle2,
   AlertTriangle,
   Code2,
+  Download,
+  Terminal,
+  FileCode,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -22,6 +26,7 @@ interface Props {
   onExecute: () => void;
   onSave: () => void;
   isExecuting: boolean;
+  onDialectSwitch?: (dialect: DatabaseDialect) => void;
 }
 
 export default function QueryOutput({
@@ -29,6 +34,7 @@ export default function QueryOutput({
   onExecute,
   onSave,
   isExecuting,
+  onDialectSwitch,
 }: Props) {
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -51,6 +57,23 @@ export default function QueryOutput({
     });
   };
 
+  const downloadQueryFile = () => {
+    const ext =
+      queryData.dialect === 'prisma' || queryData.dialect === 'drizzle'
+        ? 'ts'
+        : queryData.dialect === 'mongodb'
+        ? 'js'
+        : 'sql';
+    const blob = new Blob([queryData.query], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `query_${queryData.dialect}_${Date.now()}.${ext}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
   const getComplexityBadge = (c: GeneratedQuery['estimatedComplexity']) => {
     switch (c) {
       case 'LOW':
@@ -64,6 +87,9 @@ export default function QueryOutput({
     }
   };
 
+  // Line numbers generator
+  const lines = queryData.query.split('\n');
+
   return (
     <div className="space-y-6 font-mono">
       {/* Query Card */}
@@ -71,7 +97,7 @@ export default function QueryOutput({
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 text-[10px] font-bold uppercase">
                 {queryData.dialect.toUpperCase()} GENERATED QUERY
               </span>
@@ -100,11 +126,21 @@ export default function QueryOutput({
 
             <button
               type="button"
+              onClick={downloadQueryFile}
+              className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+              title="Download raw query file"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Export</span>
+            </button>
+
+            <button
+              type="button"
               onClick={handleSave}
               className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-amber-300 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <Bookmark className={`w-3.5 h-3.5 ${saved ? 'text-amber-400 fill-amber-400' : ''}`} />
-              <span>{saved ? 'Saved in Library!' : 'Bookmark'}</span>
+              <span>{saved ? 'Saved!' : 'Bookmark'}</span>
             </button>
 
             <button
@@ -114,24 +150,42 @@ export default function QueryOutput({
               className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-300 text-black font-extrabold text-xs transition-all shadow-md shadow-emerald-500/20 flex items-center gap-2 cursor-pointer hover:scale-105"
             >
               <Play className="w-3.5 h-3.5 fill-black" />
-              <span>{isExecuting ? 'Running Query...' : 'Run Query Sandbox'}</span>
+              <span>{isExecuting ? 'Running...' : 'Run Query Sandbox'}</span>
             </button>
           </div>
         </div>
 
-        {/* Code Editor Preview Box */}
-        <div className="relative rounded-2xl bg-[#04080e] border border-slate-800 p-5 overflow-x-auto">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-800/80 mb-3 text-[10px] text-slate-500">
-            <span className="flex items-center gap-1.5">
+        {/* Safety Audit Strip */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 rounded-2xl bg-[#161b22] border border-slate-800">
+          <SqlValidatorBadge dialect={queryData.dialect} hasLimit={true} />
+          <span className="text-[10px] text-slate-500">
+            Est. Latency: <strong className="text-cyan-300">{queryData.executionTimeEstimate || '~28ms'}</strong>
+          </span>
+        </div>
+
+        {/* Code Editor Container with Line Numbers */}
+        <div className="relative rounded-2xl bg-[#04080e] border border-slate-800 overflow-hidden shadow-inner">
+          <div className="flex items-center justify-between px-4 py-2.5 bg-[#0d1117] border-b border-slate-800 text-[10px] text-slate-400">
+            <span className="flex items-center gap-1.5 font-bold">
               <Code2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Formatted {queryData.dialect.toUpperCase()} Syntax</span>
+              <span>{queryData.dialect.toUpperCase()} Code Viewer</span>
             </span>
-            <span>Estimated Latency: {queryData.executionTimeEstimate || '~30ms'}</span>
+            <span>{lines.length} lines • UTF-8</span>
           </div>
 
-          <pre className="text-xs text-emerald-300 font-mono leading-relaxed whitespace-pre-wrap selection:bg-emerald-500/40">
-            {queryData.query}
-          </pre>
+          <div className="flex p-4 overflow-x-auto text-xs font-mono leading-relaxed">
+            {/* Line numbers column */}
+            <div className="select-none text-slate-600 text-right pr-4 border-r border-slate-800/80 mr-4 font-mono">
+              {lines.map((_, i) => (
+                <div key={i}>{i + 1}</div>
+              ))}
+            </div>
+
+            {/* Code column */}
+            <pre className="text-emerald-300 whitespace-pre-wrap selection:bg-emerald-500/30 flex-1">
+              {queryData.query}
+            </pre>
+          </div>
         </div>
 
         {/* 2-Sentence Plain English Explanation Card */}

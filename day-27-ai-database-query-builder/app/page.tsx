@@ -15,6 +15,7 @@ import QueryOutput from '@/components/QueryOutput';
 import ResultTable from '@/components/ResultTable';
 import AutoChart from '@/components/AutoChart';
 import SchemaViewer from '@/components/SchemaViewer';
+import QueryExecutionPlan from '@/components/QueryExecutionPlan';
 import {
   Database,
   Terminal,
@@ -26,6 +27,7 @@ import {
   Table as TableIcon,
   CheckCircle2,
   Code2,
+  Activity,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -33,6 +35,7 @@ export default function QueryStudioPage() {
   const [schemas, setSchemas] = useState<DatabaseSchema[]>(SAMPLE_SCHEMAS);
   const [activeSchema, setActiveSchema] = useState<DatabaseSchema>(SAMPLE_SCHEMAS[0]);
   const [dialect, setDialect] = useState<DatabaseDialect>('postgres');
+  const [activeWorkspaceTab, setActiveWorkspaceTab] = useState<'editor' | 'plan' | 'chart' | 'schema'>('editor');
 
   const [isLoading, setIsLoading] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
@@ -113,6 +116,12 @@ export default function QueryStudioPage() {
       createdAt: new Date().toISOString(),
     };
     saveQuery(newSaved);
+  };
+
+  const handleColumnClick = (tableName: string, columnName: string) => {
+    // Append clicked column name to prompt
+    handleGenerate(`Show me records from ${tableName} with column ${columnName} and calculate aggregates`);
+    setActiveWorkspaceTab('editor');
   };
 
   return (
@@ -203,30 +212,112 @@ export default function QueryStudioPage() {
         isLoading={isLoading}
       />
 
-      {/* Generated Query Output & Optimization Studio */}
-      {generatedQuery && (
-        <QueryOutput
-          queryData={generatedQuery}
-          onExecute={() => handleExecute()}
-          onSave={handleSaveQuery}
-          isExecuting={isExecuting}
-        />
+      {/* Studio View Navigation Tabs */}
+      <div className="flex items-center justify-center">
+        <div className="p-1.5 rounded-2xl bg-[#0d1117] border border-slate-800 flex items-center gap-1.5 max-w-full overflow-x-auto shadow-xl">
+          <button
+            type="button"
+            onClick={() => setActiveWorkspaceTab('editor')}
+            className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+              activeWorkspaceTab === 'editor'
+                ? 'bg-emerald-500 text-black font-black shadow-md'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Code2 className="w-4 h-4" />
+            <span>Generated Query &amp; Table</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveWorkspaceTab('plan')}
+            className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+              activeWorkspaceTab === 'plan'
+                ? 'bg-cyan-500 text-black font-black shadow-md'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Activity className="w-4 h-4" />
+            <span>Execution Plan (EXPLAIN)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveWorkspaceTab('chart')}
+            className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+              activeWorkspaceTab === 'chart'
+                ? 'bg-purple-500 text-black font-black shadow-md'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <BarChart2 className="w-4 h-4" />
+            <span>Data Visualization Studio</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveWorkspaceTab('schema')}
+            className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+              activeWorkspaceTab === 'schema'
+                ? 'bg-amber-500 text-black font-black shadow-md'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Database className="w-4 h-4" />
+            <span>Schema Explorer</span>
+          </button>
+        </div>
+      </div>
+
+      {/* TAB 1: CODE EDITOR & RESULT TABLE */}
+      {activeWorkspaceTab === 'editor' && (
+        <div className="space-y-8 animate-in fade-in duration-200">
+          {generatedQuery && (
+            <QueryOutput
+              queryData={generatedQuery}
+              onExecute={() => handleExecute()}
+              onSave={handleSaveQuery}
+              isExecuting={isExecuting}
+            />
+          )}
+
+          {executionResult && <ResultTable result={executionResult} />}
+        </div>
       )}
 
-      {/* Live Query Execution Results Table */}
-      {executionResult && <ResultTable result={executionResult} />}
+      {/* TAB 2: EXECUTION PLAN & EXPLAIN ANALYZE */}
+      {activeWorkspaceTab === 'plan' && (
+        <div className="animate-in fade-in duration-200">
+          {generatedQuery ? (
+            <QueryExecutionPlan queryData={generatedQuery} />
+          ) : (
+            <p className="text-center text-slate-500 py-12">Please generate a query first.</p>
+          )}
+        </div>
+      )}
 
-      {/* Auto-Generated Data Charts */}
-      {executionResult && <AutoChart result={executionResult} />}
+      {/* TAB 3: AUTO CHARTS & DATA STUDIO */}
+      {activeWorkspaceTab === 'chart' && (
+        <div className="animate-in fade-in duration-200">
+          {executionResult ? (
+            <AutoChart result={executionResult} />
+          ) : (
+            <p className="text-center text-slate-500 py-12">Execute a query to visualize data.</p>
+          )}
+        </div>
+      )}
 
-      {/* Embedded Schema Architecture View */}
-      <div className="pt-4">
-        <SchemaViewer
-          schemas={schemas}
-          activeSchema={activeSchema}
-          onSelectSchema={setActiveSchema}
-        />
-      </div>
+      {/* TAB 4: SCHEMA EXPLORER & CLICK-TO-PROMPT */}
+      {activeWorkspaceTab === 'schema' && (
+        <div className="animate-in fade-in duration-200">
+          <SchemaViewer
+            schemas={schemas}
+            activeSchema={activeSchema}
+            onSelectSchema={setActiveSchema}
+            onColumnClick={handleColumnClick}
+          />
+        </div>
+      )}
     </div>
   );
 }
