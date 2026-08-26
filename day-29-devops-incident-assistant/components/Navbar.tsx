@@ -1,30 +1,45 @@
 'use client';
 
-import { Activity, ShieldAlert, Terminal, GitBranch, Radio, ExternalLink, Cpu, Clock } from 'lucide-react';
+import { Activity, ShieldAlert, Terminal, GitBranch, Radio, ExternalLink, Cpu, Clock, CheckCircle2, Flame, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
+import { Severity } from '@/types';
 
 interface Props {
-  activeSeverity: 'P1' | 'P2' | 'P3' | 'P4';
+  activeSeverity: Severity;
   serviceName: string;
   incidentId: string;
+  isResolved?: boolean;
 }
 
-export default function Navbar({ activeSeverity, serviceName, incidentId }: Props) {
+export default function Navbar({ activeSeverity, serviceName, incidentId, isResolved = false }: Props) {
   const getSeverityStyle = () => {
     switch (activeSeverity) {
       case 'P1':
         return 'bg-rose-500 text-black border-rose-400 font-extrabold';
       case 'P2':
-        return 'bg-amber-500 text-black border-amber-400 font-extrabold';
+        return 'bg-orange-500 text-black border-orange-400 font-extrabold';
       case 'P3':
-        return 'bg-yellow-500 text-black border-yellow-400 font-bold';
+        return 'bg-amber-400 text-black border-amber-300 font-bold';
       default:
-        return 'bg-emerald-500 text-black border-emerald-400 font-bold';
+        return 'bg-cyan-500 text-black border-cyan-400 font-bold';
+    }
+  };
+
+  const getSeverityLabel = () => {
+    switch (activeSeverity) {
+      case 'P1':
+        return 'CRITICAL';
+      case 'P2':
+        return 'HIGH';
+      case 'P3':
+        return 'MEDIUM';
+      default:
+        return 'LOW';
     }
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/[0.08] bg-[#06090e]/90 backdrop-blur-xl font-mono text-xs">
+    <header className="sticky top-0 z-50 border-b border-white/[0.08] bg-[#06090e]/95 backdrop-blur-xl font-mono text-xs">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2.5 sm:px-6">
         {/* Brand Lockup */}
         <div className="flex items-center gap-3">
@@ -44,24 +59,32 @@ export default function Navbar({ activeSeverity, serviceName, incidentId }: Prop
 
           <span className="text-slate-700 hidden md:inline">|</span>
 
-          {/* Active Incident Beacon */}
+          {/* Active Incident Beacon with Dynamic Lifecycle Transition */}
           <div className="hidden md:flex items-center gap-2 text-[11px] text-slate-300">
             <span className={`px-2 py-0.5 rounded text-[10px] ${getSeverityStyle()}`}>
-              {activeSeverity}
+              {activeSeverity} {getSeverityLabel()}
             </span>
             <span className="font-bold text-white uppercase">{incidentId}: {serviceName}</span>
-            <span className="flex items-center gap-1 text-[10px] text-rose-400 font-bold">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
-              TRIAGE IN PROGRESS
-            </span>
+
+            {isResolved ? (
+              <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 font-extrabold text-[10px]">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>RESOLVED / MITIGATED</span>
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 text-[10px] text-rose-400 font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
+                <span>TRIAGE IN PROGRESS</span>
+              </span>
+            )}
           </div>
         </div>
 
         {/* Right Status Meta */}
         <div className="flex items-center gap-3">
           <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#0d121d] border border-white/[0.08] text-[10px] text-slate-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span>PagerDuty / Datadog Sync: <strong className="text-slate-200">Active</strong></span>
+            <span className={`w-1.5 h-1.5 rounded-full ${isResolved ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse'}`} />
+            <span>PagerDuty / Datadog: <strong className="text-slate-200">{isResolved ? 'Stable' : 'Sync Active'}</strong></span>
           </div>
 
           <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#0d121d] border border-white/[0.08] text-[10px] text-slate-300">

@@ -97,7 +97,7 @@ ${postMortem.lessonsLearned.map((l) => `- ${l}`).join('\n')}
                   {postMortem.title}
                 </h3>
                 <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-bold font-mono">
-                  {postMortem.severity}
+                  {postMortem.severity} {postMortem.severity === 'P1' ? 'CRITICAL' : postMortem.severity === 'P2' ? 'HIGH' : postMortem.severity === 'P3' ? 'MEDIUM' : 'LOW'}
                 </span>
               </div>
               <p className="text-[10px] text-slate-400 font-mono">

@@ -251,7 +251,7 @@ export const SAMPLE_INCIDENTS: Incident[] = [
     },
     comms: {
       slackMessage:
-        '⚠️ *INCIDENT ALERT — P2 MAJOR*\n*Service:* `auth-service`\n*Impact:* User login and token refresh degradation (OOMKill Exit 137)\n*Remediation:* Bumping memory limits to 2Gi and rolling back to v3.0.4.',
+        '⚠️ *INCIDENT ALERT — P2 HIGH*\n*Service:* `auth-service`\n*Impact:* User login and token refresh degradation (OOMKill Exit 137)\n*Remediation:* Bumping memory limits to 2Gi and rolling back to v3.0.4.',
       executiveBrief:
         'P2 incident active on user authentication. Engineering has increased container memory allocation and initiated a rollback to restore login stability.',
       statusPageUpdate:

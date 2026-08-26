@@ -12,11 +12,16 @@ import RunbookChecklist from '@/components/RunbookChecklist';
 import DeploymentRadar from '@/components/DeploymentRadar';
 import StakeholderCommsPanel from '@/components/StakeholderComms';
 import PostMortemModal from '@/components/PostMortemModal';
+import WarRoomModal from '@/components/WarRoomModal';
 import { Activity, ShieldAlert, Sparkles, Terminal, FileText, CheckCircle2 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 export default function HomePage() {
   const [incidents, setIncidents] = useState<Incident[]>(SAMPLE_INCIDENTS);
   const [activeIncident, setActiveIncident] = useState<Incident>(SAMPLE_INCIDENTS[0]);
+
+  // Track runbook completion per incident
+  const [completedStepsMap, setCompletedStepsMap] = useState<Record<string, Record<number, boolean>>>({});
 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isGeneratingComms, setIsGeneratingComms] = useState(false);
@@ -24,6 +29,53 @@ export default function HomePage() {
 
   const [postMortem, setPostMortem] = useState<PostMortem | null>(null);
   const [showPostMortemModal, setShowPostMortemModal] = useState(false);
+  const [showWarRoomModal, setShowWarRoomModal] = useState(false);
+
+  // Compute live resolution status
+  const currentCompletedSteps = completedStepsMap[activeIncident.id] || {};
+  const totalSteps = activeIncident.diagnosis.remediationSteps.length;
+  const completedCount = activeIncident.diagnosis.remediationSteps.filter(
+    (s) => currentCompletedSteps[s.step]
+  ).length;
+  const isIncidentResolved = totalSteps > 0 && completedCount === totalSteps;
+
+  const handleToggleStep = (stepNumber: number) => {
+    const nextSteps = {
+      ...currentCompletedSteps,
+      [stepNumber]: !currentCompletedSteps[stepNumber],
+    };
+    const nextMap = { ...completedStepsMap, [activeIncident.id]: nextSteps };
+    setCompletedStepsMap(nextMap);
+
+    const allDone = activeIncident.diagnosis.remediationSteps.every((s) => nextSteps[s.step]);
+    if (allDone) {
+      confetti({
+        particleCount: 45,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#10b981', '#06b6d4', '#f59e0b'],
+      });
+    }
+  };
+
+  const handleMarkStepComplete = (stepNumber: number) => {
+    const nextSteps = {
+      ...currentCompletedSteps,
+      [stepNumber]: true,
+    };
+    const nextMap = { ...completedStepsMap, [activeIncident.id]: nextSteps };
+    setCompletedStepsMap(nextMap);
+
+    const allDone = activeIncident.diagnosis.remediationSteps.every((s) => nextSteps[s.step]);
+    if (allDone) {
+      confetti({
+        particleCount: 45,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#10b981', '#06b6d4', '#f59e0b'],
+      });
+    }
+  };
 
   // Trigger Gemini Root Cause Diagnosis
   const handleRediagnose = async () => {
@@ -136,6 +188,7 @@ export default function HomePage() {
         activeSeverity={activeIncident.severity}
         serviceName={activeIncident.service}
         incidentId={activeIncident.id}
+        isResolved={isIncidentResolved}
       />
 
       <main className="flex-1 space-y-6 py-6 px-3 sm:px-6 max-w-7xl mx-auto w-full">
@@ -166,6 +219,8 @@ export default function HomePage() {
           onRediagnose={handleRediagnose}
           isAnalyzing={isAnalyzing}
           onOpenPostMortem={handleOpenPostMortem}
+          onOpenWarRoom={() => setShowWarRoomModal(true)}
+          isResolved={isIncidentResolved}
         />
 
         {/* 2-Column SRE War-Room Grid Layout */}
@@ -182,6 +237,9 @@ export default function HomePage() {
             <RunbookChecklist
               steps={activeIncident.diagnosis.remediationSteps}
               serviceName={activeIncident.service}
+              completedSteps={currentCompletedSteps}
+              onToggleStep={handleToggleStep}
+              onMarkStepComplete={handleMarkStepComplete}
             />
             <StakeholderCommsPanel
               comms={activeIncident.comms}
@@ -202,6 +260,16 @@ export default function HomePage() {
           onClose={() => setShowPostMortemModal(false)}
         />
       )}
+
+      {/* Safe Simulated War Room Modal */}
+      <WarRoomModal
+        isOpen={showWarRoomModal}
+        onClose={() => setShowWarRoomModal(false)}
+        serviceName={activeIncident.service}
+        severity={activeIncident.severity}
+        incidentId={activeIncident.id}
+        isResolved={isIncidentResolved}
+      />
     </div>
   );
 }
