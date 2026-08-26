@@ -15,6 +15,7 @@ import {
   X,
   Code2,
   AlertTriangle,
+  Lock,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -41,7 +42,7 @@ export default function Navbar({
   useEffect(() => {
     if (!lastDeduction) return;
     setIsFlashing(true);
-    const timer = setTimeout(() => setIsFlashing(false), 1200);
+    const timer = setTimeout(() => setIsFlashing(false), 1400);
     return () => clearTimeout(timer);
   }, [lastDeduction]);
 
@@ -56,7 +57,13 @@ export default function Navbar({
     }
   };
 
-  const isLowCredits = activeOrg.creditsRemaining < 10;
+  // Strictly bound and calculate scoped percentage
+  const scopedTotal = Math.max(1, activeOrg.creditsTotal);
+  const scopedRemaining = Math.min(scopedTotal, Math.max(0, activeOrg.creditsRemaining));
+  const usagePercentage = Math.min(100, Math.max(0, Math.round((scopedRemaining / scopedTotal) * 100)));
+
+  const isZeroCredits = scopedRemaining <= 0;
+  const isLowCredits = usagePercentage <= 10 && scopedRemaining > 0;
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/[0.08] bg-[#06090e]/95 backdrop-blur-xl font-mono text-xs">
@@ -168,30 +175,38 @@ export default function Navbar({
           </button>
         </div>
 
-        {/* Right Status Controls: Live Animated Credit Counter & Mobile Hamburger */}
+        {/* Right Status Controls: Live Scoped Credit Counter & Mobile Hamburger */}
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Animated Credit Meter Badge with Deduction Flash Toast */}
+          {/* Animated Credit Meter Badge with Scoped Capping & Ephemeral Toast */}
           <div className="relative">
             <div
               onClick={() => onChangeView('playground')}
               className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg border text-xs cursor-pointer transition-all ${
                 isFlashing
-                  ? 'bg-amber-500/25 border-amber-400 scale-105 shadow-lg shadow-amber-500/30'
+                  ? 'bg-amber-500/30 border-amber-400 scale-105 shadow-lg shadow-amber-500/30'
+                  : isZeroCredits
+                  ? 'bg-rose-500/15 border-rose-500/40 text-rose-300'
                   : isLowCredits
-                  ? 'bg-amber-500/10 border-amber-500/40 text-amber-300'
+                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-300'
                   : 'bg-[#0d121d] border-white/[0.08] text-slate-300 hover:border-emerald-500/40'
               }`}
               title="Remaining Monthly AI Credits"
             >
-              {isLowCredits ? (
+              {isZeroCredits ? (
+                <Lock className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+              ) : isLowCredits ? (
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               ) : (
                 <Zap className="w-3.5 h-3.5 text-amber-400 fill-amber-400/20 shrink-0" />
               )}
-              <span className={`font-bold font-mono ${isLowCredits ? 'text-amber-400' : 'text-white'}`}>
-                {activeOrg.creditsRemaining}
+              <span
+                className={`font-bold font-mono ${
+                  isZeroCredits ? 'text-rose-400' : isLowCredits ? 'text-amber-400' : 'text-white'
+                }`}
+              >
+                {scopedRemaining}
               </span>
-              <span className="text-slate-500 hidden sm:inline">/ {activeOrg.creditsTotal}</span>
+              <span className="text-slate-500 hidden sm:inline">/ {scopedTotal}</span>
             </div>
 
             {/* Ephemeral deduction toast overlay */}

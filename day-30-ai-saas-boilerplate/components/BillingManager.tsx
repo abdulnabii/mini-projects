@@ -100,7 +100,13 @@ Built by Abdul Nabi
 
           <div className="text-[10px] text-slate-400 pt-1 border-t border-white/[0.06] space-y-1">
             <p>Next billing renewal: {new Date(activeOrg.currentPeriodEnd).toLocaleDateString()}</p>
-            <p>Credits: <strong className="text-white">{activeOrg.creditsRemaining} / {activeOrg.creditsTotal}</strong></p>
+            <p>
+              Credits:{' '}
+              <strong className="text-white">
+                {Math.min(activeOrg.creditsTotal, Math.max(0, activeOrg.creditsRemaining))} /{' '}
+                {activeOrg.creditsTotal}
+              </strong>
+            </p>
           </div>
         </div>
 

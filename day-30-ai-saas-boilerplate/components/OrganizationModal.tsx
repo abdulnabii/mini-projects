@@ -170,6 +170,9 @@ export default function OrganizationModal({
                       <span className="text-[10px] text-slate-500 font-mono">({org.slug})</span>
                     </div>
                     <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">
+                        {Math.min(org.creditsTotal, Math.max(0, org.creditsRemaining))}/{org.creditsTotal} cred
+                      </span>
                       <span className="px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[9px] uppercase font-bold">
                         {org.plan}
                       </span>

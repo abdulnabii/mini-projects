@@ -1,16 +1,28 @@
 import { AIUsageLog, Invoice, Organization, PlanTier } from '@/types';
-import { INITIAL_INVOICES, INITIAL_ORGS } from './sampleData';
+import { INITIAL_INVOICES, INITIAL_ORGS, PLAN_CONFIGS } from './sampleData';
 
-const ORG_STORAGE_KEY = 'saasforge_orgs_v1';
-const ACTIVE_ORG_KEY = 'saasforge_active_org_id_v1';
-const USAGE_LOGS_KEY = 'saasforge_usage_logs_v1';
-const INVOICES_KEY = 'saasforge_invoices_v1';
+const ORG_STORAGE_KEY = 'saasforge_orgs_v2';
+const ACTIVE_ORG_KEY = 'saasforge_active_org_id_v2';
+const USAGE_LOGS_KEY = 'saasforge_usage_logs_v2';
+const INVOICES_KEY = 'saasforge_invoices_v2';
+
+export function sanitizeOrg(org: Organization): Organization {
+  const planCfg = PLAN_CONFIGS.find((p) => p.id === org.plan) || PLAN_CONFIGS[0];
+  const maxCredits = planCfg.creditsPerMonth;
+  return {
+    ...org,
+    creditsTotal: maxCredits,
+    creditsRemaining: Math.min(maxCredits, Math.max(0, org.creditsRemaining)),
+  };
+}
 
 export function getStoredOrganizations(): Organization[] {
   if (typeof window === 'undefined') return INITIAL_ORGS;
   try {
     const raw = localStorage.getItem(ORG_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : INITIAL_ORGS;
+    if (!raw) return INITIAL_ORGS;
+    const parsed: Organization[] = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed.map(sanitizeOrg) : INITIAL_ORGS;
   } catch {
     return INITIAL_ORGS;
   }
@@ -19,7 +31,8 @@ export function getStoredOrganizations(): Organization[] {
 export function saveOrganizations(orgs: Organization[]): void {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem(ORG_STORAGE_KEY, JSON.stringify(orgs));
+    const sanitized = orgs.map(sanitizeOrg);
+    localStorage.setItem(ORG_STORAGE_KEY, JSON.stringify(sanitized));
   } catch (e) {
     console.error('Failed to save organizations:', e);
   }

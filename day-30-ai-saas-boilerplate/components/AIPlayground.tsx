@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AIUsageLog, Organization } from '@/types';
 import {
   Zap,
@@ -29,6 +29,7 @@ interface Props {
   ) => Promise<string>;
   isGenerating: boolean;
   onNavigateToBilling: () => void;
+  lastDeduction?: { amount: number; id: number } | null;
 }
 
 const PERSONA_TEMPLATES = {
@@ -61,6 +62,7 @@ export default function AIPlayground({
   onExecuteAIFeature,
   isGenerating,
   onNavigateToBilling,
+  lastDeduction,
 }: Props) {
   const [selectedFeature, setSelectedFeature] = useState<'COPYWRITER' | 'CODE_GEN' | 'DATA_ANALYST'>(
     'COPYWRITER'
@@ -68,6 +70,7 @@ export default function AIPlayground({
   const [promptInput, setPromptInput] = useState(PERSONA_TEMPLATES.COPYWRITER[0]);
   const [outputResult, setOutputResult] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isCounterFlashing, setIsCounterFlashing] = useState(false);
 
   const [lastTelemetry, setLastTelemetry] = useState<{
     inputTokens: number;
@@ -76,10 +79,23 @@ export default function AIPlayground({
     latencyMs: number;
   } | null>(null);
 
+  // Credit Deduction Feedback Animation
+  useEffect(() => {
+    if (!lastDeduction) return;
+    setIsCounterFlashing(true);
+    const timer = setTimeout(() => setIsCounterFlashing(false), 1400);
+    return () => clearTimeout(timer);
+  }, [lastDeduction]);
+
+  // Strictly bound and calculate scoped percentage
+  const scopedTotal = Math.max(1, activeOrg.creditsTotal);
+  const scopedRemaining = Math.min(scopedTotal, Math.max(0, activeOrg.creditsRemaining));
+  const usagePercentage = Math.min(100, Math.max(0, Math.round((scopedRemaining / scopedTotal) * 100)));
+
   const requiredCredits = FEATURE_COSTS[selectedFeature];
-  const isZeroCredits = activeOrg.creditsRemaining <= 0;
-  const isInsufficientCredits = activeOrg.creditsRemaining < requiredCredits;
-  const isLowCredits = activeOrg.creditsRemaining > 0 && activeOrg.creditsRemaining < 10;
+  const isZeroCredits = scopedRemaining <= 0;
+  const isInsufficientCredits = scopedRemaining < requiredCredits;
+  const isLowCredits = usagePercentage <= 10 && scopedRemaining > 0;
 
   const handleSelectPersona = (feature: 'COPYWRITER' | 'CODE_GEN' | 'DATA_ANALYST') => {
     setSelectedFeature(feature);
@@ -120,10 +136,6 @@ export default function AIPlayground({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const creditPercentage = Math.round(
-    (activeOrg.creditsRemaining / Math.max(1, activeOrg.creditsTotal)) * 100
-  );
-
   return (
     <div className="space-y-6 font-mono text-xs text-slate-300">
       {/* Visual Proof Point Badge */}
@@ -137,13 +149,13 @@ export default function AIPlayground({
         </span>
       </div>
 
-      {/* Low Credits Warning Banner */}
+      {/* Low Credits Warning Banner (Under 10% remaining) */}
       {isLowCredits && (
         <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/40 flex items-center justify-between gap-3 text-amber-300 animate-pulse">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
             <span className="font-bold text-xs">
-              Low AI Credit Allocation: Only {activeOrg.creditsRemaining} credits remaining in your {activeOrg.plan.toUpperCase()} tier quota.
+              Low Credits Warning: Only {scopedRemaining} credits ({usagePercentage}%) remaining in your {activeOrg.plan.toUpperCase()} tier quota.
             </span>
           </div>
           <button
@@ -156,17 +168,17 @@ export default function AIPlayground({
         </div>
       )}
 
-      {/* Insufficient / Blocked Credits Alert Banner */}
+      {/* Insufficient / Blocked Credits Alert Banner (0 Balance) */}
       {isZeroCredits && (
         <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/40 flex items-center justify-between gap-3 text-rose-300">
           <div className="flex items-center gap-2.5">
             <Lock className="w-5 h-5 text-rose-400 shrink-0" />
             <div className="space-y-0.5">
               <span className="font-bold text-xs text-white">
-                Monthly AI Credit Quota Exhausted (0 Credits Remaining)
+                Monthly AI Credit Quota Exhausted ({scopedRemaining} / {scopedTotal} Credits Available)
               </span>
               <p className="text-[10px] text-slate-400 prose-text">
-                All AI inference requests are currently blocked. Upgrade to Pro ($19/mo) to unlock 750 credits instantly.
+                All inference requests are currently blocked. Upgrade to Pro ($19/mo) to unlock 750 credits immediately.
               </p>
             </div>
           </div>
@@ -175,15 +187,23 @@ export default function AIPlayground({
             onClick={onNavigateToBilling}
             className="px-4 py-2 rounded-lg bg-emerald-500 text-black font-extrabold hover:bg-emerald-400 transition-all cursor-pointer shrink-0 font-mono text-xs shadow-lg shadow-emerald-500/20"
           >
-            Upgrade to Pro (750 Credits) →
+            Upgrade Plan (Replenish Credits) →
           </button>
         </div>
       )}
 
-      {/* 1. Credit Quota & Telemetry Header */}
+      {/* 1. Credit Quota & Telemetry Header with Real Scoped Visual Cap */}
       <div className="p-4 rounded-xl bg-[#090d16] border border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl sre-card">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+          <div
+            className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+              isZeroCredits
+                ? 'bg-rose-500/10 border border-rose-500/30 text-rose-400'
+                : isLowCredits
+                ? 'bg-amber-500/10 border border-amber-500/30 text-amber-400'
+                : 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
+            }`}
+          >
             <Zap className="w-4 h-4" />
           </div>
           <div>
@@ -191,27 +211,60 @@ export default function AIPlayground({
               {activeOrg.name} — Quota Telemetry
             </h3>
             <p className="text-[10px] text-slate-400 font-mono">
-              Plan: <strong className="text-white uppercase">{activeOrg.plan}</strong> • Resets on {new Date(activeOrg.currentPeriodEnd).toLocaleDateString()}
+              Plan: <strong className="text-white uppercase">{activeOrg.plan}</strong> • Stated Cap: <strong className="text-slate-200">{scopedTotal} Credits</strong> • Resets: {new Date(activeOrg.currentPeriodEnd).toLocaleDateString()}
             </p>
           </div>
         </div>
 
+        {/* Real-time Meter with Deduction Toast */}
         <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-          <div className="text-right space-y-1">
-            <div className="flex items-center justify-end gap-1.5 font-bold text-xs">
-              <span className={isLowCredits ? 'text-amber-400' : 'text-emerald-400'}>
-                {activeOrg.creditsRemaining}
+          <div className="text-right space-y-1 relative">
+            {/* Inline floating deduction badge */}
+            {isCounterFlashing && lastDeduction && (
+              <span className="absolute -top-5 right-0 px-2 py-0.5 rounded bg-amber-500 text-black font-extrabold text-[9px] font-mono shadow-lg animate-bounce">
+                -{lastDeduction.amount} credits
               </span>
-              <span className="text-slate-500">/ {activeOrg.creditsTotal} Credits</span>
+            )}
+
+            <div
+              className={`flex items-center justify-end gap-1.5 font-bold text-xs transition-all ${
+                isCounterFlashing ? 'scale-105 text-amber-400' : ''
+              }`}
+            >
+              <span
+                className={
+                  isZeroCredits
+                    ? 'text-rose-400 font-bold'
+                    : isLowCredits
+                    ? 'text-amber-400 font-bold'
+                    : 'text-emerald-400'
+                }
+              >
+                {scopedRemaining}
+              </span>
+              <span className="text-slate-500">/ {scopedTotal} Credits</span>
+              <span className="text-[10px] text-slate-400 font-normal">({usagePercentage}%)</span>
             </div>
-            <div className="w-32 h-1.5 bg-[#04080e] rounded-full overflow-hidden border border-white/[0.08]">
+
+            {/* Visual Quota Progress Bar */}
+            <div
+              className={`w-36 h-2 rounded-full overflow-hidden border ${
+                isZeroCredits
+                  ? 'bg-[#14080a] border-rose-500/50'
+                  : isLowCredits
+                  ? 'bg-[#140e08] border-amber-500/40'
+                  : 'bg-[#04080e] border-white/[0.08]'
+              }`}
+            >
               <div
-                className={`h-full rounded-full transition-all duration-300 ${
-                  isLowCredits
-                    ? 'bg-amber-400'
+                className={`h-full rounded-full transition-all duration-500 ${
+                  isZeroCredits
+                    ? 'bg-rose-500 shadow-sm shadow-rose-500/50'
+                    : isLowCredits
+                    ? 'bg-amber-400 shadow-sm shadow-amber-400/50'
                     : 'bg-gradient-to-r from-amber-400 to-emerald-400'
                 }`}
-                style={{ width: `${creditPercentage}%` }}
+                style={{ width: `${usagePercentage}%` }}
               />
             </div>
           </div>
@@ -317,7 +370,7 @@ export default function AIPlayground({
             {isInsufficientCredits ? (
               <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-center space-y-2">
                 <p className="text-rose-400 font-bold text-[11px]">
-                  Requires {requiredCredits} credits ({activeOrg.creditsRemaining} available)
+                  Requires {requiredCredits} credits ({scopedRemaining} available in quota)
                 </p>
                 <button
                   type="button"

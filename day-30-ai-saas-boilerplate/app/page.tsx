@@ -52,7 +52,7 @@ export default function HomePage() {
   const [showOrgModal, setShowOrgModal] = useState(false);
   const [showDevModal, setShowDevModal] = useState(false);
 
-  // Initialize from LocalStorage
+  // Initialize from LocalStorage with plan validation
   useEffect(() => {
     const savedOrgs = getStoredOrganizations();
     const savedActiveId = getStoredActiveOrgId();
@@ -68,7 +68,7 @@ export default function HomePage() {
   const activeOrg =
     organizations.find((o) => o.id === activeOrgId) || organizations[0] || INITIAL_ORGS[0];
 
-  // Handle plan upgrade/change
+  // Handle plan upgrade/change with strict quota capping
   const handleUpgradePlan = (targetPlan: PlanTier, billingCycle: 'monthly' | 'yearly') => {
     const planCfg = PLAN_CONFIGS.find((p) => p.id === targetPlan) || PLAN_CONFIGS[0];
 
@@ -79,7 +79,7 @@ export default function HomePage() {
           plan: targetPlan,
           billingCycle,
           creditsTotal: planCfg.creditsPerMonth,
-          creditsRemaining: Math.max(org.creditsRemaining, planCfg.creditsPerMonth),
+          creditsRemaining: planCfg.creditsPerMonth,
         };
       }
       return org;
@@ -129,11 +129,14 @@ export default function HomePage() {
 
       const result = data.result;
 
-      // Deduct credits
+      // Deduct credits with strict bounds checking
       const updatedOrgs = organizations.map((org) => {
         if (org.id === activeOrg.id) {
           const newRemaining = Math.max(0, org.creditsRemaining - result.creditsUsed);
-          return { ...org, creditsRemaining: newRemaining };
+          return {
+            ...org,
+            creditsRemaining: Math.min(org.creditsTotal, newRemaining),
+          };
         }
         return org;
       });
@@ -141,7 +144,7 @@ export default function HomePage() {
       setOrganizations(updatedOrgs);
       saveOrganizations(updatedOrgs);
 
-      // Trigger visual feedback flash on header credit counter
+      // Trigger visual feedback flash on header and studio credit counter
       setLastCreditDeduction({
         amount: result.creditsUsed,
         id: Date.now(),
@@ -180,7 +183,7 @@ export default function HomePage() {
     }
   };
 
-  // Create new organization
+  // Create new organization with strict Free tier capping (50 credits)
   const handleCreateOrg = (name: string, slug: string) => {
     const newOrg: Organization = {
       id: `org-${Date.now()}`,
@@ -266,6 +269,7 @@ export default function HomePage() {
             onExecuteAIFeature={handleExecuteAIFeature}
             isGenerating={isGeneratingAI}
             onNavigateToBilling={() => setActiveView('billing')}
+            lastDeduction={lastCreditDeduction}
           />
         )}
 
