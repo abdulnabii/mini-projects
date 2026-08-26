@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Bot, User, Send, Sparkles, HelpCircle, MessageSquare } from 'lucide-react';
+import { Bot, User, Send, Sparkles, HelpCircle, Mic, MicOff, Copy, Check } from 'lucide-react';
 
 interface Props {
   onAskQuestion: (q: string) => Promise<string>;
@@ -19,11 +19,47 @@ export default function AIAdvisorChat({ onAskQuestion, isLoading }: Props) {
   const [messages, setMessages] = useState<{ sender: 'user' | 'advisor'; text: string; time: string }[]>([
     {
       sender: 'advisor',
-      text: 'Hello! I am your AI Certified Financial Planner. I have full visibility into your monthly income, expenses, FIRE target, and debt payoff schedule. How can I help optimize your financial growth today?',
+      text: 'Hello! I am your AI Certified Financial Planner. I have full visibility into your monthly income, expenses, FIRE target, and debt payoff schedule. How can I help optimize your financial independence today?',
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
   const [inputQuestion, setInputQuestion] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+
+  // Web Speech Voice Dictation
+  const handleVoiceInput = () => {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      alert('Voice dictation is not supported in this browser.');
+      return;
+    }
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      if (transcript) {
+        setInputQuestion(transcript);
+        handleSend(transcript);
+      }
+    };
+
+    recognition.start();
+  };
+
+  const handleCopy = (text: string, idx: number) => {
+    navigator.clipboard.writeText(text);
+    setCopiedIdx(idx);
+    setTimeout(() => setCopiedIdx(null), 2000);
+  };
 
   const handleSend = async (qText?: string) => {
     const question = qText || inputQuestion;
@@ -50,40 +86,38 @@ export default function AIAdvisorChat({ onAskQuestion, isLoading }: Props) {
   };
 
   return (
-    <div className="bg-[#0d1117] border border-amber-500/30 rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl font-mono text-xs text-slate-300 flex flex-col min-h-[500px]">
+    <div className="bg-[#0d1117] border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-4 shadow-2xl font-mono text-xs text-slate-300 flex flex-col min-h-[500px]">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-800 pb-4 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-400 via-emerald-500 to-indigo-600 p-0.5 shadow-lg">
-            <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-              <Bot className="w-5 h-5 text-amber-400" />
-            </div>
+          <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <Bot className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="font-bold text-white text-base font-outfit">AI Financial Advisor Q&amp;A</h3>
-            <p className="text-xs text-emerald-400">Contextual Portfolio Intelligence Active</p>
+            <h3 className="font-bold text-white text-sm font-mono">AI Certified Financial Planner (CFP) Q&amp;A</h3>
+            <p className="text-xs text-slate-400 prose-text">Grounds recommendations directly against your real portfolio numbers</p>
           </div>
         </div>
 
-        <span className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] font-bold">
-          Gemini 1.5 CFP
+        <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold font-mono">
+          GEMINI 1.5 CFP
         </span>
       </div>
 
       {/* Quick Question Chips */}
-      <div className="space-y-2 shrink-0">
-        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-          <HelpCircle className="w-3 h-3 text-amber-400" />
-          Suggested Advisory Prompts
+      <div className="space-y-1.5 shrink-0">
+        <label className="text-[10px] font-bold text-slate-400 uppercase font-mono flex items-center gap-1">
+          <HelpCircle className="w-3 h-3 text-emerald-400" />
+          <span>Recommended Financial Prompts:</span>
         </label>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {QUICK_QUESTIONS.map((qq, idx) => (
             <button
               key={idx}
               type="button"
               onClick={() => handleSend(qq)}
               disabled={isLoading}
-              className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-amber-500/40 text-slate-300 hover:text-white transition-all text-[11px] disabled:opacity-50 text-left"
+              className="px-2.5 py-1 rounded-lg bg-[#161b22] border border-slate-800 hover:border-emerald-500/40 text-slate-300 hover:text-white transition-all text-[11px] disabled:opacity-50 text-left font-mono cursor-pointer"
             >
               {qq}
             </button>
@@ -91,60 +125,87 @@ export default function AIAdvisorChat({ onAskQuestion, isLoading }: Props) {
         </div>
       </div>
 
-      {/* Messages thread */}
-      <div className="flex-1 overflow-y-auto space-y-4 pr-1 max-h-[360px] min-h-[220px]">
+      {/* Messages Thread */}
+      <div className="flex-1 overflow-y-auto space-y-3 pr-1 max-h-[360px] min-h-[220px]">
         {messages.map((m, idx) => (
-          <div key={idx} className={`flex items-start gap-3 ${m.sender === 'user' ? 'flex-row-reverse' : ''}`}>
+          <div key={idx} className={`flex items-start gap-2.5 ${m.sender === 'user' ? 'flex-row-reverse' : ''}`}>
             <div
-              className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 font-bold ${
-                m.sender === 'user' ? 'bg-purple-600 text-white' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+              className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 font-bold ${
+                m.sender === 'user' ? 'bg-purple-600 text-white' : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
               }`}
             >
-              {m.sender === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+              {m.sender === 'user' ? <User className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
             </div>
 
             <div
-              className={`p-4 rounded-2xl max-w-[85%] leading-relaxed ${
+              className={`p-3.5 rounded-xl max-w-[85%] leading-relaxed ${
                 m.sender === 'user'
-                  ? 'bg-purple-950/60 border border-purple-500/30 text-purple-100'
-                  : 'bg-slate-950 border border-slate-800 text-slate-200'
+                  ? 'bg-purple-950/40 border border-purple-500/30 text-purple-100'
+                  : 'bg-[#161b22] border border-slate-800 text-slate-200'
               }`}
             >
-              <p className="whitespace-pre-wrap">{m.text}</p>
+              <div className="flex items-center justify-between gap-4 border-b border-slate-800/60 pb-1 mb-1.5 text-[9px] text-slate-500 font-mono">
+                <span>{m.sender === 'user' ? 'You' : 'AI Financial Planner'}</span>
+                {m.sender === 'advisor' && (
+                  <button
+                    type="button"
+                    onClick={() => handleCopy(m.text, idx)}
+                    className="hover:text-emerald-400 flex items-center gap-1 cursor-pointer"
+                  >
+                    {copiedIdx === idx ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    <span>{copiedIdx === idx ? 'Copied' : 'Copy'}</span>
+                  </button>
+                )}
+              </div>
+
+              <p className="whitespace-pre-wrap text-xs prose-text">{m.text}</p>
               <span className="text-[9px] text-slate-500 mt-1 block text-right font-mono">{m.time}</span>
             </div>
           </div>
         ))}
 
         {isLoading && (
-          <div className="flex items-center gap-2 text-slate-400 text-xs p-2">
-            <Sparkles className="w-4 h-4 text-amber-400 animate-spin" />
-            <span>AI Certified Financial Planner is calculating recommendations...</span>
+          <div className="flex items-center gap-2 text-slate-400 text-xs p-2 font-mono">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-spin" />
+            <span>AI Certified Financial Planner is computing recommendations...</span>
           </div>
         )}
       </div>
 
-      {/* Input box */}
+      {/* Input Form */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           handleSend();
         }}
-        className="flex items-center gap-2 pt-3 border-t border-slate-800 shrink-0"
+        className="flex items-center gap-2 pt-2 border-t border-slate-800 shrink-0 font-mono"
       >
         <input
           type="text"
           value={inputQuestion}
           onChange={(e) => setInputQuestion(e.target.value)}
-          placeholder="Ask a question about your portfolio, debt, or index funds..."
-          className="flex-1 px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-amber-500 font-mono"
+          placeholder="Ask a question about debt payoff, FIRE target, or investment allocation..."
+          className="flex-1 px-3.5 py-2.5 rounded-lg bg-[#161b22] border border-slate-800 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 font-mono"
         />
+
+        <button
+          type="button"
+          onClick={handleVoiceInput}
+          className={`p-2.5 rounded-lg border text-slate-300 hover:text-white transition-all cursor-pointer ${
+            isListening ? 'bg-rose-500 text-white animate-pulse border-rose-400' : 'bg-[#161b22] border-slate-800'
+          }`}
+          title="Voice dictation input"
+        >
+          {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5 text-emerald-400" />}
+        </button>
+
         <button
           type="submit"
           disabled={!inputQuestion.trim() || isLoading}
-          className="p-3 rounded-xl bg-amber-400 text-black font-extrabold hover:bg-amber-300 transition-all disabled:opacity-50"
+          className="px-4 py-2.5 rounded-lg bg-emerald-500 text-black font-bold hover:bg-emerald-400 transition-all disabled:opacity-50 cursor-pointer font-mono text-xs flex items-center gap-1.5"
         >
-          <Send className="w-4 h-4" />
+          <Send className="w-3.5 h-3.5" />
+          <span>Ask</span>
         </button>
       </form>
     </div>

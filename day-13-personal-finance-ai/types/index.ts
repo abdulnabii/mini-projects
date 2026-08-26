@@ -1,4 +1,4 @@
-export type Currency = 'PKR' | 'USD';
+export type Currency = 'USD' | 'EUR' | 'GBP' | 'PKR' | 'INR' | 'CAD';
 
 export type TransactionCategory =
   | 'Income'
@@ -37,7 +37,12 @@ export interface DebtPayoffPlan {
   payoffMonths: number;
   totalInterestPaid: number;
   interestSavedVsMinimum: number;
-  schedule: { month: number; totalRemainingBalance: number; interestPaidThisMonth: number }[];
+  schedule: {
+    month: number;
+    totalRemainingBalance: number;
+    interestPaidThisMonth: number;
+    targetDebtName?: string;
+  }[];
 }
 
 export interface DebtOptimizationResult {
@@ -50,13 +55,17 @@ export interface DebtOptimizationResult {
 }
 
 export interface FIREAnalysis {
-  fireNumber: number; // 25 * annual expenses
+  fireNumber: number; // 25 * annual expenses (Traditional 4% rule)
+  leanFIRENumber: number; // 75% of expenses
+  fatFIRENumber: number; // 140% of expenses
+  coastFIRENumber: number; // Required today to hit retirement age without new contributions
   annualExpenses: number;
   currentInvestments: number;
   monthlySavingsRate: number; // 0.0 to 1.0
   annualSavings: number;
   yearsToFIRE: number;
   expectedFIREDate: string;
+  progressPercent: number;
   scenarioTrajectories: {
     savingsRateIncreasePct: number; // e.g. +5%
     newYearsToFIRE: number;
@@ -71,6 +80,9 @@ export interface FinancialHealthGrade {
   summaryParagraphs: string[];
   urgentActions: { title: string; detail: string; priority: 'HIGH' | 'MEDIUM' | 'LOW' }[];
   burnRateMonths: number; // emergency fund runway in months
+  savingsScore: number; // 0-100
+  debtScore: number; // 0-100
+  diversificationScore: number; // 0-100
 }
 
 export interface FinancialSummary {
@@ -81,5 +93,9 @@ export interface FinancialSummary {
   totalAssets: number;
   totalLiabilities: number;
   netWorth: number;
+  cashAssets: number;
+  investmentAssets: number;
+  realEstateAssets?: number;
   categoryBreakdown: { category: TransactionCategory; amount: number; percentage: number }[];
+  monthlyForecast: { month: string; projectedNetWorth: number; projectedSavings: number }[];
 }

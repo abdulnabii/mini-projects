@@ -1,8 +1,26 @@
 'use client';
 
+import { useState } from 'react';
 import { Currency, FinancialHealthGrade, FinancialSummary } from '@/types';
 import { formatCurrency } from '@/lib/storage';
-import { Wallet, DollarSign, TrendingUp, TrendingDown, ShieldAlert, Sparkles, PieChart, ArrowUpRight, ArrowDownRight, CheckCircle2 } from 'lucide-react';
+import {
+  Wallet,
+  TrendingUp,
+  ShieldAlert,
+  Sparkles,
+  PieChart,
+  ArrowUpRight,
+  ArrowDownRight,
+  CheckCircle2,
+  Calendar,
+  Layers,
+  Download,
+  Check,
+  Award,
+  Globe,
+  Sliders,
+} from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 interface Props {
   summary: FinancialSummary;
@@ -12,7 +30,24 @@ interface Props {
   onToggleCurrency: (c: Currency) => void;
 }
 
-export default function FinancialOverview({ summary, narrative, isLoadingNarrative, currency, onToggleCurrency }: Props) {
+const CURRENCIES: { code: Currency; label: string; symbol: string }[] = [
+  { code: 'USD', label: 'US Dollar', symbol: '$' },
+  { code: 'EUR', label: 'Euro', symbol: '€' },
+  { code: 'GBP', label: 'British Pound', symbol: '£' },
+  { code: 'PKR', label: 'Pakistani Rupee', symbol: 'Rs.' },
+  { code: 'INR', label: 'Indian Rupee', symbol: '₹' },
+  { code: 'CAD', label: 'Canadian Dollar', symbol: 'CA$' },
+];
+
+export default function FinancialOverview({
+  summary,
+  narrative,
+  isLoadingNarrative,
+  currency,
+  onToggleCurrency,
+}: Props) {
+  const [copiedReport, setCopiedReport] = useState(false);
+
   const getGradeColor = (g: string) => {
     if (g.startsWith('A')) return 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10';
     if (g.startsWith('B')) return 'text-teal-400 border-teal-500/30 bg-teal-500/10';
@@ -22,149 +57,205 @@ export default function FinancialOverview({ summary, narrative, isLoadingNarrati
 
   const fmt = (amt: number) => formatCurrency(amt, currency);
 
+  const exportFinancialReport = () => {
+    const reportText = `# 📊 WealthPulse.AI — Comprehensive Financial Health Report
+Generated: ${new Date().toLocaleDateString()}
+Primary Currency: ${currency}
+
+## 1. Executive Summary
+- Net Worth: ${fmt(summary.netWorth)}
+- Total Assets: ${fmt(summary.totalAssets)} (Cash: ${fmt(summary.cashAssets)}, Investments: ${fmt(summary.investmentAssets)})
+- Total Liabilities: ${fmt(summary.totalLiabilities)}
+- Monthly Net Cashflow: ${fmt(summary.monthlyIncome)} Income - ${fmt(summary.monthlyExpenses)} Expenses = ${fmt(summary.monthlySavings)}/mo (${(summary.savingsRate * 100).toFixed(1)}% Savings Rate)
+
+## 2. CFP Diagnostic Grade: ${narrative?.grade || 'A'}
+"${narrative?.headline || 'Strong wealth building trajectory with high savings cadence.'}"
+
+## 3. Priority Action Items
+${narrative?.urgentActions?.map((a, i) => `${i + 1}. [${a.priority}] ${a.title}: ${a.detail}`).join('\n') || '1. Continue consistent index fund accumulation.'}
+
+---
+Built with WealthPulse.AI by Abdul Nabi
+`;
+
+    navigator.clipboard.writeText(reportText);
+    setCopiedReport(true);
+    setTimeout(() => setCopiedReport(false), 2000);
+    confetti({
+      particleCount: 25,
+      spread: 60,
+      origin: { y: 0.7 },
+      colors: ['#10b981', '#f59e0b'],
+    });
+  };
+
   return (
-    <div className="space-y-8 font-mono text-xs text-slate-300">
-      {/* Top Header Controls: Currency Selector Switch */}
-      <div className="flex items-center justify-between bg-[#0d1117] border border-amber-500/20 px-5 py-3 rounded-2xl">
+    <div className="space-y-6 font-mono text-xs text-slate-300">
+      {/* Top Header Bar: Multi-Currency Switcher & 1-Click Export */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-2xl bg-[#0d1117] border border-slate-800 shadow-xl">
         <div className="flex items-center gap-2">
-          <span className="text-slate-400 font-bold text-xs">Primary Display Currency:</span>
-          <span className="text-amber-400 font-bold text-xs">{currency === 'PKR' ? 'Pakistani Rupee (Rs. / PKR)' : 'US Dollar ($ / USD)'}</span>
+          <Globe className="w-4 h-4 text-emerald-400" />
+          <span className="text-slate-400 font-bold text-xs uppercase font-mono">
+            Display Currency:
+          </span>
+          <div className="flex items-center gap-1 flex-wrap p-0.5 rounded-xl bg-[#161b22] border border-slate-800">
+            {CURRENCIES.map((c) => (
+              <button
+                key={c.code}
+                type="button"
+                onClick={() => onToggleCurrency(c.code)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
+                  currency === c.code
+                    ? 'bg-emerald-500 text-black font-bold shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <span>{c.code} ({c.symbol})</span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
-          <button
-            type="button"
-            onClick={() => onToggleCurrency('PKR')}
-            className={`px-3 py-1 rounded-lg font-bold transition-all text-xs ${
-              currency === 'PKR' ? 'bg-amber-400 text-black shadow-md' : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            PKR (Rs.)
-          </button>
-          <button
-            type="button"
-            onClick={() => onToggleCurrency('USD')}
-            className={`px-3 py-1 rounded-lg font-bold transition-all text-xs ${
-              currency === 'USD' ? 'bg-amber-400 text-black shadow-md' : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            USD ($)
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={exportFinancialReport}
+          className="px-3.5 py-1.5 rounded-lg bg-[#161b22] border border-slate-800 hover:border-emerald-500/40 text-slate-300 hover:text-white text-xs font-mono font-medium transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+        >
+          {copiedReport ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Download className="w-3.5 h-3.5 text-emerald-400" />}
+          <span>{copiedReport ? 'Report Copied to Clipboard!' : 'Export Financial Health Report'}</span>
+        </button>
       </div>
 
-      {/* 1. Net Worth & Cash Flow Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* 1. Core Financial Metric Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         {/* Net Worth */}
-        <div className="p-5 rounded-3xl bg-[#0d1117] border border-amber-500/30 space-y-2 shadow-xl shadow-amber-500/5">
+        <div className="p-4 rounded-2xl bg-[#0d1117] border border-emerald-500/30 space-y-1.5 shadow-xl hover:border-emerald-500/60 transition-colors">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Net Worth</span>
-            <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-              <Wallet className="w-4 h-4" />
+            <span className="text-[10px] font-bold text-slate-400 uppercase font-mono">
+              Total Net Worth
+            </span>
+            <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+              <Wallet className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-black text-white font-outfit">{fmt(summary.netWorth)}</p>
-          <div className="flex items-center gap-2 text-[10px] text-slate-500 pt-1 border-t border-slate-800">
+          <p className="text-2xl font-bold text-white font-mono">{fmt(summary.netWorth)}</p>
+          <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800">
             <span>Assets: <strong className="text-emerald-400">{fmt(summary.totalAssets)}</strong></span>
-            <span>Liabilities: <strong className="text-rose-400">{fmt(summary.totalLiabilities)}</strong></span>
+            <span>Debts: <strong className="text-rose-400">{fmt(summary.totalLiabilities)}</strong></span>
           </div>
         </div>
 
         {/* Monthly Income */}
-        <div className="p-5 rounded-3xl bg-[#0d1117] border border-slate-800 space-y-2">
+        <div className="p-4 rounded-2xl bg-[#0d1117] border border-slate-800 space-y-1.5 hover:border-slate-700 transition-colors">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Monthly Income</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-              <ArrowUpRight className="w-4 h-4" />
+            <span className="text-[10px] font-bold text-slate-400 uppercase font-mono">
+              Monthly Inflow
+            </span>
+            <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+              <ArrowUpRight className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-black text-emerald-400 font-outfit">{fmt(summary.monthlyIncome)}</p>
-          <p className="text-[10px] text-slate-500 pt-1 border-t border-slate-800">Primary Cash Flow Generation</p>
+          <p className="text-2xl font-bold text-emerald-400 font-mono">{fmt(summary.monthlyIncome)}</p>
+          <p className="text-[10px] text-slate-500 pt-1 border-t border-slate-800">
+            Salary &amp; Capital Inflow
+          </p>
         </div>
 
         {/* Monthly Expenses */}
-        <div className="p-5 rounded-3xl bg-[#0d1117] border border-slate-800 space-y-2">
+        <div className="p-4 rounded-2xl bg-[#0d1117] border border-slate-800 space-y-1.5 hover:border-slate-700 transition-colors">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Monthly Burn Rate</span>
-            <div className="w-8 h-8 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
-              <ArrowDownRight className="w-4 h-4" />
+            <span className="text-[10px] font-bold text-slate-400 uppercase font-mono">
+              Monthly Burn Rate
+            </span>
+            <div className="w-7 h-7 rounded-lg bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
+              <ArrowDownRight className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-black text-rose-400 font-outfit">{fmt(summary.monthlyExpenses)}</p>
-          <p className="text-[10px] text-slate-500 pt-1 border-t border-slate-800">Total Fixed &amp; Discretionary Outflow</p>
+          <p className="text-2xl font-bold text-rose-400 font-mono">{fmt(summary.monthlyExpenses)}</p>
+          <p className="text-[10px] text-slate-500 pt-1 border-t border-slate-800">
+            Fixed &amp; Discretionary Outflow
+          </p>
         </div>
 
         {/* Savings Rate */}
-        <div className="p-5 rounded-3xl bg-[#0d1117] border border-slate-800 space-y-2">
+        <div className="p-4 rounded-2xl bg-[#0d1117] border border-slate-800 space-y-1.5 hover:border-slate-700 transition-colors">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Savings Rate</span>
-            <div className="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
-              <TrendingUp className="w-4 h-4" />
+            <span className="text-[10px] font-bold text-slate-400 uppercase font-mono">
+              Savings Rate
+            </span>
+            <div className="w-7 h-7 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
+              <TrendingUp className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-black text-purple-400 font-outfit">{(summary.savingsRate * 100).toFixed(1)}%</p>
+          <p className="text-2xl font-bold text-purple-400 font-mono">
+            {(summary.savingsRate * 100).toFixed(1)}%
+          </p>
           <p className="text-[10px] text-slate-500 pt-1 border-t border-slate-800">
-            Net Savings: <strong className="text-purple-300">{fmt(summary.monthlySavings)}/mo</strong>
+            Invested: <strong className="text-purple-300">{fmt(summary.monthlySavings)}/mo</strong>
           </p>
         </div>
       </div>
 
-      {/* 2. AI Financial Review Narrative & Grade */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-[#0d1117] border border-amber-500/30 space-y-6 shadow-2xl">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+      {/* 2. AI Certified Financial Planner Diagnostic Narrative */}
+      <div className="p-6 rounded-2xl bg-[#0d1117] border border-slate-800 space-y-5 shadow-xl">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-              <Sparkles className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+              <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-bold text-white text-base font-outfit">AI Certified Financial Planner Review</h3>
-              <p className="text-xs text-slate-400">Powered by Gemini 1.5 Flash Financial Intelligence Engine</p>
+              <h3 className="font-bold text-white text-sm font-mono">
+                AI Certified Financial Planner Diagnostic
+              </h3>
+              <p className="text-xs text-slate-400 prose-text">
+                Context-grounded portfolio review powered by Gemini 1.5 Flash
+              </p>
             </div>
           </div>
 
           {narrative && (
-            <div className={`px-5 py-2.5 rounded-2xl border flex items-center gap-3 ${getGradeColor(narrative.grade)}`}>
-              <span className="text-2xl font-black font-outfit">{narrative.grade}</span>
-              <span className="text-xs font-bold">Financial Health Score</span>
+            <div className={`px-4 py-2 rounded-xl border flex items-center gap-2.5 ${getGradeColor(narrative.grade)}`}>
+              <span className="text-xl font-bold font-mono">{narrative.grade}</span>
+              <span className="text-[10px] font-bold font-mono">FINANCIAL HEALTH GRADE</span>
             </div>
           )}
         </div>
 
         {isLoadingNarrative ? (
-          <div className="flex items-center justify-center gap-3 py-8 text-slate-400">
-            <Sparkles className="w-5 h-5 text-amber-400 animate-spin" />
+          <div className="flex items-center justify-center gap-3 py-8 text-slate-400 font-mono">
+            <Sparkles className="w-4 h-4 text-emerald-400 animate-spin" />
             <span>Analyzing portfolio cash flow and generating financial diagnosis...</span>
           </div>
         ) : narrative ? (
-          <div className="space-y-5">
-            <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 text-amber-200 font-bold text-sm font-outfit">
+          <div className="space-y-4">
+            <div className="p-3.5 rounded-xl bg-[#161b22] border border-emerald-500/20 text-emerald-200 font-mono font-medium text-xs">
               "{narrative.headline}"
             </div>
 
-            <div className="space-y-3 leading-relaxed text-slate-200">
+            <div className="space-y-2.5 leading-relaxed text-slate-200 text-xs prose-text">
               {narrative.summaryParagraphs.map((p, idx) => (
                 <p key={idx}>{p}</p>
               ))}
             </div>
 
             {/* 3 Urgent Action Items */}
-            <div className="space-y-3 pt-2">
-              <label className="text-[11px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                <ShieldAlert className="w-3.5 h-3.5" />
-                Priority Financial Action Roadmap
-              </label>
+            <div className="space-y-2.5 pt-2">
+              <span className="text-[10px] font-bold text-slate-400 uppercase font-mono flex items-center gap-1">
+                <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
+                <span>Priority Financial Action Roadmap:</span>
+              </span>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {narrative.urgentActions.map((action, idx) => (
-                  <div key={idx} className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+                  <div key={idx} className="p-3.5 rounded-xl bg-[#161b22] border border-slate-800 space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400">
-                        Priority #{idx + 1} ({action.priority})
+                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono">
+                        PRIORITY #{idx + 1} ({action.priority})
                       </span>
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                     </div>
-                    <h4 className="font-bold text-white text-xs font-outfit">{action.title}</h4>
-                    <p className="text-[10px] text-slate-400 leading-relaxed">{action.detail}</p>
+                    <h4 className="font-bold text-white text-xs font-mono">{action.title}</h4>
+                    <p className="text-[10px] text-slate-400 prose-text leading-relaxed">{action.detail}</p>
                   </div>
                 ))}
               </div>
@@ -173,34 +264,72 @@ export default function FinancialOverview({ summary, narrative, isLoadingNarrati
         ) : null}
       </div>
 
-      {/* 3. Category Spending Breakdown */}
-      <div className="p-6 rounded-3xl bg-[#0d1117] border border-slate-800 space-y-4">
+      {/* 3. 12-Month Forward Net Worth Forecast Grid */}
+      <div className="p-6 rounded-2xl bg-[#0d1117] border border-slate-800 space-y-4 shadow-xl">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-          <h3 className="font-bold text-white text-sm font-outfit flex items-center gap-2">
-            <PieChart className="w-4 h-4 text-amber-400" />
-            Monthly Category Spending Breakdown
-          </h3>
-          <span className="text-slate-500 text-[11px]">{summary.categoryBreakdown.length} Categories</span>
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-emerald-400" />
+            <h3 className="font-bold text-white text-sm font-mono">
+              12-Month Compound Net Worth Forecast
+            </h3>
+          </div>
+          <span className="text-[10px] text-emerald-400 font-mono font-bold">
+            +8% Annualized Index Return + {fmt(summary.monthlySavings)}/mo
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2.5">
+          {summary.monthlyForecast.map((fc, idx) => (
+            <div
+              key={idx}
+              className="p-3 rounded-xl bg-[#161b22] border border-slate-800/80 space-y-1 hover:border-emerald-500/40 transition-colors"
+            >
+              <span className="text-[10px] text-slate-400 font-bold uppercase font-mono block">
+                Month +{idx + 1} ({fc.month})
+              </span>
+              <div className="text-xs font-bold text-white font-mono truncate">
+                {fmt(fc.projectedNetWorth)}
+              </div>
+              <span className="text-[9px] text-emerald-400 font-mono block">
+                +{fmt(fc.projectedSavings)} saved
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 4. Category Spending Breakdown Grid */}
+      <div className="p-6 rounded-2xl bg-[#0d1117] border border-slate-800 space-y-4 shadow-xl">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="flex items-center gap-2">
+            <PieChart className="w-4 h-4 text-cyan-400" />
+            <h3 className="font-bold text-white text-sm font-mono">
+              Monthly Category Outflow Allocation
+            </h3>
+          </div>
+          <span className="text-slate-400 text-[10px] font-mono">
+            {summary.categoryBreakdown.length} Active Categories
+          </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {summary.categoryBreakdown.map((cat, idx) => (
-            <div key={idx} className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+            <div key={idx} className="p-3 rounded-xl bg-[#161b22] border border-slate-800 space-y-1.5">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-slate-200 text-xs">{cat.category}</span>
-                <span className="text-amber-400 font-bold">{fmt(cat.amount)}</span>
+                <span className="font-medium text-slate-200 text-xs font-mono">{cat.category}</span>
+                <span className="text-emerald-400 font-bold font-mono">{fmt(cat.amount)}</span>
               </div>
 
               {/* Progress bar */}
-              <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+              <div className="w-full h-1.5 rounded-full bg-slate-900 overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-amber-400 to-emerald-400 rounded-full"
+                  className="h-full bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full"
                   style={{ width: `${Math.min(cat.percentage, 100)}%` }}
                 />
               </div>
 
-              <div className="flex items-center justify-between text-[10px] text-slate-500">
-                <span>{cat.percentage.toFixed(1)}% of total expenses</span>
+              <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono">
+                <span>{cat.percentage.toFixed(1)}% of total burn rate</span>
               </div>
             </div>
           ))}

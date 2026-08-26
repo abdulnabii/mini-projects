@@ -30,20 +30,29 @@ Return ONLY a valid JSON object with this exact structure (no markdown wrapping)
   "grade": "B",
   "headline": "Strong wealth generation foundation, but high credit card APR requires immediate avalanche focus.",
   "summaryParagraphs": [
-    "Your 32% savings rate puts you in the top tier of financial discipline. However, carrying high-interest debt while building savings creates a net drag on your wealth creation.",
-    "By adopting the Avalanche payoff strategy, you can extinguish your high-APR balances in 12 months and free up $400/month for index fund investing."
+    "Your savings rate puts you in the top tier of financial discipline. However, carrying high-interest debt while building savings creates a net drag on your wealth creation.",
+    "By adopting the Avalanche payoff strategy, you can extinguish your high-APR balances in 12 months and free up extra monthly cash flow for index fund investing."
   ],
   "urgentActions": [
-    { "title": "Redirect $400/month to Avalanche Debt Payoff", "detail": "Eliminates high-APR credit card balance in 12 months, saving over $2,900 in interest.", "priority": "HIGH" },
-    { "title": "Trim Dining Expenses by 20%", "detail": "Reallocate $180/month into low-cost S&P 500 index funds to accelerate FIRE date by 3.2 years.", "priority": "MEDIUM" },
-    { "title": "Build 3-Month Emergency Liquid Cash Buffer", "detail": "Ensure $12,500 in High-Yield Savings Account before expanding speculative investments.", "priority": "HIGH" }
+    { "title": "Redirect extra cash flow to Avalanche Debt Payoff", "detail": "Eliminates high-APR credit card balance in 12 months, saving significant interest.", "priority": "HIGH" },
+    { "title": "Trim Dining Expenses by 20%", "detail": "Reallocate discretionary outflow into low-cost S&P 500 index funds to accelerate FIRE date.", "priority": "MEDIUM" },
+    { "title": "Build 3-Month Emergency Liquid Cash Buffer", "detail": "Ensure emergency reserve in High-Yield Savings Account before expanding speculative investments.", "priority": "HIGH" }
   ],
-  "burnRateMonths": 6.2
+  "burnRateMonths": 6.2,
+  "savingsScore": 88,
+  "debtScore": 72,
+  "diversificationScore": 80
 }`;
 
       const result = await model.generateContent(prompt);
       const text = result.response.text().trim().replace(/^```json\n?/, '').replace(/\n?```$/, '');
-      return JSON.parse(text);
+      const parsed = JSON.parse(text);
+      return {
+        savingsScore: 85,
+        debtScore: 75,
+        diversificationScore: 80,
+        ...parsed,
+      };
     } catch (err) {
       console.warn('Gemini financial narrative generation error:', err);
     }
@@ -75,6 +84,9 @@ Return ONLY a valid JSON object with this exact structure (no markdown wrapping)
       },
     ],
     burnRateMonths: 5.5,
+    savingsScore: 92,
+    debtScore: 78,
+    diversificationScore: 84,
   };
 }
 

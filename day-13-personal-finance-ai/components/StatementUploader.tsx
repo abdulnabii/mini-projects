@@ -3,11 +3,26 @@
 import { useState } from 'react';
 import Papa from 'papaparse';
 import { DEMO_PRESETS } from '@/lib/storage';
-import { Debt, Transaction, TransactionCategory } from '@/types';
-import { UploadCloud, FileText, Sparkles, CheckCircle2, Building2, AlertCircle } from 'lucide-react';
+import { Debt, Transaction, TransactionCategory, Currency } from '@/types';
+import {
+  UploadCloud,
+  FileText,
+  Sparkles,
+  CheckCircle2,
+  Building2,
+  AlertCircle,
+  RefreshCw,
+} from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 interface Props {
-  onLoadTransactions: (txs: Transaction[], debts?: Debt[], cashAssets?: number, investmentAssets?: number) => void;
+  onLoadTransactions: (
+    txs: Transaction[],
+    debts?: Debt[],
+    cashAssets?: number,
+    investmentAssets?: number,
+    currency?: Currency
+  ) => void;
   isLoading: boolean;
 }
 
@@ -28,17 +43,16 @@ export default function StatementUploader({ onLoadTransactions, isLoading }: Pro
           const rawAmt = parseFloat(row.Amount || row.amount || '0');
           const amt = isNaN(rawAmt) ? -50 : rawAmt;
 
-          // Simple fuzzy categorization rules
           let cat: TransactionCategory = 'Other';
           const lowerDesc = desc.toLowerCase();
           if (lowerDesc.includes('salary') || lowerDesc.includes('deposit') || amt > 0) cat = 'Income';
           else if (lowerDesc.includes('rent') || lowerDesc.includes('mortgage') || lowerDesc.includes('apartments')) cat = 'Housing';
-          else if (lowerDesc.includes('food') || lowerDesc.includes('whole foods') || lowerDesc.includes('trader') || lowerDesc.includes('costco')) cat = 'Groceries';
-          else if (lowerDesc.includes('restaurant') || lowerDesc.includes('dining') || lowerDesc.includes('coffee') || lowerDesc.includes('bar')) cat = 'Dining';
-          else if (lowerDesc.includes('vanguard') || lowerDesc.includes('fidelity') || lowerDesc.includes('index') || lowerDesc.includes('stock')) cat = 'Investments';
-          else if (lowerDesc.includes('uber') || lowerDesc.includes('transit') || lowerDesc.includes('gas') || lowerDesc.includes('tesla')) cat = 'Transport';
-          else if (lowerDesc.includes('utility') || lowerDesc.includes('coned') || lowerDesc.includes('power') || lowerDesc.includes('internet')) cat = 'Utilities';
-          else if (lowerDesc.includes('netflix') || lowerDesc.includes('spotify') || lowerDesc.includes('sub')) cat = 'Subscriptions';
+          else if (lowerDesc.includes('food') || lowerDesc.includes('whole foods') || lowerDesc.includes('trader') || lowerDesc.includes('costco') || lowerDesc.includes('imtiaz') || lowerDesc.includes('carrefour')) cat = 'Groceries';
+          else if (lowerDesc.includes('restaurant') || lowerDesc.includes('dining') || lowerDesc.includes('coffee') || lowerDesc.includes('bar') || lowerDesc.includes('kolachi') || lowerDesc.includes('aylanto')) cat = 'Dining';
+          else if (lowerDesc.includes('vanguard') || lowerDesc.includes('fidelity') || lowerDesc.includes('index') || lowerDesc.includes('stock') || lowerDesc.includes('mutual') || lowerDesc.includes('etf')) cat = 'Investments';
+          else if (lowerDesc.includes('uber') || lowerDesc.includes('transit') || lowerDesc.includes('gas') || lowerDesc.includes('tesla') || lowerDesc.includes('petrol') || lowerDesc.includes('shell')) cat = 'Transport';
+          else if (lowerDesc.includes('utility') || lowerDesc.includes('coned') || lowerDesc.includes('power') || lowerDesc.includes('internet') || lowerDesc.includes('electric') || lowerDesc.includes('fiber')) cat = 'Utilities';
+          else if (lowerDesc.includes('netflix') || lowerDesc.includes('spotify') || lowerDesc.includes('sub') || lowerDesc.includes('chatgpt')) cat = 'Subscriptions';
 
           return {
             id: `tx_user_${idx}_${Date.now()}`,
@@ -51,6 +65,12 @@ export default function StatementUploader({ onLoadTransactions, isLoading }: Pro
         });
 
         onLoadTransactions(parsedTxs);
+        confetti({
+          particleCount: 25,
+          spread: 60,
+          origin: { y: 0.7 },
+          colors: ['#10b981', '#06b6d4'],
+        });
       },
       error: (err) => {
         console.error('PapaParse CSV error:', err);
@@ -60,7 +80,7 @@ export default function StatementUploader({ onLoadTransactions, isLoading }: Pro
 
   return (
     <div className="space-y-6 font-mono text-xs text-slate-300">
-      {/* 1. Drag & Drop File Upload Area */}
+      {/* Drag & Drop File Upload Area */}
       <div
         onDragOver={(e) => {
           e.preventDefault();
@@ -74,24 +94,24 @@ export default function StatementUploader({ onLoadTransactions, isLoading }: Pro
             handleFileUpload(e.dataTransfer.files[0]);
           }
         }}
-        className={`p-8 rounded-3xl border-2 border-dashed text-center transition-all flex flex-col items-center justify-center gap-3 ${
+        className={`p-8 rounded-2xl border-2 border-dashed text-center transition-all flex flex-col items-center justify-center gap-3 ${
           dragActive
-            ? 'border-amber-400 bg-amber-500/10'
+            ? 'border-emerald-400 bg-emerald-500/10'
             : 'border-slate-800 bg-[#0d1117] hover:border-slate-700'
         }`}
       >
-        <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-lg shadow-amber-500/10">
+        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-md">
           <UploadCloud className="w-6 h-6" />
         </div>
 
         <div>
-          <h3 className="font-bold text-white text-sm font-outfit">Import Bank Statement (CSV)</h3>
-          <p className="text-slate-400 text-xs mt-1">
-            Drag &amp; drop your CSV bank statement or click below. Parsed client-side with AES-256 privacy.
+          <h3 className="font-bold text-white text-sm font-mono">Import Bank Statement (CSV)</h3>
+          <p className="text-slate-400 text-xs mt-0.5 prose-text">
+            Drag &amp; drop your bank export CSV or click below. Parsed client-side with AES-256 privacy.
           </p>
         </div>
 
-        <label className="px-5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-amber-400 hover:text-amber-300 hover:border-amber-500/40 font-bold transition-all cursor-pointer">
+        <label className="px-4 py-2 rounded-lg bg-[#161b22] border border-slate-800 text-emerald-400 hover:text-emerald-300 hover:border-emerald-500/40 font-bold transition-all cursor-pointer font-mono">
           Browse CSV File
           <input
             type="file"
@@ -102,36 +122,52 @@ export default function StatementUploader({ onLoadTransactions, isLoading }: Pro
         </label>
 
         {fileName && (
-          <div className="flex items-center gap-2 text-emerald-400 font-bold bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/30">
-            <CheckCircle2 className="w-4 h-4" />
+          <div className="flex items-center gap-1.5 text-emerald-400 font-bold bg-emerald-500/10 px-3 py-1 rounded-md border border-emerald-500/30 font-mono">
+            <CheckCircle2 className="w-3.5 h-3.5" />
             <span>Loaded: {fileName}</span>
           </div>
         )}
       </div>
 
-      {/* 2. Demo Pre-loaded Bank Statement Presets */}
-      <div className="space-y-3">
-        <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-          Or Load Pre-Configured Demo Financial Profiles
+      {/* Pre-loaded Multi-Currency Demo Profiles */}
+      <div className="space-y-2.5">
+        <label className="block text-[10px] font-bold text-slate-400 uppercase font-mono">
+          Or Load Pre-Configured Global Financial Profiles:
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {DEMO_PRESETS.map((preset, idx) => (
             <button
               key={idx}
               type="button"
-              onClick={() => onLoadTransactions(preset.transactions, preset.debts, preset.cashAssets, preset.investmentAssets)}
-              className="p-4 rounded-2xl bg-[#0d1117] border border-slate-800 hover:border-amber-500/50 text-left transition-all group flex flex-col justify-between gap-2"
+              onClick={() => {
+                onLoadTransactions(
+                  preset.transactions,
+                  preset.debts,
+                  preset.cashAssets,
+                  preset.investmentAssets,
+                  preset.currency
+                );
+                confetti({
+                  particleCount: 20,
+                  spread: 50,
+                  origin: { y: 0.7 },
+                  colors: ['#10b981', '#06b6d4'],
+                });
+              }}
+              className="p-4 rounded-xl bg-[#0d1117] border border-slate-800 hover:border-emerald-500/50 text-left transition-all group flex flex-col justify-between gap-2 cursor-pointer shadow-md"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-amber-400 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center gap-1">
+                <span className="text-[10px] font-bold text-emerald-400 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-1 font-mono">
                   <Building2 className="w-3 h-3" />
                   {preset.bank}
                 </span>
-                <span className="text-[10px] text-slate-500">{preset.transactions.length} Txs</span>
+                <span className="text-[10px] text-cyan-400 font-bold font-mono">
+                  {preset.currency} • {preset.transactions.length} Txs
+                </span>
               </div>
               <div>
-                <h4 className="font-bold text-slate-100 text-xs font-outfit">{preset.name}</h4>
-                <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-1">{preset.description}</p>
+                <h4 className="font-bold text-slate-100 text-xs font-mono">{preset.name}</h4>
+                <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-1 prose-text">{preset.description}</p>
               </div>
             </button>
           ))}
