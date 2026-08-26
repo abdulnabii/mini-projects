@@ -20,17 +20,19 @@ export default function DeploymentRadar({ deployments }: Props) {
   };
 
   return (
-    <div className="bg-[#0d1117] border border-slate-800 rounded-2xl p-5 space-y-3.5 shadow-xl font-mono text-xs text-slate-300">
+    <div className="bg-[#090d16] border border-white/[0.08] rounded-xl p-4 space-y-3 shadow-2xl font-mono text-xs text-slate-300 sre-card">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
         <div className="flex items-center gap-2">
-          <GitBranch className="w-4 h-4 text-cyan-400" />
-          <h3 className="font-bold text-white text-sm font-mono">
-            Deployment Correlation Radar (Pre-Incident 4h Window)
+          <div className="w-6 h-6 rounded bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+            <GitBranch className="w-3.5 h-3.5" />
+          </div>
+          <h3 className="font-bold text-white text-xs font-mono uppercase tracking-wider">
+            Deployment Correlation Radar (Pre-Incident 4h)
           </h3>
         </div>
         <span className="text-slate-400 text-[10px] font-mono">
-          {deployments.length} Recent Release{deployments.length === 1 ? '' : 's'}
+          {deployments.length} Release{deployments.length === 1 ? '' : 's'} Detected
         </span>
       </div>
 
@@ -39,11 +41,11 @@ export default function DeploymentRadar({ deployments }: Props) {
           No code deployments registered in the 4-hour pre-incident window.
         </div>
       ) : (
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           {deployments.map((dep) => (
             <div
               key={dep.id}
-              className="p-3.5 rounded-xl bg-[#161b22] border border-slate-800 hover:border-cyan-500/40 transition-colors space-y-2"
+              className="p-3 rounded-lg bg-[#0f1422] border border-white/[0.06] hover:border-cyan-500/40 transition-colors space-y-1.5"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -62,7 +64,7 @@ export default function DeploymentRadar({ deployments }: Props) {
                 "{dep.commitMessage}"
               </p>
 
-              <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800/80 font-mono">
+              <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-white/[0.04] font-mono">
                 <div className="flex items-center gap-3">
                   <span className="flex items-center gap-1">
                     <GitCommit className="w-3 h-3 text-slate-500" />
@@ -75,7 +77,7 @@ export default function DeploymentRadar({ deployments }: Props) {
                 </div>
 
                 <span className="text-slate-500">
-                  Deployed at {new Date(dep.deployedAt).toLocaleTimeString()}
+                  {new Date(dep.deployedAt).toLocaleTimeString()}
                 </span>
               </div>
             </div>

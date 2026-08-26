@@ -14,6 +14,7 @@ import {
   X,
   Sparkles,
   Calendar,
+  Layers,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -83,24 +84,24 @@ ${postMortem.lessonsLearned.map((l) => `- ${l}`).join('\n')}
 
   return (
     <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-[#0d1117] border border-rose-500/40 rounded-2xl p-6 max-w-3xl w-full space-y-5 shadow-2xl my-8 font-mono text-xs text-slate-300 max-h-[90vh] flex flex-col">
+      <div className="bg-[#090d16] border border-rose-500/40 rounded-xl p-5 max-w-3xl w-full space-y-4 shadow-2xl my-8 font-mono text-xs text-slate-300 max-h-[90vh] flex flex-col">
         {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4 shrink-0">
+        <div className="flex items-center justify-between border-b border-white/[0.08] pb-3.5 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-rose-500 to-amber-500 flex items-center justify-center text-black shadow-md">
-              <FileText className="w-5 h-5" />
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-500 to-amber-500 flex items-center justify-center text-black shadow-md font-bold">
+              <FileText className="w-4 h-4" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-white text-base font-mono">
+                <h3 className="font-bold text-white text-sm font-mono">
                   {postMortem.title}
                 </h3>
-                <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-bold">
+                <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-bold font-mono">
                   {postMortem.severity}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 font-mono">
-                Blameless SRE Post-Incident Review • Lead: {postMortem.leadResponder}
+              <p className="text-[10px] text-slate-400 font-mono">
+                Blameless SRE Post-Incident Review • Lead Commander: {postMortem.leadResponder}
               </p>
             </div>
           </div>
@@ -109,7 +110,7 @@ ${postMortem.lessonsLearned.map((l) => `- ${l}`).join('\n')}
             <button
               type="button"
               onClick={handleCopyMarkdown}
-              className="px-3 py-1.5 rounded-lg bg-emerald-500 text-black font-extrabold text-xs flex items-center gap-1.5 hover:bg-emerald-400 transition-all cursor-pointer shadow-md"
+              className="px-3 py-1.5 rounded-lg bg-emerald-500 text-black font-extrabold text-xs flex items-center gap-1.5 hover:bg-emerald-400 transition-all cursor-pointer shadow-md font-mono"
             >
               {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copied Markdown!' : 'Export Post-Mortem'}</span>
@@ -118,17 +119,17 @@ ${postMortem.lessonsLearned.map((l) => `- ${l}`).join('\n')}
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 rounded-lg bg-[#161b22] text-slate-400 hover:text-white transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg bg-[#0f1422] text-slate-400 hover:text-white transition-colors cursor-pointer border border-white/[0.08]"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Modal Body (Scrollable) */}
-        <div className="flex-1 overflow-y-auto space-y-5 pr-1">
+        {/* Modal Body */}
+        <div className="flex-1 overflow-y-auto space-y-4 pr-1">
           {/* Executive Summary */}
-          <div className="p-4 rounded-xl bg-[#161b22] border border-slate-800 space-y-1.5">
+          <div className="p-3.5 rounded-lg bg-[#0f1422] border border-white/[0.06] space-y-1">
             <span className="text-[10px] font-bold text-rose-400 uppercase font-mono">
               1. Executive Summary
             </span>
@@ -138,14 +139,14 @@ ${postMortem.lessonsLearned.map((l) => `- ${l}`).join('\n')}
           </div>
 
           {/* 5-Whys Root Cause Analysis */}
-          <div className="p-4 rounded-xl bg-[#161b22] border border-slate-800 space-y-2">
+          <div className="p-3.5 rounded-lg bg-[#0f1422] border border-white/[0.06] space-y-1.5">
             <span className="text-[10px] font-bold text-amber-400 uppercase font-mono">
               2. Root Cause 5-Whys Diagnostic
             </span>
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               {postMortem.fiveWhys.map((why, idx) => (
                 <div key={idx} className="flex items-start gap-2 text-xs">
-                  <span className="text-amber-400 font-bold">Q{idx + 1}:</span>
+                  <span className="text-amber-400 font-bold font-mono">Q{idx + 1}:</span>
                   <span className="text-slate-200">{why}</span>
                 </div>
               ))}
@@ -153,14 +154,14 @@ ${postMortem.lessonsLearned.map((l) => `- ${l}`).join('\n')}
           </div>
 
           {/* Incident Timeline */}
-          <div className="p-4 rounded-xl bg-[#161b22] border border-slate-800 space-y-2">
+          <div className="p-3.5 rounded-lg bg-[#0f1422] border border-white/[0.06] space-y-1.5">
             <span className="text-[10px] font-bold text-cyan-400 uppercase font-mono flex items-center gap-1">
               <Clock className="w-3.5 h-3.5" />
               <span>3. Sequence of Events Timeline</span>
             </span>
-            <div className="space-y-1.5 divide-y divide-slate-800/60">
+            <div className="space-y-1 divide-y divide-white/[0.04]">
               {postMortem.timeline.map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between pt-1.5 text-[11px]">
+                <div key={idx} className="flex items-center justify-between pt-1 text-[11px]">
                   <span className="font-bold text-cyan-300 font-mono">{item.time}</span>
                   <span className="text-slate-200 text-right">{item.event}</span>
                 </div>
@@ -169,26 +170,26 @@ ${postMortem.lessonsLearned.map((l) => `- ${l}`).join('\n')}
           </div>
 
           {/* Corrective Action Items */}
-          <div className="p-4 rounded-xl bg-[#161b22] border border-slate-800 space-y-2.5">
+          <div className="p-3.5 rounded-lg bg-[#0f1422] border border-white/[0.06] space-y-2">
             <span className="text-[10px] font-bold text-emerald-400 uppercase font-mono flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>4. Preventative &amp; Corrective Action Items</span>
             </span>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {postMortem.actionItems.map((action, idx) => (
                 <div
                   key={idx}
-                  className="p-2.5 rounded-lg bg-[#04080e] border border-slate-800 flex items-center justify-between gap-3 text-xs"
+                  className="p-2 rounded bg-[#04080e] border border-white/[0.04] flex items-center justify-between gap-3 text-xs"
                 >
                   <div className="space-y-0.5">
                     <span className="font-bold text-white">{action.task}</span>
-                    <div className="flex items-center gap-3 text-[10px] text-slate-500">
-                      <span>Owner: <strong className="text-slate-400">{action.owner}</strong></span>
+                    <div className="flex items-center gap-3 text-[10px] text-slate-500 font-mono">
+                      <span>Owner: <strong className="text-slate-300">{action.owner}</strong></span>
                       <span>Due: {action.dueDate}</span>
                     </div>
                   </div>
 
-                  <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold">
+                  <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold font-mono">
                     {action.status}
                   </span>
                 </div>
@@ -197,13 +198,13 @@ ${postMortem.lessonsLearned.map((l) => `- ${l}`).join('\n')}
           </div>
 
           {/* Lessons Learned */}
-          <div className="p-4 rounded-xl bg-[#161b22] border border-slate-800 space-y-2">
+          <div className="p-3.5 rounded-lg bg-[#0f1422] border border-white/[0.06] space-y-1.5">
             <span className="text-[10px] font-bold text-purple-400 uppercase font-mono">
               5. Architectural Lessons Learned
             </span>
             <div className="space-y-1 text-xs">
               {postMortem.lessonsLearned.map((lesson, idx) => (
-                <div key={idx} className="flex items-center gap-2">
+                <div key={idx} className="flex items-center gap-1.5">
                   <span className="text-purple-400">•</span>
                   <span className="text-slate-200">{lesson}</span>
                 </div>

@@ -132,12 +132,16 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen font-mono">
-      <Navbar activeSeverity={activeIncident.severity} serviceName={activeIncident.service} />
+      <Navbar
+        activeSeverity={activeIncident.severity}
+        serviceName={activeIncident.service}
+        incidentId={activeIncident.id}
+      />
 
       <main className="flex-1 space-y-6 py-6 px-3 sm:px-6 max-w-7xl mx-auto w-full">
         {/* Centered Hero Header */}
-        <section className="text-center space-y-2.5 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono font-bold">
+        <section className="text-center space-y-2.5 max-w-3xl mx-auto pt-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono font-bold">
             <Activity className="w-3.5 h-3.5" />
             <span>AI SITE RELIABILITY &amp; INCIDENT TRIAGE TERMINAL</span>
           </div>
@@ -165,15 +169,15 @@ export default function HomePage() {
         />
 
         {/* 2-Column SRE War-Room Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column: Log Viewer & Deployment Radar (5 cols) */}
-          <div className="lg:col-span-6 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          {/* Left Column: Log Stream & Deployment Correlation Radar (6 cols) */}
+          <div className="lg:col-span-6 space-y-5">
             <LogViewer logs={activeIncident.logs} onAddCustomLogs={handleAddCustomLogs} />
             <DeploymentRadar deployments={activeIncident.recentDeployments} />
           </div>
 
           {/* Right Column: AI Diagnosis, Remediation Runbook & Stakeholder Comms (6 cols) */}
-          <div className="lg:col-span-6 space-y-6">
+          <div className="lg:col-span-6 space-y-5">
             <RootCausePanel diagnosis={activeIncident.diagnosis} isAnalyzing={isAnalyzing} />
             <RunbookChecklist
               steps={activeIncident.diagnosis.remediationSteps}

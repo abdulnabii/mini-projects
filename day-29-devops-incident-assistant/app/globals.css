@@ -2,9 +2,14 @@
 
 @layer base {
   body {
-    background-color: #060e14;
+    background-color: #06090e;
     color: #e2e8f0;
     font-family: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    background-image: 
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(225, 29, 72, 0.08), transparent),
+      linear-gradient(to bottom, transparent 95%, rgba(15, 23, 42, 0.4) 100%),
+      radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 24px 24px;
   }
 
   p, .prose-text {
@@ -12,21 +17,42 @@
   }
 }
 
-/* Custom scrollbars */
+/* Custom SRE scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #060e14;
+  background: #06090e;
 }
 
 ::-webkit-scrollbar-thumb {
   background: #1e293b;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #ef4444;
+  background: #f43f5e;
+}
+
+/* Scanline and pulse effects */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.sre-card {
+  background: #090d16;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.2s ease-in-out;
+}
+
+.sre-card:hover {
+  border-color: rgba(244, 63, 94, 0.3);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
 }
