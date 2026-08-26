@@ -1,0 +1,351 @@
+'use client';
+
+import { useState } from 'react';
+import { AIUsageLog, Organization } from '@/types';
+import {
+  Zap,
+  Sparkles,
+  Code2,
+  BarChart3,
+  FileText,
+  Copy,
+  Check,
+  Clock,
+  Coins,
+  Cpu,
+  AlertTriangle,
+} from 'lucide-react';
+import confetti from 'canvas-confetti';
+
+interface Props {
+  activeOrg: Organization;
+  usageLogs: AIUsageLog[];
+  onExecuteAIFeature: (
+    feature: 'COPYWRITER' | 'CODE_GEN' | 'DATA_ANALYST',
+    prompt: string
+  ) => Promise<string>;
+  isGenerating: boolean;
+}
+
+const PRESETS = {
+  COPYWRITER: [
+    'Write a high-converting landing page headline and 3 value pillars for an AI Customer Support SaaS.',
+    'Draft a 1-click renewal discount email for a customer whose usage has declined by 40%.',
+  ],
+  CODE_GEN: [
+    'Write an Upstash Redis rate-limiting middleware in Next.js 16 with token bucket algorithm.',
+    'Create a Drizzle ORM PostgreSQL schema for multi-tenant organizations and Stripe subscriptions.',
+  ],
+  DATA_ANALYST: [
+    'Analyze an AI SaaS with $14.8k MRR, 1.8% churn, and $0.12 token cost ratio per $1 MRR.',
+    'Formulate a pricing strategy to convert free tier users who consume 80% quota in under 7 days.',
+  ],
+};
+
+export default function AIPlayground({
+  activeOrg,
+  usageLogs,
+  onExecuteAIFeature,
+  isGenerating,
+}: Props) {
+  const [selectedFeature, setSelectedFeature] = useState<'COPYWRITER' | 'CODE_GEN' | 'DATA_ANALYST'>(
+    'COPYWRITER'
+  );
+  const [promptInput, setPromptInput] = useState(PRESETS.COPYWRITER[0]);
+  const [outputResult, setOutputResult] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const [lastTelemetry, setLastTelemetry] = useState<{
+    inputTokens: number;
+    outputTokens: number;
+    creditsUsed: number;
+    latencyMs: number;
+  } | null>(null);
+
+  const handleRun = async () => {
+    if (!promptInput.trim() || isGenerating) return;
+
+    try {
+      const startTime = Date.now();
+      const text = await onExecuteAIFeature(selectedFeature, promptInput);
+      const latencyMs = Date.now() - startTime;
+
+      setOutputResult(text);
+      setLastTelemetry({
+        inputTokens: Math.max(12, Math.round(promptInput.length / 3.8)),
+        outputTokens: Math.max(30, Math.round(text.length / 3.8)),
+        creditsUsed: selectedFeature === 'COPYWRITER' ? 3 : selectedFeature === 'CODE_GEN' ? 5 : 4,
+        latencyMs,
+      });
+
+      confetti({
+        particleCount: 25,
+        spread: 50,
+        origin: { y: 0.7 },
+        colors: ['#10b981', '#6366f1'],
+      });
+    } catch (err) {
+      console.error('Execution error:', err);
+    }
+  };
+
+  const handleCopy = () => {
+    if (!outputResult) return;
+    navigator.clipboard.writeText(outputResult);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const creditPercentage = Math.round(
+    (activeOrg.creditsRemaining / Math.max(1, activeOrg.creditsTotal)) * 100
+  );
+
+  return (
+    <div className="space-y-6 font-mono text-xs text-slate-300">
+      {/* 1. Credit Quota & Telemetry Header */}
+      <div className="p-4 rounded-xl bg-[#090d16] border border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl sre-card">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <Zap className="w-4 h-4" />
+          </div>
+          <div>
+            <h3 className="font-bold text-white text-xs font-mono uppercase tracking-wider">
+              {activeOrg.name} — AI Credit Allocation
+            </h3>
+            <p className="text-[10px] text-slate-400 font-mono">
+              Plan: <strong className="text-white uppercase">{activeOrg.plan}</strong> • Resets on {new Date(activeOrg.currentPeriodEnd).toLocaleDateString()}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <div className="text-right space-y-1">
+            <div className="flex items-center justify-end gap-1.5 font-bold text-xs">
+              <span className="text-emerald-400 font-mono">{activeOrg.creditsRemaining}</span>
+              <span className="text-slate-500">/ {activeOrg.creditsTotal} Credits</span>
+            </div>
+            <div className="w-32 h-1.5 bg-[#04080e] rounded-full overflow-hidden border border-white/[0.08]">
+              <div
+                className="h-full bg-gradient-to-r from-amber-400 to-emerald-400 rounded-full transition-all duration-300"
+                style={{ width: `${creditPercentage}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Main Studio Grid (2 Columns) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* Left Column: Feature Selector & Prompt Editor (6 cols) */}
+        <div className="lg:col-span-6 space-y-4">
+          <div className="p-5 rounded-xl bg-[#090d16] border border-white/[0.08] space-y-4 shadow-xl sre-card">
+            {/* Feature Tabs */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-mono">
+                Select Production AI Engine:
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedFeature('COPYWRITER');
+                    setPromptInput(PRESETS.COPYWRITER[0]);
+                  }}
+                  className={`p-2.5 rounded-lg border text-center transition-all cursor-pointer space-y-1 ${
+                    selectedFeature === 'COPYWRITER'
+                      ? 'bg-emerald-500/15 border-emerald-500 text-emerald-300 font-bold'
+                      : 'bg-[#0f1422] border-white/[0.06] text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <FileText className="w-4 h-4 mx-auto" />
+                  <span className="block text-[10px] font-mono">AI Copywriter</span>
+                  <span className="block text-[9px] text-slate-500">3 credits/call</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedFeature('CODE_GEN');
+                    setPromptInput(PRESETS.CODE_GEN[0]);
+                  }}
+                  className={`p-2.5 rounded-lg border text-center transition-all cursor-pointer space-y-1 ${
+                    selectedFeature === 'CODE_GEN'
+                      ? 'bg-emerald-500/15 border-emerald-500 text-emerald-300 font-bold'
+                      : 'bg-[#0f1422] border-white/[0.06] text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Code2 className="w-4 h-4 mx-auto" />
+                  <span className="block text-[10px] font-mono">AI Architect</span>
+                  <span className="block text-[9px] text-slate-500">5 credits/call</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedFeature('DATA_ANALYST');
+                    setPromptInput(PRESETS.DATA_ANALYST[0]);
+                  }}
+                  className={`p-2.5 rounded-lg border text-center transition-all cursor-pointer space-y-1 ${
+                    selectedFeature === 'DATA_ANALYST'
+                      ? 'bg-emerald-500/15 border-emerald-500 text-emerald-300 font-bold'
+                      : 'bg-[#0f1422] border-white/[0.06] text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <BarChart3 className="w-4 h-4 mx-auto" />
+                  <span className="block text-[10px] font-mono">SaaS Analyst</span>
+                  <span className="block text-[9px] text-slate-500">4 credits/call</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Prompt Textarea */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">
+                  Prompt Instructions:
+                </label>
+                <span className="text-[10px] text-slate-500">{promptInput.length} chars</span>
+              </div>
+              <textarea
+                rows={5}
+                value={promptInput}
+                onChange={(e) => setPromptInput(e.target.value)}
+                placeholder="Enter prompt instruction for the AI engine..."
+                className="w-full p-3 rounded-lg bg-[#04060a] border border-white/[0.08] text-xs text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 font-mono"
+              />
+            </div>
+
+            {/* Sample Preset Chips */}
+            <div className="space-y-1.5">
+              <span className="text-[10px] text-slate-500 font-bold uppercase block">
+                Quick Preset Templates:
+              </span>
+              <div className="space-y-1">
+                {PRESETS[selectedFeature].map((p, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setPromptInput(p)}
+                    className="w-full text-left p-1.5 rounded bg-[#0f1422] border border-white/[0.04] hover:border-white/[0.1] text-[10px] text-slate-300 hover:text-white transition-colors truncate cursor-pointer"
+                  >
+                    › {p}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Run Button */}
+            <button
+              type="button"
+              onClick={handleRun}
+              disabled={isGenerating || !promptInput.trim()}
+              className="w-full py-2.5 rounded-lg bg-emerald-500 text-black font-extrabold hover:bg-emerald-400 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-emerald-500/20 disabled:opacity-50 font-mono text-xs"
+            >
+              <Zap className={`w-3.5 h-3.5 fill-black ${isGenerating ? 'animate-spin' : ''}`} />
+              <span>{isGenerating ? 'Inference in Progress...' : 'Execute Metered AI Inference'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Right Column: Output Stream & Telemetry (6 cols) */}
+        <div className="lg:col-span-6 space-y-4">
+          <div className="p-5 rounded-xl bg-[#090d16] border border-white/[0.08] space-y-3.5 shadow-xl sre-card">
+            <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-emerald-400" />
+                <h3 className="font-bold text-white text-xs font-mono uppercase tracking-wider">
+                  Engine Output &amp; Telemetry
+                </h3>
+              </div>
+
+              {outputResult && (
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className="px-2.5 py-1 rounded bg-[#0f1422] hover:bg-slate-800 text-emerald-400 font-bold transition-all flex items-center gap-1 cursor-pointer text-[10px] font-mono"
+                >
+                  {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                  <span>{copied ? 'Copied!' : 'Copy'}</span>
+                </button>
+              )}
+            </div>
+
+            {/* Output Viewport */}
+            <div className="p-4 rounded-lg bg-[#04060a] border border-white/[0.06] min-h-[190px] max-h-[300px] overflow-y-auto font-mono text-xs leading-relaxed text-slate-200">
+              {isGenerating ? (
+                <div className="flex items-center justify-center gap-2 py-12 text-slate-500">
+                  <Sparkles className="w-4 h-4 text-emerald-400 animate-spin" />
+                  <span>Generating metered AI output with Gemini 1.5 Flash...</span>
+                </div>
+              ) : outputResult ? (
+                <div className="whitespace-pre-wrap select-all">{outputResult}</div>
+              ) : (
+                <div className="py-12 text-center text-slate-600 font-mono">
+                  Select a template on the left and click "Execute Metered AI Inference".
+                </div>
+              )}
+            </div>
+
+            {/* Telemetry Chips */}
+            {lastTelemetry && (
+              <div className="grid grid-cols-4 gap-2 pt-1 text-center font-mono">
+                <div className="p-2 rounded bg-[#04080e] border border-white/[0.04]">
+                  <span className="text-[9px] text-slate-500 block uppercase">Input</span>
+                  <strong className="text-white text-xs">{lastTelemetry.inputTokens} tok</strong>
+                </div>
+                <div className="p-2 rounded bg-[#04080e] border border-white/[0.04]">
+                  <span className="text-[9px] text-slate-500 block uppercase">Output</span>
+                  <strong className="text-white text-xs">{lastTelemetry.outputTokens} tok</strong>
+                </div>
+                <div className="p-2 rounded bg-[#04080e] border border-white/[0.04]">
+                  <span className="text-[9px] text-slate-500 block uppercase">Latency</span>
+                  <strong className="text-emerald-400 text-xs">{lastTelemetry.latencyMs} ms</strong>
+                </div>
+                <div className="p-2 rounded bg-[#04080e] border border-white/[0.04]">
+                  <span className="text-[9px] text-slate-500 block uppercase">Deducted</span>
+                  <strong className="text-amber-400 text-xs">-{lastTelemetry.creditsUsed} cred</strong>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Recent Usage Audit Logs */}
+          <div className="p-4 rounded-xl bg-[#090d16] border border-white/[0.08] space-y-2.5 shadow-xl sre-card">
+            <div className="flex items-center justify-between border-b border-white/[0.06] pb-2">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">
+                Organization Metering Audit Log
+              </span>
+              <span className="text-[10px] text-slate-500">{usageLogs.length} Records</span>
+            </div>
+
+            {usageLogs.length === 0 ? (
+              <div className="py-4 text-center text-slate-600 font-mono text-[11px]">
+                No usage logs recorded in this session yet.
+              </div>
+            ) : (
+              <div className="space-y-1.5 max-h-[140px] overflow-y-auto font-mono text-[10px]">
+                {usageLogs.slice(0, 5).map((log) => (
+                  <div
+                    key={log.id}
+                    className="p-2 rounded bg-[#04060a] border border-white/[0.04] flex items-center justify-between gap-2"
+                  >
+                    <div className="flex items-center gap-2 truncate">
+                      <span className="px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-300 font-bold border border-emerald-500/30">
+                        {log.feature}
+                      </span>
+                      <span className="text-slate-300 truncate">{log.promptSnippet}</span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-amber-400 font-bold">-{log.creditsUsed} cred</span>
+                      <span className="text-slate-500">{log.latencyMs}ms</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
