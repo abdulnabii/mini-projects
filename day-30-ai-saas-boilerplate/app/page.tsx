@@ -46,6 +46,8 @@ export default function HomePage() {
   const [invoices, setInvoices] = useState<Invoice[]>(INITIAL_INVOICES);
   const [adminMetrics, setAdminMetrics] = useState<AdminMetrics>(INITIAL_ADMIN_METRICS);
 
+  const [lastCreditDeduction, setLastCreditDeduction] = useState<{ amount: number; id: number } | null>(null);
+
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [showOrgModal, setShowOrgModal] = useState(false);
   const [showDevModal, setShowDevModal] = useState(false);
@@ -138,6 +140,12 @@ export default function HomePage() {
 
       setOrganizations(updatedOrgs);
       saveOrganizations(updatedOrgs);
+
+      // Trigger visual feedback flash on header credit counter
+      setLastCreditDeduction({
+        amount: result.creditsUsed,
+        id: Date.now(),
+      });
 
       // Record usage log
       const newLog: AIUsageLog = {
@@ -235,6 +243,7 @@ export default function HomePage() {
         activeView={activeView}
         onChangeView={setActiveView}
         onOpenDevModal={() => setShowDevModal(true)}
+        lastDeduction={lastCreditDeduction}
       />
 
       <main className="flex-1 py-6 px-3 sm:px-6 max-w-7xl mx-auto w-full space-y-6">
@@ -256,6 +265,7 @@ export default function HomePage() {
             usageLogs={usageLogs}
             onExecuteAIFeature={handleExecuteAIFeature}
             isGenerating={isGeneratingAI}
+            onNavigateToBilling={() => setActiveView('billing')}
           />
         )}
 

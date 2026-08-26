@@ -17,6 +17,7 @@ import {
   Rocket,
   Lock,
   Layers,
+  Flame,
 } from 'lucide-react';
 
 interface Props {
@@ -76,7 +77,37 @@ export default function HeroMarketing({
         </div>
       </section>
 
-      {/* 2. Feature Capability Matrix (4 Pillars) */}
+      {/* 2. Interactive Proof Point Elevation Callout */}
+      <div
+        onClick={onLaunchPlayground}
+        className="p-5 rounded-2xl bg-gradient-to-r from-emerald-950/30 via-[#0b101d] to-indigo-950/30 border border-emerald-500/40 shadow-2xl shadow-emerald-500/10 cursor-pointer hover:border-emerald-400 transition-all group flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+      >
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500 text-black flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/30 group-hover:scale-105 transition-transform">
+            <Zap className="w-5 h-5 fill-black" />
+          </div>
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-white text-sm font-mono">
+                Interactive AI Feature Studio (Live Demo)
+              </span>
+              <span className="px-2 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[9px] font-bold uppercase animate-pulse">
+                Try It Live
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 prose-text">
+              Test real-time Gemini 1.5 Flash token metering with AI Copywriter, Full-Stack Architect, and SaaS Analyst personas.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-xs group-hover:translate-x-1 transition-transform shrink-0 font-mono">
+          <span>Launch AI Playground</span>
+          <ArrowRight className="w-4 h-4" />
+        </div>
+      </div>
+
+      {/* 3. Feature Capability Matrix (4 Pillars) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         <div className="p-4 rounded-xl bg-[#090d16] border border-white/[0.08] space-y-2 sre-card">
           <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
@@ -119,7 +150,7 @@ export default function HeroMarketing({
         </div>
       </div>
 
-      {/* 3. Interactive Pricing Matrix */}
+      {/* 4. Interactive Pricing Matrix with Clear Status Hierarchy */}
       <div className="space-y-6 pt-4">
         <div className="text-center space-y-2">
           <h2 className="text-2xl font-bold text-white font-mono">
@@ -159,26 +190,36 @@ export default function HeroMarketing({
           </div>
         </div>
 
-        {/* Pricing Cards */}
+        {/* Pricing Cards with Single Status Rule */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto">
           {PLAN_CONFIGS.map((plan) => {
             const isCurrent = currentPlan === plan.id;
             const price = billingCycle === 'yearly' ? plan.yearlyPrice : plan.monthlyPrice;
 
+            // Target badge logic: Never show both "Current Active Plan" and "Most Popular" on the same card!
+            const showMostPopularBadge = !isCurrent && ((currentPlan === 'free' && plan.id === 'pro') || (currentPlan === 'pro' && plan.id === 'enterprise'));
+
             return (
               <div
                 key={plan.id}
                 className={`p-6 rounded-2xl border transition-all flex flex-col justify-between space-y-5 relative ${
-                  plan.highlighted
-                    ? 'bg-[#0b101c] border-emerald-500/50 shadow-2xl shadow-emerald-500/10'
+                  isCurrent
+                    ? 'bg-[#0f1524] border-emerald-500/60 shadow-2xl shadow-emerald-500/10 ring-1 ring-emerald-500/30'
+                    : showMostPopularBadge
+                    ? 'bg-[#0b101c] border-indigo-500/50 shadow-xl'
                     : 'bg-[#090d16] border-white/[0.08] hover:border-white/[0.15]'
                 }`}
               >
-                {plan.highlighted && (
-                  <span className="absolute -top-2.5 right-6 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-emerald-400 to-teal-400 text-black font-extrabold text-[9px] font-mono shadow-md">
-                    MOST POPULAR
+                {/* Single Status Badge */}
+                {isCurrent ? (
+                  <span className="absolute -top-2.5 right-6 px-2.5 py-0.5 rounded-full bg-emerald-500 text-black font-extrabold text-[9px] font-mono shadow-md">
+                    CURRENT ACTIVE PLAN
                   </span>
-                )}
+                ) : showMostPopularBadge ? (
+                  <span className="absolute -top-2.5 right-6 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-indigo-400 to-purple-400 text-black font-extrabold text-[9px] font-mono shadow-md">
+                    {currentPlan === 'free' ? 'MOST POPULAR' : 'RECOMMENDED UPGRADE'}
+                  </span>
+                ) : null}
 
                 <div className="space-y-3">
                   <div className="space-y-1">
@@ -217,16 +258,17 @@ export default function HeroMarketing({
 
                 <button
                   type="button"
+                  disabled={isCurrent}
                   onClick={() => onSelectPlan(plan.id, billingCycle)}
                   className={`w-full py-2.5 rounded-xl font-bold text-xs font-mono transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                     isCurrent
-                      ? 'bg-[#161b26] text-slate-400 border border-white/[0.08] cursor-default'
-                      : plan.highlighted
+                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 cursor-default'
+                      : showMostPopularBadge
                       ? 'bg-emerald-500 text-black hover:bg-emerald-400 shadow-md shadow-emerald-500/20'
                       : 'bg-[#0f1422] text-white hover:bg-[#161f33] border border-white/[0.08]'
                   }`}
                 >
-                  <span>{isCurrent ? 'Current Active Plan' : `Select ${plan.name}`}</span>
+                  <span>{isCurrent ? 'Active Plan' : `Upgrade to ${plan.name}`}</span>
                   {!isCurrent && <ArrowRight className="w-3.5 h-3.5" />}
                 </button>
               </div>
