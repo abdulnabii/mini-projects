@@ -37,7 +37,7 @@ Welcome to the **30 AI Projects in 30 Days** repository by **Abdul Nabi**. This 
 | **27** | [QueryForge.AI — Natural Language SQL & ORM Studio](./day-27-ai-database-query-builder) | Database / DevTools | 🌐 [day-27-ai-database-query-builder.vercel.app](https://day-27-ai-database-query-builder.vercel.app) | Next.js 16, Monaco, Gemini API | ✅ Deployed |
 | **28** | [OmniData.3D — 3D Interactive Data Visualization Platform](./day-28-3d-data-visualization) | Data Viz / WebGL / Spatial AI | 🌐 [day-28-3d-data-visualization.vercel.app](https://day-28-3d-data-visualization.vercel.app) | Next.js 16, Three.js, WebGL, Gemini API | ✅ Deployed |
 | **29** | [OpsPulse.AI — AI DevOps Incident Response & SRE Triage Assistant](./day-29-devops-incident-assistant) | DevOps / SRE / Automation | 🌐 [day-29-devops-incident-assistant.vercel.app](https://day-29-devops-incident-assistant.vercel.app) | Next.js 16, Tailwind CSS, Gemini API | ✅ Deployed |
-| **30** | *AI SaaS Boilerplate* | SaaS / Enterprise | *Coming Next* | Next.js 16, Gemini API | ⏳ Queued |
+| **30** | [SaaSForge.AI — Full-Stack AI SaaS Boilerplate & Starter Kit](./day-30-ai-saas-boilerplate) | SaaS / Full-Stack / Developer Tools | 🌐 [day-30-ai-saas-boilerplate.vercel.app](https://day-30-ai-saas-boilerplate.vercel.app) | Next.js 16, Stripe, Upstash, Clerk, Gemini API | ✅ Deployed |
 
 ---
 
