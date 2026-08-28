@@ -18,6 +18,7 @@ import HeadingTreeCard from '@/components/HeadingTreeCard';
 import ActionPlanCard from '@/components/ActionPlanCard';
 import AISectionRewriter from '@/components/AISectionRewriter';
 import FAQSchemaGenerator from '@/components/FAQSchemaGenerator';
+import AEOFAQSection from '@/components/AEOFAQSection';
 import { Sparkles, Search, CheckCircle2, ArrowDown, RotateCcw, Download } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -224,6 +225,9 @@ ${auditResult.actionPlan
             <ActionPlanCard actionPlan={auditResult.actionPlan} />
           </section>
         )}
+
+        {/* 100% AEO Crawlable Knowledge Hub Section */}
+        <AEOFAQSection />
       </main>
 
       <Footer />
