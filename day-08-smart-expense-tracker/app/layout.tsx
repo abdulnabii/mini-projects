@@ -23,6 +23,61 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
+      
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: `{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://day-08-smart-expense-tracker.vercel.app/#webapp",
+      "name": "SpendWise.AI",
+      "url": "https://day-08-smart-expense-tracker.vercel.app",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "description": "Intelligent personal financial management platform with automated expense categorization, budget pacing forecast, subscription leak detector, and actionable AI coaching.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://day-08-smart-expense-tracker.vercel.app/#website",
+      "url": "https://day-08-smart-expense-tracker.vercel.app",
+      "name": "SpendWise.AI",
+      "publisher": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://day-08-smart-expense-tracker.vercel.app/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does SpendWise.AI detect subscription leaks?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The engine scans recurring transaction patterns, identifies duplicate or unused SaaS subscriptions, and calculates annual cost savings."
+          }
+        }
+      ]
+    }
+  ]
+}` }}
+        />
+      </head>
       <body className={`${inter.variable} ${jetBrainsMono.variable} ${outfit.variable} bg-[#060e0e] text-slate-200 min-h-screen flex flex-col font-sans antialiased selection:bg-emerald-500/30 selection:text-white`}>
         {children}
       </body>

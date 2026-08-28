@@ -23,6 +23,61 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
+      
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: `{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://day-14-language-flashcard-ai.vercel.app/#webapp",
+      "name": "LingoPulse.AI",
+      "url": "https://day-14-language-flashcard-ai.vercel.app",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "description": "Multi-sensory language acquisition engine combining the SuperMemo-2 (SM-2) algorithm, 3D interactive flashcards, AI deck generation across 5 languages (with RTL Arabic/Urdu), and live speech pronunciation scoring.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://day-14-language-flashcard-ai.vercel.app/#website",
+      "url": "https://day-14-language-flashcard-ai.vercel.app",
+      "name": "LingoPulse.AI",
+      "publisher": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://day-14-language-flashcard-ai.vercel.app/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does the SM-2 spaced repetition algorithm work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "SM-2 calculates optimal review intervals dynamically based on user recall grades (0 to 5), ensuring flashcards are presented immediately before natural memory decay occurs."
+          }
+        }
+      ]
+    }
+  ]
+}` }}
+        />
+      </head>
       <body className={`${inter.variable} ${mono.variable} ${outfit.variable} bg-[#0b0f19] text-slate-200 min-h-screen flex flex-col font-sans antialiased selection:bg-emerald-500/30 selection:text-white`}>
         {children}
       </body>

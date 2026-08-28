@@ -25,6 +25,61 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
+      
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: `{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://day-12-coding-interview-coach.vercel.app/#webapp",
+      "name": "AlgoCoach.AI",
+      "url": "https://day-12-coding-interview-coach.vercel.app",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "description": "Interactive technical interview simulator evaluating algorithmic problem solving, Big-O time/space complexity, edge-case coverage, and code design in real-time.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://day-12-coding-interview-coach.vercel.app/#website",
+      "url": "https://day-12-coding-interview-coach.vercel.app",
+      "name": "AlgoCoach.AI",
+      "publisher": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://day-12-coding-interview-coach.vercel.app/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does AlgoCoach.AI evaluate coding submissions?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It evaluates algorithmic correctness against test cases, calculates theoretical Big-O time and space complexity, and provides step-by-step optimization hints."
+          }
+        }
+      ]
+    }
+  ]
+}` }}
+        />
+      </head>
       <body className={`${inter.variable} ${outfit.variable} ${mono.variable} bg-[#0a0d14] text-slate-200 min-h-screen flex flex-col antialiased`}>
         <Navbar />
         <main className="flex-1 flex flex-col">{children}</main>

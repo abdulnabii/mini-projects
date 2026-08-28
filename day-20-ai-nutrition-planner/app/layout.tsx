@@ -21,6 +21,61 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable} dark`}>
+      
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: `{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://day-20-ai-nutrition-planner.vercel.app/#webapp",
+      "name": "MacroBite.AI",
+      "url": "https://day-20-ai-nutrition-planner.vercel.app",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "description": "Personalized dietary planner calculating exact Basal Metabolic Rate (BMR), Total Daily Energy Expenditure (TDEE), and multi-day meal plans with automated grocery lists.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://day-20-ai-nutrition-planner.vercel.app/#website",
+      "url": "https://day-20-ai-nutrition-planner.vercel.app",
+      "name": "MacroBite.AI",
+      "publisher": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://day-20-ai-nutrition-planner.vercel.app/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does MacroBite.AI calculate calorie targets?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It uses the Mifflin-St Jeor equation factoring in body weight, height, age, gender, and activity level to generate precise macronutrient splits."
+          }
+        }
+      ]
+    }
+  ]
+}` }}
+        />
+      </head>
       <body className="min-h-screen flex flex-col bg-[#060e14] text-slate-200 antialiased selection:bg-emerald-500 selection:text-black">
         <Navbar />
         <main className="flex-1 p-4 sm:p-8 max-w-7xl mx-auto w-full space-y-10 font-mono min-w-0">

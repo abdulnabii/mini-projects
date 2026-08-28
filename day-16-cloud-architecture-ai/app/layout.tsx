@@ -33,6 +33,61 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
+      
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: `{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://day-16-cloud-architecture-ai.vercel.app/#webapp",
+      "name": "CloudArchitect.AI",
+      "url": "https://day-16-cloud-architecture-ai.vercel.app",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "description": "Interactive cloud topology designer with automated Single Point of Failure (SPOF) security audits, multi-region high-availability recommendations, and 1-click Terraform HCL generation.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://day-16-cloud-architecture-ai.vercel.app/#website",
+      "url": "https://day-16-cloud-architecture-ai.vercel.app",
+      "name": "CloudArchitect.AI",
+      "publisher": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://day-16-cloud-architecture-ai.vercel.app/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Can CloudArchitect.AI generate infrastructure code?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! CloudArchitect.AI converts visual architecture diagrams directly into production-ready Terraform (IaC) and AWS CloudFormation templates."
+          }
+        }
+      ]
+    }
+  ]
+}` }}
+        />
+      </head>
       <body
         className={`${inter.variable} ${mono.variable} ${outfit.variable} bg-[#060a12] text-slate-200 min-h-screen flex flex-col font-sans antialiased selection:bg-cyan-500/30 selection:text-white`}
       >

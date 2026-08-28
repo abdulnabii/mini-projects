@@ -30,6 +30,69 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
+      
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: `{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://ai-symptom-checker.vercel.app/#webapp",
+      "name": "HealthPulse.AI",
+      "url": "https://ai-symptom-checker.vercel.app",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "description": "AI-powered clinical triage engine analyzing patient symptoms with severity stratification, red flag detection, differential considerations, and plain-English medical guidance.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://ai-symptom-checker.vercel.app/#website",
+      "url": "https://ai-symptom-checker.vercel.app",
+      "name": "HealthPulse.AI",
+      "publisher": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://ai-symptom-checker.vercel.app/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is HealthPulse.AI?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "HealthPulse.AI is an AI-powered medical symptom checker that assists patients in understanding potential health conditions through intelligent clinical triage and urgency stratification."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the clinical triage engine work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The engine cross-references reported symptoms, duration, and patient demographics against medical knowledge graphs to evaluate emergency red flags and suggest appropriate care pathways."
+          }
+        }
+      ]
+    }
+  ]
+}` }}
+        />
+      </head>
       <body className={`${inter.variable} bg-slate-950 text-slate-100 min-h-screen flex flex-col`}>
         <DisclaimerBanner />
         <Navbar />

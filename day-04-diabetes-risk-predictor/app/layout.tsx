@@ -31,6 +31,61 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
+      
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: `{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://diabetes-risk-predictor.vercel.app/#webapp",
+      "name": "GlucoPredict.AI",
+      "url": "https://diabetes-risk-predictor.vercel.app",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "description": "Evidence-based clinical diabetes risk assessment tool utilizing ensemble ML models with SHAP feature importance explainability, lifestyle interventions, and metabolic biomarkers.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://diabetes-risk-predictor.vercel.app/#website",
+      "url": "https://diabetes-risk-predictor.vercel.app",
+      "name": "GlucoPredict.AI",
+      "publisher": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://diabetes-risk-predictor.vercel.app/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What machine learning models power GlucoPredict.AI?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "GlucoPredict.AI uses trained clinical classification algorithms paired with SHAP (SHapley Additive exPlanations) values to make predictive risk scores transparent and clinically actionable."
+          }
+        }
+      ]
+    }
+  ]
+}` }}
+        />
+      </head>
       <body className={`${inter.variable} ${mono.variable} ${outfit.variable} bg-[#061019] text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-teal-500/30 selection:text-white`}>
         <Navbar />
         <main className="flex-1 flex flex-col">{children}</main>

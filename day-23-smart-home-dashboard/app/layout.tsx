@@ -21,6 +21,61 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable} dark`}>
+      
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: `{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://day-23-smart-home-dashboard.vercel.app/#webapp",
+      "name": "HomeSync.AI",
+      "url": "https://day-23-smart-home-dashboard.vercel.app",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "description": "Unified IoT control platform managing smart lighting, climate, security cameras, and automated energy-saving routines with real-time kilowatt telemetry.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://day-23-smart-home-dashboard.vercel.app/#website",
+      "url": "https://day-23-smart-home-dashboard.vercel.app",
+      "name": "HomeSync.AI",
+      "publisher": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://day-23-smart-home-dashboard.vercel.app/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does HomeSync.AI optimize energy consumption?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "HomeSync.AI correlates ambient weather forecasts, room occupancy sensors, and peak utility pricing tiers to schedule HVAC and appliance usage automatically."
+          }
+        }
+      ]
+    }
+  ]
+}` }}
+        />
+      </head>
       <body className="min-h-screen flex flex-col bg-[#060e14] text-slate-200 antialiased selection:bg-cyan-500 selection:text-black">
         <Navbar />
         <main className="flex-1 p-4 sm:p-8 max-w-7xl mx-auto w-full space-y-10 font-mono min-w-0">

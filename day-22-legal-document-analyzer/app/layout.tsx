@@ -21,6 +21,61 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable} dark`}>
+      
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: `{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://day-22-legal-document-analyzer.vercel.app/#webapp",
+      "name": "LexiGuard.AI",
+      "url": "https://day-22-legal-document-analyzer.vercel.app",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "description": "Contract intelligence tool parsing NDAs, SaaS agreements, and employment contracts to surface high-risk indemnification clauses, non-compete liabilities, and plain-English summaries.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://day-22-legal-document-analyzer.vercel.app/#website",
+      "url": "https://day-22-legal-document-analyzer.vercel.app",
+      "name": "LexiGuard.AI",
+      "publisher": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://day-22-legal-document-analyzer.vercel.app/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does LexiGuard.AI analyze contracts?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "LexiGuard.AI scans legal agreements against standard industry benchmarks to identify ambiguous terms, uncapped liability clauses, and unfavorable termination windows."
+          }
+        }
+      ]
+    }
+  ]
+}` }}
+        />
+      </head>
       <body className="min-h-screen flex flex-col bg-[#060e14] text-slate-200 antialiased selection:bg-amber-500 selection:text-black">
         <Navbar />
         <main className="flex-1 p-4 sm:p-8 max-w-7xl mx-auto w-full space-y-10 font-mono min-w-0">

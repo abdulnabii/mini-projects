@@ -23,6 +23,61 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
+      
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: `{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://day-11-medical-image-classifier.vercel.app/#webapp",
+      "name": "RadVision.AI",
+      "url": "https://day-11-medical-image-classifier.vercel.app",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "description": "Clinical diagnostic assistant analyzing radiographic scans with simulated GradCAM class activation heatmap overlays, confidence metrics, and radiological differential findings.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://day-11-medical-image-classifier.vercel.app/#website",
+      "url": "https://day-11-medical-image-classifier.vercel.app",
+      "name": "RadVision.AI",
+      "publisher": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://day-11-medical-image-classifier.vercel.app/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is GradCAM in medical imaging?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "GradCAM (Gradient-weighted Class Activation Mapping) produces visual heatmaps highlighting the exact regions of an X-ray or MRI that influenced the AI model diagnostic classification."
+          }
+        }
+      ]
+    }
+  ]
+}` }}
+        />
+      </head>
       <body className={`${inter.variable} ${jetBrainsMono.variable} ${outfit.variable} bg-[#080c14] text-slate-200 min-h-screen flex flex-col font-sans antialiased selection:bg-cyan-500/30 selection:text-white`}>
         {children}
       </body>

@@ -10,7 +10,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
         disallow: ['/api/'],
       },
-      // Explicit AI Answer Engine & Web Crawler Authorizations (AEO & GEO)
       {
         userAgent: [
           'GPTBot',

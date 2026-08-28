@@ -31,6 +31,61 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
+      
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: `{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://day-17-job-application-tracker.vercel.app/#webapp",
+      "name": "JobFlow.AI",
+      "url": "https://day-17-job-application-tracker.vercel.app",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "description": "Kanban job application management CRM featuring interview preparation flashcards, salary benchmark analytics, and automated follow-up email drafts.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://day-17-job-application-tracker.vercel.app/#website",
+      "url": "https://day-17-job-application-tracker.vercel.app",
+      "name": "JobFlow.AI",
+      "publisher": {
+        "@type": "Person",
+        "name": "Abdul Nabi",
+        "url": "https://github.com/abdulnabii"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://day-17-job-application-tracker.vercel.app/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does JobFlow.AI organize job applications?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "JobFlow.AI uses an interactive Kanban pipeline (Applied, Screening, Technical, Offer) with automated reminder scheduling and interview Q&A generators."
+          }
+        }
+      ]
+    }
+  ]
+}` }}
+        />
+      </head>
       <body
         className={`${inter.variable} ${mono.variable} ${outfit.variable} bg-[#060a12] text-slate-200 min-h-screen flex flex-col font-sans antialiased selection:bg-emerald-500/30 selection:text-white`}
       >

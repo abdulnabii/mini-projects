@@ -20,6 +20,7 @@ export default function robots(): MetadataRoute.Robots {
           'Google-Extended',
           'Applebot',
           'cohere-ai',
+          'Bytespider',
           'Googlebot',
           'Bingbot',
         ],
