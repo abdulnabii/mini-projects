@@ -56,9 +56,48 @@ export interface HeadingStructureMetric {
 export interface ContentLengthMetric {
   wordCount: number;
   top10BenchmarkWords: number;
-  gapWords: number; // positive means need more words
+  gapWords: number;
   status: 'comprehensive' | 'optimal' | 'thin';
   recommendation: string;
+}
+
+export interface EEATMetric {
+  experienceScore: number; // 0 to 100
+  expertiseScore: number;
+  authoritativenessScore: number;
+  trustworthinessScore: number;
+  compositeEEAT: number;
+  searchIntent: 'Informational' | 'Commercial' | 'Transactional' | 'Navigational';
+  intentConfidence: number; // e.g. 92%
+}
+
+export interface NLPEntityItem {
+  name: string;
+  count: number;
+  category: 'Concept' | 'Technology' | 'Metric' | 'Methodology';
+}
+
+export interface MissingNLPEntity {
+  name: string;
+  importance: 'HIGH' | 'MEDIUM';
+  suggestedContext: string;
+}
+
+export interface NLPEntityMetric {
+  coveredEntities: NLPEntityItem[];
+  missingEntities: MissingNLPEntity[];
+  entityCoverageScore: number; // 0 to 100
+}
+
+export interface CompetitorBenchmark {
+  userWords: number;
+  avgTop10Words: number;
+  userHeadings: number;
+  avgTop10Headings: number;
+  userReadability: number;
+  avgTop10Readability: number;
+  userKeywordDensity: number;
+  avgTop10KeywordDensity: number;
 }
 
 export interface LinkOpportunity {
@@ -72,7 +111,7 @@ export interface ActionPlanItem {
   action: string;
   impact: 'HIGH' | 'MEDIUM' | 'LOW';
   effort: 'LOW' | 'MEDIUM' | 'HIGH';
-  category: 'Keyword' | 'Readability' | 'Meta' | 'Headings' | 'Content Length' | 'Links';
+  category: 'Keyword' | 'Readability' | 'Meta' | 'Headings' | 'Content Length' | 'Links' | 'EEAT' | 'NLP';
 }
 
 export interface GSCPerformance {
@@ -95,6 +134,9 @@ export interface SEOAuditResult {
   metaAudit: MetaAuditMetric;
   headingStructure: HeadingStructureMetric;
   contentLength: ContentLengthMetric;
+  eeat: EEATMetric;
+  nlpEntities: NLPEntityMetric;
+  competitorBenchmark: CompetitorBenchmark;
   internalLinks: LinkOpportunity[];
   actionPlan: ActionPlanItem[];
   gscPerformance: GSCPerformance;

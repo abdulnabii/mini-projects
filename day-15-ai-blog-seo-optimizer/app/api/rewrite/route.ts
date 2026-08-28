@@ -3,12 +3,12 @@ import { rewriteParagraphWithAI } from '@/lib/gemini';
 
 export async function POST(req: Request) {
   try {
-    const { paragraph, targetKeyword, goal } = await req.json();
+    const { paragraph, targetKeyword, mode } = await req.json();
 
     const result = await rewriteParagraphWithAI(
       paragraph || '',
       targetKeyword || '',
-      goal || 'Improve readability, sentence brevity, and keyword placement'
+      mode || 'READABILITY'
     );
 
     return NextResponse.json(result);

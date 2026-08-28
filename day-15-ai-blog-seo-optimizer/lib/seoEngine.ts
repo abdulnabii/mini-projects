@@ -1,12 +1,17 @@
 import {
   ActionPlanItem,
+  CompetitorBenchmark,
   ContentLengthMetric,
+  EEATMetric,
   GSCPerformance,
   HeadingNode,
   HeadingStructureMetric,
   KeywordDensityMetric,
   LinkOpportunity,
   MetaAuditMetric,
+  MissingNLPEntity,
+  NLPEntityItem,
+  NLPEntityMetric,
   ReadabilityMetric,
   SEOAuditResult,
 } from '@/types';
@@ -38,13 +43,11 @@ export function scoreReadability(text: string): ReadabilityMetric {
   const avgSentenceLength = Number((totalWords / totalSentences).toFixed(1));
   const avgSyllablesPerWord = Number((totalSyllables / totalWords).toFixed(2));
 
-  // Flesch Reading Ease Formula
-  // 206.835 - (1.015 * ASL) - (84.6 * ASW)
+  // Flesch Reading Ease Formula: 206.835 - (1.015 * ASL) - (84.6 * ASW)
   const rawEase = 206.835 - 1.015 * avgSentenceLength - 84.6 * avgSyllablesPerWord;
   const fleschScore = Math.max(0, Math.min(100, Math.round(rawEase)));
 
-  // Flesch-Kincaid Grade Level Formula
-  // (0.39 * ASL) + (11.8 * ASW) - 15.59
+  // Flesch-Kincaid Grade Level Formula: (0.39 * ASL) + (11.8 * ASW) - 15.59
   const rawGrade = 0.39 * avgSentenceLength + 11.8 * avgSyllablesPerWord - 15.59;
   const gradeNumber = Math.max(1, Math.round(rawGrade));
 
@@ -273,6 +276,131 @@ export function benchmarkContentLength(wordCount: number): ContentLengthMetric {
   };
 }
 
+// Google E-E-A-T & Search Intent Engine
+export function evaluateEEAT(content: string, title: string, keyword: string): EEATMetric {
+  const text = content.toLowerCase();
+
+  // Experience: first-person pronouns, empirical testing, real-world setup
+  const expSignals = ['we tested', 'our team', 'in production', 'we benchmarked', 'case study', 'observed in', 'hands-on'];
+  let expCount = 0;
+  expSignals.forEach((s) => {
+    if (text.includes(s)) expCount += 1;
+  });
+  const experienceScore = Math.min(100, Math.max(50, expCount * 22 + 45));
+
+  // Expertise: technical terms, metrics, code, data points
+  const expertSignals = ['ms', 'latency', 'architecture', 'throughput', 'algorithm', 'parameter', 'protocol', 'database', 'schema', 'api'];
+  let expertCount = 0;
+  expertSignals.forEach((s) => {
+    if (text.includes(s)) expertCount += 1;
+  });
+  const expertiseScore = Math.min(100, Math.max(55, expertCount * 12 + 40));
+
+  // Authoritativeness: industry standards, citations, comparative analysis
+  const authSignals = ['according to', 'research by', 'rfc', 'iso', 'standard', 'framework', 'industry benchmark', 'compared to'];
+  let authCount = 0;
+  authSignals.forEach((s) => {
+    if (text.includes(s)) authCount += 1;
+  });
+  const authoritativenessScore = Math.min(100, Math.max(45, authCount * 20 + 40));
+
+  // Trustworthiness: clear takeaways, caveats, disclaimers, no spammy claims
+  const trustSignals = ['tradeoff', 'limitation', 'consideration', 'best practice', 'security', 'compliance'];
+  let trustCount = 0;
+  trustSignals.forEach((s) => {
+    if (text.includes(s)) trustCount += 1;
+  });
+  const trustworthinessScore = Math.min(100, Math.max(60, trustCount * 15 + 50));
+
+  const compositeEEAT = Math.round(
+    experienceScore * 0.25 + expertiseScore * 0.3 + authoritativenessScore * 0.25 + trustworthinessScore * 0.2
+  );
+
+  // Search intent classification
+  let searchIntent: EEATMetric['searchIntent'] = 'Informational';
+  let intentConfidence = 88;
+
+  if (title.toLowerCase().includes('best') || title.toLowerCase().includes('vs') || title.toLowerCase().includes('review')) {
+    searchIntent = 'Commercial';
+    intentConfidence = 92;
+  } else if (title.toLowerCase().includes('buy') || title.toLowerCase().includes('pricing') || title.toLowerCase().includes('download')) {
+    searchIntent = 'Transactional';
+    intentConfidence = 95;
+  } else if (title.toLowerCase().includes('login') || title.toLowerCase().includes('portal')) {
+    searchIntent = 'Navigational';
+    intentConfidence = 90;
+  }
+
+  return {
+    experienceScore,
+    expertiseScore,
+    authoritativenessScore,
+    trustworthinessScore,
+    compositeEEAT,
+    searchIntent,
+    intentConfidence,
+  };
+}
+
+// NLP Semantic Entities & Topic Gaps Analyzer
+export function analyzeNLPEntities(content: string, targetKeyword: string): NLPEntityMetric {
+  const norm = content.toLowerCase();
+
+  // Curated knowledge graph entities based on tech / SEO topics
+  const candidateEntities: { name: string; category: NLPEntityItem['category'] }[] = [
+    { name: 'Latency Benchmarks', category: 'Metric' },
+    { name: 'Throughput (RPS)', category: 'Metric' },
+    { name: 'Core Web Vitals', category: 'Metric' },
+    { name: 'Next.js Turbopack', category: 'Technology' },
+    { name: 'Kubernetes Pods', category: 'Technology' },
+    { name: 'TypeScript Interface', category: 'Technology' },
+    { name: 'PostgreSQL Connection Pool', category: 'Technology' },
+    { name: 'Spaced Repetition SM-2', category: 'Methodology' },
+    { name: 'Flesch-Kincaid Grade', category: 'Methodology' },
+    { name: 'Token Bucket Limiter', category: 'Methodology' },
+    { name: 'Zero-Shot Inference', category: 'Concept' },
+    { name: 'Semantic Search Embeddings', category: 'Concept' },
+    { name: 'Idempotency Keys', category: 'Concept' },
+    { name: 'Multi-Tenant RBAC', category: 'Concept' },
+    { name: 'Structured JSON-LD Schema', category: 'Technology' },
+  ];
+
+  const coveredEntities: NLPEntityItem[] = [];
+  const missingEntities: MissingNLPEntity[] = [];
+
+  candidateEntities.forEach((ent) => {
+    const regex = new RegExp(`\\b${ent.name.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
+    const matches = norm.match(regex);
+    if (matches && matches.length > 0) {
+      coveredEntities.push({
+        name: ent.name,
+        count: matches.length,
+        category: ent.category,
+      });
+    } else {
+      if (missingEntities.length < 5) {
+        missingEntities.push({
+          name: ent.name,
+          importance: missingEntities.length < 2 ? 'HIGH' : 'MEDIUM',
+          suggestedContext: `Incorporate '${ent.name}' into technical implementation sections to signal deep semantic breadth to Google Gemini & RankBrain.`,
+        });
+      }
+    }
+  });
+
+  const totalCandidate = candidateEntities.length;
+  const entityCoverageScore = Math.min(
+    100,
+    Math.max(40, Math.round((coveredEntities.length / Math.max(1, candidateEntities.length * 0.6)) * 100))
+  );
+
+  return {
+    coveredEntities,
+    missingEntities,
+    entityCoverageScore,
+  };
+}
+
 export function runFullSEOAudit(
   content: string,
   targetKeyword: string,
@@ -285,40 +413,58 @@ export function runFullSEOAudit(
   const headingStructure = validateHeadings(content, targetKeyword);
   const metaAudit = auditMeta(title, metaDescription, targetKeyword);
   const contentLength = benchmarkContentLength(readability.totalWords);
+  const eeat = evaluateEEAT(content, title, targetKeyword);
+  const nlpEntities = analyzeNLPEntities(content, targetKeyword);
+
+  // Competitor Top-10 Benchmark
+  const competitorBenchmark: CompetitorBenchmark = {
+    userWords: readability.totalWords,
+    avgTop10Words: 2450,
+    userHeadings: headingStructure.headings.length,
+    avgTop10Headings: 14,
+    userReadability: readability.fleschScore,
+    avgTop10Readability: 65,
+    userKeywordDensity: keywordDensity.densityPercent,
+    avgTop10KeywordDensity: 1.8,
+  };
 
   // Calculate composite score (0 - 100)
   let score = 0;
 
-  // Readability (25 pts)
-  if (readability.fleschScore >= 60 && readability.fleschScore <= 75) score += 25;
-  else if (readability.fleschScore >= 50 && readability.fleschScore <= 85) score += 20;
-  else score += 12;
+  // Readability (20 pts)
+  if (readability.fleschScore >= 60 && readability.fleschScore <= 75) score += 20;
+  else if (readability.fleschScore >= 50 && readability.fleschScore <= 85) score += 16;
+  else score += 10;
 
-  // Keyword optimization (25 pts)
-  if (keywordDensity.status === 'optimal') score += 12;
-  else score += 6;
-  if (keywordDensity.inTitle) score += 4;
-  if (keywordDensity.inFirst100Words) score += 4;
-  if (keywordDensity.inH2Count > 0) score += 3;
+  // Keyword optimization (20 pts)
+  if (keywordDensity.status === 'optimal') score += 10;
+  else score += 5;
+  if (keywordDensity.inTitle) score += 3;
+  if (keywordDensity.inFirst100Words) score += 3;
+  if (keywordDensity.inH2Count > 0) score += 2;
   if (keywordDensity.inMetaDescription) score += 2;
 
-  // Meta Audit (20 pts)
-  if (metaAudit.titleStatus === 'optimal') score += 5;
-  if (metaAudit.hasKeywordInTitle) score += 5;
-  if (metaAudit.descriptionStatus === 'optimal') score += 5;
-  if (metaAudit.hasKeywordInDescription) score += 5;
+  // Meta Audit (15 pts)
+  if (metaAudit.titleStatus === 'optimal') score += 4;
+  if (metaAudit.hasKeywordInTitle) score += 4;
+  if (metaAudit.descriptionStatus === 'optimal') score += 4;
+  if (metaAudit.hasKeywordInDescription) score += 3;
 
   // Headings & Hierarchy (15 pts)
   if (!headingStructure.hasMissingH1 && !headingStructure.hasMultipleH1) score += 6;
   if (headingStructure.h2Count >= 3) score += 5;
   if (!headingStructure.hasSkippedLevels) score += 4;
 
+  // E-E-A-T & NLP Entities (15 pts)
+  score += Math.round((eeat.compositeEEAT / 100) * 8);
+  score += Math.round((nlpEntities.entityCoverageScore / 100) * 7);
+
   // Content Length (15 pts)
   if (contentLength.status === 'comprehensive') score += 15;
   else if (contentLength.status === 'optimal') score += 10;
   else score += 5;
 
-  score = Math.min(100, Math.max(25, score));
+  score = Math.min(100, Math.max(30, score));
 
   // Determine Grade
   let grade: SEOAuditResult['grade'] = 'B';
@@ -336,7 +482,7 @@ export function runFullSEOAudit(
   if (!metaAudit.hasKeywordInTitle || metaAudit.titleStatus !== 'optimal') {
     actionPlan.push({
       priority: priority++,
-      action: `Optimize Title: Ensure target keyword "${targetKeyword}" appears in the first 50 characters (Current: ${metaAudit.titleLength} chars).`,
+      action: `Optimize Title: Position target keyword "${targetKeyword}" in the first 50 characters (Current length: ${metaAudit.titleLength} chars).`,
       impact: 'HIGH',
       effort: 'LOW',
       category: 'Meta',
@@ -346,7 +492,7 @@ export function runFullSEOAudit(
   if (!metaAudit.hasKeywordInDescription || metaAudit.descriptionStatus !== 'optimal') {
     actionPlan.push({
       priority: priority++,
-      action: `Refine Meta Description: Expand to 140–160 chars with target keyword and clear call-to-action (Current: ${metaAudit.descriptionLength} chars).`,
+      action: `Refine Meta Description: Expand to 140–160 chars with target keyword and value proposition (Current length: ${metaAudit.descriptionLength} chars).`,
       impact: 'HIGH',
       effort: 'LOW',
       category: 'Meta',
@@ -356,7 +502,7 @@ export function runFullSEOAudit(
   if (keywordDensity.status === 'under-optimized') {
     actionPlan.push({
       priority: priority++,
-      action: `Increase Keyword Presence: Naturally incorporate "${targetKeyword}" in 2–3 subheadings and opening paragraph (Current density: ${keywordDensity.densityPercent}%).`,
+      action: `Increase Keyword Density: Weave "${targetKeyword}" into 2 subheadings and the opening paragraph (Current density: ${keywordDensity.densityPercent}%).`,
       impact: 'HIGH',
       effort: 'MEDIUM',
       category: 'Keyword',
@@ -364,57 +510,67 @@ export function runFullSEOAudit(
   } else if (keywordDensity.status === 'over-optimized') {
     actionPlan.push({
       priority: priority++,
-      action: `Reduce Keyword Stuffing: Replace repetitive instances of "${targetKeyword}" with semantic LSI synonyms (Current density: ${keywordDensity.densityPercent}%).`,
+      action: `Mitigate Keyword Stuffing: Replace repetitive instances of "${targetKeyword}" with semantic LSI synonyms (Current density: ${keywordDensity.densityPercent}%).`,
       impact: 'HIGH',
       effort: 'MEDIUM',
       category: 'Keyword',
     });
   }
 
+  if (nlpEntities.missingEntities.length > 0) {
+    actionPlan.push({
+      priority: priority++,
+      action: `Inject Missing NLP Entities: Add topical coverage for '${nlpEntities.missingEntities[0].name}' to close competitor content gaps.`,
+      impact: 'HIGH',
+      effort: 'LOW',
+      category: 'NLP',
+    });
+  }
+
   if (contentLength.status === 'thin') {
     actionPlan.push({
       priority: priority++,
-      action: `Expand Content Depth: Add ~${contentLength.gapWords} words of practical implementations & FAQs to outrank top 10 competitors.`,
+      action: `Expand Content Depth: Add ~${contentLength.gapWords} words of practical blueprints & benchmarks to match Top-10 SERP averages.`,
       impact: 'HIGH',
       effort: 'HIGH',
       category: 'Content Length',
     });
   }
 
+  if (eeat.compositeEEAT < 75) {
+    actionPlan.push({
+      priority: priority++,
+      action: 'Strengthen E-E-A-T Signals: Add real-world benchmark metrics, hands-on production observations, and quantitative test findings.',
+      impact: 'MEDIUM',
+      effort: 'MEDIUM',
+      category: 'EEAT',
+    });
+  }
+
   if (readability.fleschScore < 55) {
     actionPlan.push({
       priority: priority++,
-      action: `Improve Readability Grade: Simplify compound sentences (Average sentence length is ${readability.avgSentenceLength} words; aim for < 18 words).`,
+      action: `Boost Flesch Reading Ease: Shorten compound sentences (Average sentence length is ${readability.avgSentenceLength} words; target < 18 words).`,
       impact: 'MEDIUM',
       effort: 'MEDIUM',
       category: 'Readability',
     });
   }
 
-  if (headingStructure.hasSkippedLevels || headingStructure.issues.length > 0) {
-    actionPlan.push({
-      priority: priority++,
-      action: 'Fix Heading Hierarchy: Eliminate skipped H-tag levels and add descriptive subheadings.',
-      impact: 'MEDIUM',
-      effort: 'LOW',
-      category: 'Headings',
-    });
-  }
-
   // Internal link opportunities
   const internalLinks: LinkOpportunity[] = [
     {
-      anchorPhrase: 'modern architecture patterns',
-      targetTopic: '/blog/software-architecture-best-practices',
+      anchorPhrase: 'autonomous agentic workflows',
+      targetTopic: '/blog/ai-agent-architecture-guide',
       reason: 'Semantically related high-authority internal pillar page.',
     },
     {
-      anchorPhrase: 'performance benchmarking metrics',
-      targetTopic: '/blog/web-vitals-optimization-guide',
+      anchorPhrase: 'real-time latency benchmarks',
+      targetTopic: '/blog/web-vitals-performance-optimization',
       reason: 'Deepens visitor time-on-site and passes PageRank equity.',
     },
     {
-      anchorPhrase: 'cloud deployment workflows',
+      anchorPhrase: 'cloud architecture deployment',
       targetTopic: '/blog/devops-ci-cd-pipelines',
       reason: 'Contextual link to practical execution tutorial.',
     },
@@ -422,10 +578,10 @@ export function runFullSEOAudit(
 
   // GSC Performance Estimator
   const gscPerformance: GSCPerformance = {
-    estimatedPosition: score >= 85 ? 4.2 : score >= 70 ? 11.5 : 28.4,
-    projectedCTR: score >= 85 ? 6.8 : score >= 70 ? 2.9 : 0.8,
-    projectedMonthlyClicks: score >= 85 ? 1420 : score >= 70 ? 380 : 65,
-    projectedImpressions: score >= 85 ? 21000 : score >= 70 ? 13500 : 8200,
+    estimatedPosition: score >= 85 ? 3.8 : score >= 70 ? 9.2 : 24.5,
+    projectedCTR: score >= 85 ? 7.4 : score >= 70 ? 3.2 : 0.9,
+    projectedMonthlyClicks: score >= 85 ? 1850 : score >= 70 ? 490 : 75,
+    projectedImpressions: score >= 85 ? 24500 : score >= 70 ? 15200 : 8800,
     rankingDifficulty: 'Medium',
   };
 
@@ -442,15 +598,18 @@ export function runFullSEOAudit(
     grade,
     headlineSummary:
       score >= 85
-        ? 'High-ranking content profile with strong keyword distribution and clear readability.'
+        ? 'Exceptional on-page SEO profile with robust keyword distribution, high E-E-A-T signals, and plain English readability.'
         : score >= 70
-        ? 'Solid on-page SEO foundation with minor heading and meta description optimization opportunities.'
-        : 'Under-optimized content. Follow the prioritized action plan below to climb search rankings.',
+        ? 'Solid SEO foundation. Resolve minor entity gaps and heading hierarchy warnings to climb to Page 1.'
+        : 'Under-optimized content asset. Execute the prioritized roadmap below to achieve competitive search ranking.',
     keywordDensity,
     readability,
     metaAudit,
     headingStructure,
     contentLength,
+    eeat,
+    nlpEntities,
+    competitorBenchmark,
     internalLinks,
     actionPlan,
     gscPerformance,
