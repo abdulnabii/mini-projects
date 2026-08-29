@@ -169,6 +169,16 @@ export const INITIAL_SAMPLE_RESULT: ArchitectureDesignResult = {
       },
     ],
   },
+  wellArchitected: {
+    security: 96,
+    reliability: 94,
+    performance: 98,
+    costOptimization: 88,
+    operationalExcellence: 92,
+    sustainability: 90,
+    overallScore: 94,
+    frameworkSummary: 'Exceeds AWS Well-Architected Framework benchmarks with Multi-AZ redundancy, WAF perimeter security, ARM64 Graviton compute, and automated IaC.',
+  },
   terraformCode: `# main.tf - Production Cloud Infrastructure
 terraform {
   required_version = ">= 1.5.0"
@@ -275,6 +285,47 @@ services:
 volumes:
   redis_data:
   pg_data:
+`,
+  kubernetesCode: `# k8s-deployment.yaml - Kubernetes Production Manifest
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ride-hailing-matching-service
+  labels:
+    app: matching-service
+spec:
+  replicas: 8
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: matching-service
+  template:
+    metadata:
+      labels:
+        app: matching-service
+    spec:
+      containers:
+      - name: matching-worker
+        image: ghcr.io/abdulnabii/ride-matching-engine:latest
+        resources:
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
 `,
   createdAt: new Date().toISOString(),
 };

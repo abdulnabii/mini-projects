@@ -9,12 +9,14 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ArchitectureInput from '@/components/ArchitectureInput';
 import VisualDiagramCanvas from '@/components/VisualDiagramCanvas';
+import WellArchitectedRadarCard from '@/components/WellArchitectedRadarCard';
 import CostEstimatorCard from '@/components/CostEstimatorCard';
 import SPOFAuditCard from '@/components/SPOFAuditCard';
 import IaCCodeStudio from '@/components/IaCCodeStudio';
 import SpecExportModal from '@/components/SpecExportModal';
+import AEOFAQSection from '@/components/AEOFAQSection';
 import confetti from 'canvas-confetti';
-import { Cloud, Sparkles, Server, FileText, Download, ShieldCheck, Activity } from 'lucide-react';
+import { Cloud, Sparkles, Server, FileText, Download, ShieldCheck, Activity, Layers } from 'lucide-react';
 
 export default function HomePage() {
   const [architecture, setArchitecture] = useState<ArchitectureDesignResult | null>(INITIAL_SAMPLE_RESULT);
@@ -47,7 +49,7 @@ export default function HomePage() {
 
       if (data.spofAudit?.overallReliabilityScore >= 90) {
         try {
-          confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+          confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 }, colors: ['#06b6d4', '#3b82f6', '#10b981'] });
         } catch (e) {}
       }
 
@@ -65,7 +67,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#060a12] text-slate-200 selection:bg-cyan-500/30 selection:text-white">
+    <div className="min-h-screen flex flex-col bg-[#060a12] text-slate-200 selection:bg-cyan-500/30 selection:text-white font-mono">
       <Navbar />
 
       <main className="flex-1 space-y-10 py-8 px-4 sm:px-6 max-w-7xl mx-auto w-full">
@@ -83,13 +85,13 @@ export default function HomePage() {
             </span>
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-400 font-mono max-w-2xl mx-auto leading-relaxed">
-            Generate visual cloud diagrams, monthly AWS/GCP cost estimations, Single Point of Failure (SPOF) reliability audits, and copy-ready Terraform infrastructure code in seconds.
+          <p className="text-sm sm:text-base text-slate-400 font-mono max-w-2xl mx-auto leading-relaxed prose-text">
+            Generate interactive visual cloud topologies, AWS Well-Architected Framework audits, monthly cost projections, Single Point of Failure (SPOF) analyses, and production Terraform &amp; Kubernetes manifests in seconds.
           </p>
         </section>
 
         {/* Input Workbench */}
-        <section className="rounded-3xl bg-[#0b1220] border border-cyan-500/30 p-6 sm:p-8 shadow-2xl shadow-cyan-500/10">
+        <section className="rounded-3xl bg-[#090d16] border border-white/[0.08] p-6 sm:p-8 shadow-2xl shadow-cyan-500/5 sre-card">
           <ArchitectureInput onGenerate={handleGenerate} isLoading={isLoading} />
         </section>
 
@@ -97,7 +99,7 @@ export default function HomePage() {
         {architecture && (
           <section id="architecture-results-section" className="space-y-8 animate-in fade-in duration-500">
             {/* Quick Export & Action Bar */}
-            <div className="flex items-center justify-between flex-wrap gap-4 p-4 rounded-2xl bg-[#0b1220] border border-slate-800 font-mono text-xs">
+            <div className="flex items-center justify-between flex-wrap gap-4 p-4 rounded-2xl bg-[#090d16] border border-white/[0.08] font-mono text-xs sre-card">
               <div className="flex items-center gap-2">
                 <span className="text-slate-400 font-bold">Active System:</span>
                 <span className="text-white font-bold font-outfit text-sm">{architecture.title}</span>
@@ -110,10 +112,10 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => setIsExportModalOpen(true)}
-                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 text-black font-bold text-xs flex items-center gap-2 transition-all shadow-lg shadow-cyan-500/20 hover:scale-105 cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 text-black font-bold text-xs flex items-center gap-2 transition-all shadow-lg shadow-cyan-500/20 hover:scale-105 cursor-pointer font-mono"
                 >
                   <FileText className="w-4 h-4" />
-                  <span>Export System Spec Report</span>
+                  <span>Export System Spec RFC (Markdown)</span>
                 </button>
               </div>
             </div>
@@ -121,7 +123,15 @@ export default function HomePage() {
             {/* 1. Visual Multi-Tier Diagram Canvas */}
             <VisualDiagramCanvas architecture={architecture} />
 
-            {/* 2. Grid: Cost Estimator & Reliability Matrix */}
+            {/* 2. 6-Pillar Well-Architected Framework Assessment */}
+            {architecture.wellArchitected && (
+              <WellArchitectedRadarCard
+                score={architecture.wellArchitected}
+                provider={architecture.targetProvider}
+              />
+            )}
+
+            {/* 3. Grid: Cost Estimator & Reliability Matrix */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               <CostEstimatorCard
                 costBreakdown={architecture.costBreakdown}
@@ -130,10 +140,13 @@ export default function HomePage() {
               <SPOFAuditCard spofAudit={architecture.spofAudit} />
             </div>
 
-            {/* 3. Infrastructure as Code (IaC) Studio */}
+            {/* 4. Infrastructure as Code (IaC) Studio: Terraform, Docker & Kubernetes */}
             <IaCCodeStudio architecture={architecture} />
           </section>
         )}
+
+        {/* 5. Crawlable AEO & SEO Knowledge Hub Section */}
+        <AEOFAQSection />
       </main>
 
       {/* System Design Spec Export Modal */}

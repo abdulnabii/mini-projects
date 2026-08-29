@@ -45,6 +45,17 @@ export interface SPOFItem {
   failoverMitigation: string;
 }
 
+export interface WellArchitectedScore {
+  security: number; // 0-100
+  reliability: number;
+  performance: number;
+  costOptimization: number;
+  operationalExcellence: number;
+  sustainability: number;
+  overallScore: number;
+  frameworkSummary: string;
+}
+
 export interface ArchitectureDesignResult {
   id: string;
   title: string;
@@ -65,8 +76,10 @@ export interface ArchitectureDesignResult {
     rtoMinutes: number; // Recovery Time Objective
     risks: SPOFItem[];
   };
+  wellArchitected: WellArchitectedScore;
   terraformCode: string;
   dockerComposeCode: string;
+  kubernetesCode: string;
   createdAt: string;
 }
 
