@@ -13,8 +13,10 @@ import InterviewPrepModal from '@/components/InterviewPrepModal';
 import ResumeManagerModal from '@/components/ResumeManagerModal';
 import SalaryNegotiatorModal from '@/components/SalaryNegotiatorModal';
 import FollowUpEmailModal from '@/components/FollowUpEmailModal';
+import OfferComparisonModal from '@/components/OfferComparisonModal';
+import AEOFAQSection from '@/components/AEOFAQSection';
 import confetti from 'canvas-confetti';
-import { Briefcase, Sparkles, Plus, Award, CheckCircle2, TrendingUp, Flame, Target, Zap } from 'lucide-react';
+import { Briefcase, Sparkles, Plus, Award, CheckCircle2, TrendingUp, Flame, Target, Zap, Scale } from 'lucide-react';
 
 export default function HomePage() {
   const [jobs, setJobs] = useState<JobApplication[]>([]);
@@ -24,6 +26,7 @@ export default function HomePage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [addModalDefaultStage, setAddModalDefaultStage] = useState<PipelineStage>('applied');
   const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
+  const [isOfferCompModalOpen, setIsOfferCompModalOpen] = useState(false);
 
   const [activeJobForMatch, setActiveJobForMatch] = useState<JobApplication | null>(null);
   const [activeJobForCover, setActiveJobForCover] = useState<JobApplication | null>(null);
@@ -108,16 +111,17 @@ export default function HomePage() {
   const weeklyPercent = Math.round((weeklyCurrent / weeklyGoal) * 100);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#060a12] text-slate-200 selection:bg-emerald-500/30 selection:text-white">
+    <div className="min-h-screen flex flex-col bg-[#060a12] text-slate-200 selection:bg-emerald-500/30 selection:text-white font-mono">
       <Navbar
         onOpenAddModal={() => openAddModal('applied')}
         onOpenResumeModal={() => setIsResumeModalOpen(true)}
+        onOpenOfferComparison={() => setIsOfferCompModalOpen(true)}
         totalJobsCount={jobs.length}
       />
 
       <main className="flex-1 space-y-6 py-6 px-4 sm:px-6 max-w-7xl mx-auto w-full">
         {/* Top Header & Overview */}
-        <section className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-800/80 pb-5">
+        <section className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
           <div className="space-y-1.5">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold">
               <Briefcase className="w-3.5 h-3.5" />
@@ -127,23 +131,23 @@ export default function HomePage() {
               Job Application Pipeline &amp; Career Hub
             </h1>
             <p className="text-xs text-slate-400 font-mono">
-              Track applications, calculate instant AI resume match percentages, and prepare for interviews.
+              Track applications across 7 stages, calculate instant AI resume match percentages, and prepare for technical interviews.
             </p>
           </div>
 
           {/* Quick Metrics Bar */}
           <div className="flex items-center gap-2.5 flex-wrap font-mono text-xs">
-            <div className="p-3 rounded-2xl bg-[#0b1220] border border-slate-800 text-center min-w-[90px] shadow-sm">
+            <div className="p-3 rounded-2xl bg-[#090d16] border border-white/[0.08] text-center min-w-[90px] shadow-sm">
               <span className="text-xl font-black text-white font-outfit">{jobs.length}</span>
               <span className="block text-[9px] font-bold text-slate-400 uppercase">Total Apps</span>
             </div>
 
-            <div className="p-3 rounded-2xl bg-[#0b1220] border border-purple-500/30 text-center min-w-[90px] shadow-sm">
+            <div className="p-3 rounded-2xl bg-[#090d16] border border-purple-500/30 text-center min-w-[90px] shadow-sm">
               <span className="text-xl font-black text-purple-400 font-outfit">{activeInterviews}</span>
               <span className="block text-[9px] font-bold text-slate-400 uppercase">Interviewing</span>
             </div>
 
-            <div className="p-3 rounded-2xl bg-[#0b1220] border border-emerald-500/30 text-center min-w-[90px] shadow-sm">
+            <div className="p-3 rounded-2xl bg-[#090d16] border border-emerald-500/30 text-center min-w-[90px] shadow-sm">
               <span className="text-xl font-black text-emerald-400 font-outfit">{offersCount}</span>
               <span className="block text-[9px] font-bold text-slate-400 uppercase">Offers</span>
             </div>
@@ -160,7 +164,7 @@ export default function HomePage() {
         </section>
 
         {/* Weekly Goal & Pipeline Velocity Banner */}
-        <section className="p-4 rounded-2xl bg-gradient-to-r from-[#0b1424] via-[#0b1220] to-[#070e1a] border border-emerald-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-xs shadow-md">
+        <section className="p-4 rounded-2xl bg-gradient-to-r from-[#09101f] via-[#090d16] to-[#070c14] border border-emerald-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-xs shadow-md">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
               <Target className="w-5 h-5" />
@@ -176,7 +180,7 @@ export default function HomePage() {
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 font-sans mt-0.5">
-                Top candidates apply to 5 targeted high-fit roles weekly to maintain interview momentum.
+                Top candidates submit 5 high-alignment applications weekly to maintain consistent interview velocity.
               </p>
             </div>
           </div>
@@ -208,6 +212,9 @@ export default function HomePage() {
             onOpenAddModal={(stage) => openAddModal(stage || 'applied')}
           />
         </section>
+
+        {/* Crawlable AEO & SEO Knowledge Hub Section */}
+        <AEOFAQSection />
       </main>
 
       {/* Add Job Modal */}
@@ -267,6 +274,13 @@ export default function HomePage() {
           job={activeJobForFollowUp}
         />
       )}
+
+      {/* Offer Comparison Studio Modal */}
+      <OfferComparisonModal
+        isOpen={isOfferCompModalOpen}
+        onClose={() => setIsOfferCompModalOpen(false)}
+        offerJobs={jobs.filter((j) => j.stage === 'offer')}
+      />
 
       {/* Resume Manager Modal */}
       <ResumeManagerModal
