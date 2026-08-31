@@ -10,100 +10,113 @@ interface Props {
 
 type BreathPhase = 'Inhale' | 'Hold (Full)' | 'Exhale' | 'Hold (Empty)';
 
+interface PhaseStep {
+  name: BreathPhase;
+  duration: number;
+}
+
 export default function BreathingExerciseModal({ isOpen, onClose }: Props) {
   const [technique, setTechnique] = useState<'box' | '478' | 'coherent'>('box');
   const [isActive, setIsActive] = useState(false);
-  const [currentPhase, setCurrentPhase] = useState<BreathPhase>('Inhale');
+  const [phaseIndex, setPhaseIndex] = useState(0);
   const [secondsRemaining, setSecondsRemaining] = useState(4);
   const [completedCycles, setCompletedCycles] = useState(0);
 
-  if (!isOpen) return null;
-
-  // Pattern definition: [phaseName, durationInSeconds]
-  const getPattern = (): [BreathPhase, number][] => {
+  // Pattern definition based on technique
+  const getSteps = (): PhaseStep[] => {
     if (technique === '478') {
       return [
-        ['Inhale', 4],
-        ['Hold (Full)', 7],
-        ['Exhale', 8],
+        { name: 'Inhale', duration: 4 },
+        { name: 'Hold (Full)', duration: 7 },
+        { name: 'Exhale', duration: 8 },
       ];
     }
     if (technique === 'coherent') {
       return [
-        ['Inhale', 5],
-        ['Exhale', 5],
+        { name: 'Inhale', duration: 5 },
+        { name: 'Exhale', duration: 5 },
       ];
     }
     // Box Breathing (4-4-4-4)
     return [
-      ['Inhale', 4],
-      ['Hold (Full)', 4],
-      ['Exhale', 4],
-      ['Hold (Empty)', 4],
+      { name: 'Inhale', duration: 4 },
+      { name: 'Hold (Full)', duration: 4 },
+      { name: 'Exhale', duration: 4 },
+      { name: 'Hold (Empty)', duration: 4 },
     ];
   };
 
+  const steps = getSteps();
+  const currentStep = steps[phaseIndex % steps.length] || steps[0];
+
   useEffect(() => {
-    if (!isActive) return;
+    if (!isActive || !isOpen) return;
 
-    const pattern = getPattern();
-    let phaseIndex = pattern.findIndex((p) => p[0] === currentPhase);
-    if (phaseIndex === -1) phaseIndex = 0;
-
-    const interval = setInterval(() => {
+    const timer = setInterval(() => {
       setSecondsRemaining((prev) => {
         if (prev > 1) {
           return prev - 1;
         }
 
-        // Advance phase
-        const nextIndex = (phaseIndex + 1) % pattern.length;
-        if (nextIndex === 0) {
-          setCompletedCycles((c) => c + 1);
-        }
-        setCurrentPhase(pattern[nextIndex][0]);
-        return pattern[nextIndex][1];
+        // Time's up for current phase -> advance to next phase
+        setPhaseIndex((currIdx) => {
+          const nextIdx = (currIdx + 1) % steps.length;
+          if (nextIdx === 0) {
+            setCompletedCycles((c) => c + 1);
+          }
+          return nextIdx;
+        });
+
+        // Set duration of the NEXT step
+        const nextStep = steps[((phaseIndex + 1) % steps.length)];
+        return nextStep ? nextStep.duration : 4;
       });
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [isActive, currentPhase, technique]);
+    return () => clearInterval(timer);
+  }, [isActive, isOpen, phaseIndex, steps]);
+
+  if (!isOpen) return null;
 
   const handleReset = () => {
     setIsActive(false);
-    setCurrentPhase('Inhale');
-    setSecondsRemaining(getPattern()[0][1]);
+    setPhaseIndex(0);
+    setSecondsRemaining(steps[0].duration);
     setCompletedCycles(0);
   };
 
   const handleTechniqueChange = (t: 'box' | '478' | 'coherent') => {
     setTechnique(t);
     setIsActive(false);
-    setCurrentPhase('Inhale');
+    setPhaseIndex(0);
     if (t === '478') setSecondsRemaining(4);
     else if (t === 'coherent') setSecondsRemaining(5);
     else setSecondsRemaining(4);
   };
 
-  const isExpanding = currentPhase === 'Inhale';
-  const isContracting = currentPhase === 'Exhale';
+  const isExpanding = currentStep.name === 'Inhale';
+  const isContracting = currentStep.name === 'Exhale';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200 font-mono text-xs text-slate-300">
-      <div className="relative w-full max-w-xl rounded-3xl bg-[#0b1220] border-2 border-teal-500/40 p-6 sm:p-8 space-y-6 shadow-2xl shadow-teal-500/20 text-center">
+      <div className="relative w-full max-w-xl rounded-3xl bg-[#090d16] border-2 border-teal-500/40 p-6 sm:p-8 space-y-6 shadow-2xl shadow-teal-500/20 text-center">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
           <div className="flex items-center gap-2.5 text-left">
             <div className="w-9 h-9 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400">
               <Wind className="w-5 h-5" />
             </div>
             <div>
               <h3 className="font-bold text-white text-base font-outfit">Somatic Breathwork Studio</h3>
-              <p className="text-[11px] text-slate-400">Vagal nerve stimulation for nervous system down-regulation</p>
+              <p className="text-[11px] text-slate-400 font-sans">Vagal nerve stimulation for nervous system down-regulation</p>
             </div>
           </div>
 
-          <button onClick={onClose} className="p-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-400 hover:text-white">
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 rounded-xl bg-[#04080e] border border-white/[0.08] text-slate-400 hover:text-white cursor-pointer"
+          >
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -121,12 +134,12 @@ export default function BreathingExerciseModal({ isOpen, onClose }: Props) {
               onClick={() => handleTechniqueChange(t.id as any)}
               className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                 technique === t.id
-                  ? 'bg-teal-500/10 border-teal-400 text-white shadow-md shadow-teal-500/20'
-                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                  ? 'bg-teal-500/15 border-teal-400 text-white shadow-md shadow-teal-500/20'
+                  : 'bg-[#04080e] border-white/[0.08] text-slate-400 hover:text-white'
               }`}
             >
               <span className="block font-bold text-xs font-outfit">{t.label}</span>
-              <span className="text-[9px] text-slate-500">{t.desc}</span>
+              <span className="text-[9px] text-slate-500 font-sans">{t.desc}</span>
             </button>
           ))}
         </div>
@@ -143,12 +156,12 @@ export default function BreathingExerciseModal({ isOpen, onClose }: Props) {
             }`}
           >
             <span className="text-sm font-bold text-teal-300 font-outfit uppercase tracking-widest animate-pulse">
-              {currentPhase}
+              {currentStep.name}
             </span>
             <span className="text-5xl font-black text-white font-outfit mt-1">
               {secondsRemaining}
             </span>
-            <span className="text-[9px] text-slate-400 mt-1">
+            <span className="text-[9px] text-slate-400 mt-1 font-mono">
               {completedCycles} Cycles Completed
             </span>
           </div>
@@ -161,7 +174,7 @@ export default function BreathingExerciseModal({ isOpen, onClose }: Props) {
             onClick={() => setIsActive(!isActive)}
             className={`px-8 py-3 rounded-2xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer font-outfit ${
               isActive
-                ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/30 hover:bg-amber-400'
+                ? 'bg-amber-400 text-black shadow-lg shadow-amber-500/30 hover:bg-amber-300'
                 : 'bg-gradient-to-r from-teal-400 to-emerald-400 text-black shadow-lg shadow-teal-500/30 hover:scale-105'
             }`}
           >
@@ -172,7 +185,7 @@ export default function BreathingExerciseModal({ isOpen, onClose }: Props) {
           <button
             type="button"
             onClick={handleReset}
-            className="p-3 rounded-2xl bg-slate-950 border border-slate-800 text-slate-400 hover:text-white transition-all"
+            className="p-3 rounded-2xl bg-[#04080e] border border-white/[0.08] text-slate-400 hover:text-white transition-all cursor-pointer"
             title="Reset timer"
           >
             <RotateCcw className="w-4 h-4" />
