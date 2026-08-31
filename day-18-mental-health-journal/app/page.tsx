@@ -12,6 +12,7 @@ import PastEntriesDrawer from '@/components/PastEntriesDrawer';
 import BreathingExerciseModal from '@/components/BreathingExerciseModal';
 import CopingTechniquesModal from '@/components/CopingTechniquesModal';
 import ExportDataModal from '@/components/ExportDataModal';
+import AEOFAQSection from '@/components/AEOFAQSection';
 import confetti from 'canvas-confetti';
 import { Heart, Sparkles, Wind, BookOpen, Compass, ShieldCheck, Flame, Lock } from 'lucide-react';
 
@@ -62,7 +63,7 @@ export default function HomePage() {
 
       if (analysis.sentimentScore >= 0.4) {
         try {
-          confetti({ particleCount: 50, spread: 50, origin: { y: 0.6 } });
+          confetti({ particleCount: 50, spread: 50, origin: { y: 0.6 }, colors: ['#10b981', '#14b8a6', '#06b6d4'] });
         } catch (e) {}
       }
 
@@ -110,7 +111,7 @@ export default function HomePage() {
   const stats = calculateMoodStats(entries);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#060a12] text-slate-200 selection:bg-emerald-500/30 selection:text-white">
+    <div className="min-h-screen flex flex-col bg-[#060a12] text-slate-200 selection:bg-emerald-500/30 selection:text-white font-mono">
       <Navbar
         onOpenBreathing={() => setIsBreathingOpen(true)}
         onOpenExport={() => setIsExportOpen(true)}
@@ -132,22 +133,22 @@ export default function HomePage() {
             </span>
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-400 font-mono max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-slate-400 font-mono max-w-2xl mx-auto leading-relaxed prose-text">
             Write freely. Receive compassionate, trauma-informed AI reflections, detect subconscious cognitive distortions, track 30-day emotional patterns, and practice somatic grounding.
           </p>
 
           {/* Quick Streak Pill */}
           <div className="flex items-center justify-center gap-2 text-xs font-mono pt-1">
-            <span className="px-3 py-1 rounded-full bg-[#0b1220] border border-slate-800 text-slate-300 flex items-center gap-1.5 shadow-sm">
+            <span className="px-3 py-1 rounded-full bg-[#090d16] border border-white/[0.08] text-slate-300 flex items-center gap-1.5 shadow-sm">
               <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
               <span>
                 Daily Journaling Streak: <strong className="text-amber-400">{stats.streakDays} Days</strong>
               </span>
             </span>
 
-            <span className="px-3 py-1 rounded-full bg-[#0b1220] border border-slate-800 text-slate-400 flex items-center gap-1.5">
+            <span className="px-3 py-1 rounded-full bg-[#090d16] border border-white/[0.08] text-slate-400 flex items-center gap-1.5">
               <Lock className="w-3 h-3 text-emerald-400" />
-              <span>100% Client-Side Privacy</span>
+              <span>100% Client-Side Privacy Vault</span>
             </span>
           </div>
         </section>
@@ -177,7 +178,7 @@ export default function HomePage() {
 
         {/* 3. Past Entries Drawer */}
         {entries.length > 0 && (
-          <section className="pt-4 border-t border-slate-800/80">
+          <section className="pt-4 border-t border-white/[0.08]">
             <PastEntriesDrawer
               entries={entries}
               onSelectEntry={(entry) => {
@@ -189,6 +190,9 @@ export default function HomePage() {
             />
           </section>
         )}
+
+        {/* 4. Crawlable AEO & SEO Knowledge Hub Section */}
+        <AEOFAQSection />
       </main>
 
       {/* Breathing Exercise Modal */}
