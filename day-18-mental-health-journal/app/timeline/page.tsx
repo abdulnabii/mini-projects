@@ -5,24 +5,25 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { getStoredJournalEntries, calculateMoodStats } from '@/lib/storage';
 import { getMoodBadgeProps } from '@/lib/journalEngine';
+import { DEFAULT_JOURNAL_ENTRIES } from '@/lib/defaultEntries';
 import { JournalEntry, MoodStats, MoodCategory } from '@/types';
 import Link from 'next/link';
 import { TrendingUp, ArrowLeft, Heart, Flame, Calendar, Sparkles, PieChart, Activity, Brain } from 'lucide-react';
 
 export default function TimelinePage() {
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [stats, setStats] = useState<MoodStats | null>(null);
+  const [entries, setEntries] = useState<JournalEntry[]>(DEFAULT_JOURNAL_ENTRIES);
+  const [stats, setStats] = useState<MoodStats>(calculateMoodStats(DEFAULT_JOURNAL_ENTRIES));
 
   useEffect(() => {
     const loaded = getStoredJournalEntries();
-    setEntries(loaded);
-    setStats(calculateMoodStats(loaded));
+    if (loaded && loaded.length > 0) {
+      setEntries(loaded);
+      setStats(calculateMoodStats(loaded));
+    }
   }, []);
 
-  if (!stats) return null;
-
   return (
-    <div className="min-h-screen flex flex-col bg-[#060a12] text-slate-200 selection:bg-emerald-500/30 selection:text-white">
+    <div className="min-h-screen flex flex-col bg-[#060a12] text-slate-200 selection:bg-emerald-500/30 selection:text-white font-mono">
       <Navbar onOpenBreathing={() => {}} onOpenExport={() => {}} streakCount={stats.streakDays} />
 
       <main className="flex-1 space-y-8 py-8 px-4 sm:px-6 max-w-7xl mx-auto w-full font-mono text-xs">
@@ -30,7 +31,7 @@ export default function TimelinePage() {
         <div className="flex items-center justify-between">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-300 hover:text-white hover:border-emerald-500/40 transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-300 hover:text-white hover:border-emerald-500/40 transition-all cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Journaling Workbench</span>
@@ -53,7 +54,7 @@ export default function TimelinePage() {
 
         {/* Top KPIs */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="p-5 rounded-3xl bg-[#0b1220] border border-slate-800 space-y-1">
+          <div className="p-5 rounded-3xl bg-[#090d16] border border-white/[0.08] space-y-1">
             <span className="text-[10px] font-bold text-slate-500 uppercase">Journaling Streak</span>
             <p className="text-3xl font-black text-amber-400 font-outfit flex items-center gap-1.5">
               <Flame className="w-6 h-6 fill-amber-400" />
@@ -62,13 +63,13 @@ export default function TimelinePage() {
             <span className="text-[10px] text-slate-500">Consistent self-care habit</span>
           </div>
 
-          <div className="p-5 rounded-3xl bg-[#0b1220] border border-slate-800 space-y-1">
+          <div className="p-5 rounded-3xl bg-[#090d16] border border-white/[0.08] space-y-1">
             <span className="text-[10px] font-bold text-slate-500 uppercase">Total Entries</span>
             <p className="text-3xl font-black text-white font-outfit">{stats.totalEntries}</p>
             <span className="text-[10px] text-slate-500">Encrypted in browser</span>
           </div>
 
-          <div className="p-5 rounded-3xl bg-[#0b1220] border border-slate-800 space-y-1">
+          <div className="p-5 rounded-3xl bg-[#090d16] border border-white/[0.08] space-y-1">
             <span className="text-[10px] font-bold text-slate-500 uppercase">Dominant State</span>
             <p className="text-2xl font-black text-emerald-400 font-outfit capitalize">
               {getMoodBadgeProps(stats.dominantMood).emoji} {stats.dominantMood}
@@ -76,7 +77,7 @@ export default function TimelinePage() {
             <span className="text-[10px] text-slate-500">Most frequent check-in</span>
           </div>
 
-          <div className="p-5 rounded-3xl bg-[#0b1220] border border-slate-800 space-y-1">
+          <div className="p-5 rounded-3xl bg-[#090d16] border border-white/[0.08] space-y-1">
             <span className="text-[10px] font-bold text-slate-500 uppercase">Average Valence</span>
             <p className="text-3xl font-black text-teal-400 font-outfit">
               {stats.averageValence > 0 ? `+${stats.averageValence}` : stats.averageValence}
@@ -86,8 +87,8 @@ export default function TimelinePage() {
         </div>
 
         {/* Visual Emotional Timeline Graph */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-[#0b1220] border border-slate-800 space-y-6 shadow-xl">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="p-6 sm:p-8 rounded-3xl bg-[#090d16] border border-white/[0.08] space-y-6 shadow-xl">
+          <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
             <h3 className="font-bold text-white text-base font-outfit flex items-center gap-2">
               <Activity className="w-4 h-4 text-emerald-400" />
               Emotional Valence Progression Over Time (-1.0 to +1.0)
@@ -99,11 +100,10 @@ export default function TimelinePage() {
             {entries.map((entry) => {
               const valence = entry.analysis?.sentimentScore ?? 0.0;
               const badge = getMoodBadgeProps(entry.moodTag);
-              // Normalized to 0-100% for visual bar width (where -1.0 is 10% and +1.0 is 95%)
               const percentage = Math.round(((valence + 1) / 2) * 85 + 10);
 
               return (
-                <div key={entry.id} className="p-3.5 rounded-2xl bg-slate-950/90 border border-slate-800/80 space-y-2">
+                <div key={entry.id} className="p-3.5 rounded-2xl bg-[#04080e] border border-white/[0.06] space-y-2">
                   <div className="flex items-center justify-between flex-wrap gap-2 text-xs">
                     <div className="flex items-center gap-2">
                       <span className="text-base">{badge.emoji}</span>
@@ -145,7 +145,7 @@ export default function TimelinePage() {
         </div>
 
         {/* Mood Distribution Grid */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-[#0b1220] border border-slate-800 space-y-4 shadow-xl">
+        <div className="p-6 sm:p-8 rounded-3xl bg-[#090d16] border border-white/[0.08] space-y-4 shadow-xl">
           <h3 className="font-bold text-white text-base font-outfit flex items-center gap-2">
             <PieChart className="w-4 h-4 text-teal-400" />
             Mood Distribution Spectrum
