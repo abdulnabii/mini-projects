@@ -26,6 +26,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { STARTER_TEMPLATES } from '@/lib/shapes';
+import AEOFAQSection from '@/components/AEOFAQSection';
 
 function generateCreativeRoomId(): string {
   const adjectives = ['quantum', 'stellar', 'hyper', 'cyber', 'nexus', 'vertex', 'aurora', 'pulse', 'matrix', 'zenith'];
@@ -105,7 +106,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex flex-col items-center justify-center pt-28 pb-16 px-6 overflow-hidden">
+      <section className="relative min-h-[85vh] flex flex-col items-center justify-center pt-28 pb-12 px-6 overflow-hidden">
         {/* Glow ambient meshes */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none" />
         <div className="absolute top-1/3 left-1/4 w-[400px] h-[300px] bg-indigo-600/15 rounded-full blur-[120px] pointer-events-none" />
@@ -121,7 +122,7 @@ export default function LandingPage() {
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08]">
             Infinite Visual Canvas.{' '}
             <br className="hidden sm:inline" />
-            <span className="gradient-text-cyan">Real-Time Intelligence.</span>
+            <span className="bg-gradient-to-r from-cyan-400 via-sky-400 to-indigo-400 bg-clip-text text-transparent">Real-Time Intelligence.</span>
           </h1>
 
           <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
@@ -196,7 +197,7 @@ export default function LandingPage() {
             </div>
 
             {/* Canvas Scene Simulation */}
-            <div className="h-80 canvas-grid-dots relative overflow-hidden flex items-center justify-center p-6">
+            <div className="h-80 relative overflow-hidden flex items-center justify-center p-6 bg-[#070b16]">
               {/* Simulated Nodes */}
               <div className="absolute left-[8%] top-[38%] px-5 py-3 rounded-2xl bg-slate-950/90 border-2 border-sky-400 text-white text-xs font-bold shadow-xl">
                 <span className="block text-[10px] text-sky-400 font-mono">EDGE GATEWAY</span>
@@ -252,10 +253,10 @@ export default function LandingPage() {
       </section>
 
       {/* Starter Templates Gallery */}
-      <section className="py-20 px-6 max-w-6xl mx-auto space-y-12">
+      <section className="py-16 px-6 max-w-6xl mx-auto space-y-10">
         <div className="text-center space-y-3">
           <h2 className="text-3xl sm:text-4xl font-black">
-            Architect Faster with <span className="gradient-text-cyan">Starter Blueprints</span>
+            Architect Faster with <span className="bg-gradient-to-r from-cyan-400 via-sky-400 to-indigo-400 bg-clip-text text-transparent">Starter Blueprints</span>
           </h2>
           <p className="text-slate-400 text-sm max-w-xl mx-auto">
             Kickstart your brainstorm with battle-tested system design and agile templates.
@@ -294,8 +295,11 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Crawlable AEO & SEO Knowledge Hub Section */}
+      <AEOFAQSection />
+
       {/* Footer */}
-      <footer className="border-t border-slate-800/80 py-10 px-6 text-center text-xs text-slate-500 space-y-2">
+      <footer className="border-t border-slate-800/80 py-10 px-6 text-center text-xs text-slate-500 space-y-2 mt-12">
         <p>
           Built by{' '}
           <a
