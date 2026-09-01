@@ -14,6 +14,7 @@ import {
 import MacroRing from '@/components/MacroRing';
 import WaterTracker from '@/components/WaterTracker';
 import MicronutrientRadar from '@/components/MicronutrientRadar';
+import AEOFAQSection from '@/components/AEOFAQSection';
 import {
   Camera,
   Calendar,
@@ -274,6 +275,9 @@ export default function DashboardPage() {
 
       {/* Micronutrient Longevity Radar */}
       <MicronutrientRadar mealLogs={mealLogs} />
+
+      {/* Crawlable AEO & SEO Knowledge Hub Section */}
+      <AEOFAQSection />
     </div>
   );
 }
