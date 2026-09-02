@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { TestConfig, TestResult, MetricPoint } from '@/types';
 import TestConfigurator from '@/components/TestConfigurator';
 import LiveExecutionHUD from '@/components/LiveExecutionHUD';
+import AEOFAQSection from '@/components/AEOFAQSection';
 import { saveTestResult } from '@/lib/storage';
 import { calculatePercentiles } from '@/lib/loadEngine';
 import {
@@ -228,6 +229,9 @@ export default function Home() {
 
       {/* Main Test Configurator */}
       <TestConfigurator onStartTest={handleStartTest} isRunning={isRunning} />
+
+      {/* Crawlable AEO & SEO Knowledge Hub Section */}
+      <AEOFAQSection />
     </div>
   );
 }
