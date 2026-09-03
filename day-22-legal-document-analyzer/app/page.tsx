@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { DocType, SupportedLanguage, LegalAnalysis } from '@/types';
 import DocumentUpload from '@/components/DocumentUpload';
+import AEOFAQSection from '@/components/AEOFAQSection';
 import { saveAnalysisToStorage } from '@/lib/storage';
 import {
   Scale,
@@ -104,6 +105,9 @@ export default function Home() {
 
       {/* Main Document Upload Studio */}
       <DocumentUpload onAnalyze={handleAnalyze} isLoading={isLoading} />
+
+      {/* Crawlable AEO & SEO Knowledge Hub Section */}
+      <AEOFAQSection />
     </div>
   );
 }
