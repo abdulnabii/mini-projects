@@ -7,6 +7,7 @@ import VoiceCommandCenter from '@/components/VoiceCommandCenter';
 import SceneBar from '@/components/SceneBar';
 import DeviceGrid from '@/components/DeviceGrid';
 import DeviceConfigModal from '@/components/DeviceConfigModal';
+import AEOFAQSection from '@/components/AEOFAQSection';
 import {
   Zap,
   Mic,
@@ -170,7 +171,7 @@ export default function SmartHomeDashboard() {
           <span className="text-[10px] text-purple-400 font-bold uppercase flex items-center gap-1.5">
             <Mic className="w-3.5 h-3.5" /> Voice Engine
           </span>
-          <div className="text-lg font-black text-purple-300">Gemini 1.5 STT/TTS</div>
+          <div className="text-lg font-black text-purple-300">Gemini 1.5 Flash NLU</div>
         </div>
       </div>
 
@@ -210,6 +211,9 @@ export default function SmartHomeDashboard() {
         />
       </div>
 
+      {/* AEO Knowledge Hub */}
+      <AEOFAQSection />
+
       {/* Device Config Modal */}
       <DeviceConfigModal
         device={editingDevice}
@@ -221,3 +225,4 @@ export default function SmartHomeDashboard() {
     </div>
   );
 }
+

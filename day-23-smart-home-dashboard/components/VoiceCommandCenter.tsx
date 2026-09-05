@@ -45,6 +45,8 @@ export default function VoiceCommandCenter({ currentDevices, onExecuteActions }:
   const [audioLevel, setAudioLevel] = useState(0);
 
   const recognitionRef = useRef<any>(null);
+  // Ref always holds latest transcript value — avoids stale closure in rec.onend
+  const transcriptRef = useRef<string>('');
 
   useEffect(() => {
     setHasSpeechSupport(isSpeechRecognitionSupported());
@@ -85,6 +87,7 @@ export default function VoiceCommandCenter({ currentDevices, onExecuteActions }:
     rec.onresult = (event: any) => {
       const current = event.results[event.results.length - 1][0].transcript;
       setTranscript(current);
+      transcriptRef.current = current;
     };
 
     rec.onerror = (event: any) => {
@@ -94,9 +97,11 @@ export default function VoiceCommandCenter({ currentDevices, onExecuteActions }:
 
     rec.onend = () => {
       setIsListening(false);
-      if (transcript.trim()) {
-        handleProcessCommand(transcript);
+      const finalTranscript = transcriptRef.current.trim();
+      if (finalTranscript) {
+        handleProcessCommand(finalTranscript);
       }
+      transcriptRef.current = '';
     };
 
     recognitionRef.current = rec;
