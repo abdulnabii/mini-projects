@@ -31,11 +31,19 @@ export default function RootLayout({
     {
       "@type": "WebApplication",
       "@id": "https://day-24-opensource-discovery-engine.vercel.app/#webapp",
-      "name": "RepoRadar.AI",
+      "name": "GitMatch.AI",
       "url": "https://day-24-opensource-discovery-engine.vercel.app",
-      "applicationCategory": "BusinessApplication",
+      "applicationCategory": "DeveloperApplication",
       "operatingSystem": "All",
-      "description": "Curated GitHub open-source discovery radar analyzing repository bus factor, maintenance velocity, issue resolution time, and good-first-issue opportunities.",
+      "description": "AI-powered open source project discovery engine matching developer tech stacks with healthy repositories, good-first-issues, and personalized first PR guides.",
+      "featureList": [
+        "Skill-based open source repository matching",
+        "0-100 composite repository health score audit",
+        "AI First-Contribution PR Guide generator powered by Gemini 1.5 Flash",
+        "Live GitHub repository inspector (REST API v3)",
+        "AI Issue Solver & PR Drafter Studio",
+        "Personal PR Contribution Kanban Pipeline"
+      ],
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -51,7 +59,7 @@ export default function RootLayout({
       "@type": "WebSite",
       "@id": "https://day-24-opensource-discovery-engine.vercel.app/#website",
       "url": "https://day-24-opensource-discovery-engine.vercel.app",
-      "name": "RepoRadar.AI",
+      "name": "GitMatch.AI",
       "publisher": {
         "@type": "Person",
         "name": "Abdul Nabi",
@@ -64,10 +72,34 @@ export default function RootLayout({
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "What is the Bus Factor metric?",
+          "name": "How does GitMatch.AI calculate the Open Source Project Health Score?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Bus Factor calculates the minimum number of team members that have to disappear before a project stalls, helping developers identify well-distributed open source libraries."
+            "text": "GitMatch.AI computes a composite 0–100 health score evaluating five vital dimensions: maintenance recency, maintainer responsiveness, issue resolution velocity, documentation completeness, and community bus factor distribution."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the First PR Guide generator and how is it customized to my skills?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The First PR Guide uses Google Gemini 1.5 Flash to analyze the target repository's architecture, conventions, and contributing guidelines against your selected tech stack, generating an actionable onboarding roadmap."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I audit any GitHub repository that is not in the curated list?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The Audit Any GitHub Repo tool connects directly to the GitHub REST API v3 to inspect real-time star velocity, open good-first-issues, license details, and maintainer turnaround in seconds."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the Bus Factor metric in open-source projects?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Bus Factor calculates the minimum number of core maintainers whose absence would cause a repository to stall, helping first-time contributors identify healthy, well-mentored projects."
           }
         }
       ]

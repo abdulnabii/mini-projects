@@ -10,6 +10,7 @@ import UserSkillDetector from '@/components/UserSkillDetector';
 import RepoInspector from '@/components/RepoInspector';
 import IssueSolverModal from '@/components/IssueSolverModal';
 import ContributionPipeline from '@/components/ContributionPipeline';
+import AEOFAQSection from '@/components/AEOFAQSection';
 import {
   Sparkles,
   GitPullRequest,
@@ -348,6 +349,9 @@ export default function DiscoveryPage() {
           />
         </div>
       )}
+
+      {/* Crawlable AEO/GEO Structured Knowledge Hub */}
+      <AEOFAQSection />
 
       {/* First Contribution Guide Modal */}
       <FirstContributionGuide
