@@ -35,7 +35,17 @@ export default function RootLayout({
       "url": "https://day-25-ai-content-studio.vercel.app",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "All",
-      "description": "Omnichannel content creation suite transforming long-form articles into viral Twitter/X threads, LinkedIn carousels, TikTok hooks, and newsletter snippets.",
+      "description": "AI-powered social media content studio generating viral Twitter/X threads, LinkedIn thought-leadership posts, and multi-slide carousels calibrated to your authentic voice with Gemini 1.5 Pro.",
+      "featureList": [
+        "Idea-to-10-Tweet thread generator with viral hooks",
+        "LinkedIn professional long-form authority post generator",
+        "AI voice calibration learning from user sample posts",
+        "5-way viral hook variant generator with predicted CTR",
+        "0-100 predicted engagement score and readability audit",
+        "Multi-slide LinkedIn carousel generator",
+        "Full-article content repurposing engine",
+        "Drafts & scheduling queue with optimal posting time recommendations"
+      ],
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -64,10 +74,34 @@ export default function RootLayout({
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "Which social platforms are supported?",
+          "name": "How does ThreadGenius.AI calibrate to my authentic writing voice?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "ThreadGenius.AI outputs optimized copy for Twitter/X threads, LinkedIn professional posts, Instagram captions, and short-form video scripts."
+            "text": "ThreadGenius.AI analyzes sample past tweets, LinkedIn posts, or writing snippets using Google Gemini 1.5 Pro to extract sentence length, emoji density, and tone patterns for personalized generation."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is the Predicted Viral Engagement Score calculated?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The 0-100 engagement metric evaluates hook strength, whitespace readability, emotional curiosity gaps, and call-to-action clarity against viral post heuristics."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What formats does the LinkedIn Carousel Creator generate?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Carousel Studio transforms complex technical ideas into structured 5-10 slide visual outlines with high-impact headlines and scannable bullet takeaways."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I repurpose long-form engineering blogs or changelogs into social posts?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The Repurposer Studio takes raw markdown or technical articles and atomizes them into a Twitter thread, a LinkedIn post, and a carousel outline in a single generation pass."
           }
         }
       ]

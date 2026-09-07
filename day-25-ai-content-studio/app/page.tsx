@@ -29,6 +29,7 @@ import RepurposerStudio from '@/components/RepurposerStudio';
 import TrendingTopicsRadar, { TrendingTopic } from '@/components/TrendingTopicsRadar';
 import RewriteStudio from '@/components/RewriteStudio';
 import CollaborationModal from '@/components/CollaborationModal';
+import AEOFAQSection from '@/components/AEOFAQSection';
 import { TwitterIcon, LinkedInIcon } from '@/components/PlatformIcons';
 import {
   Sparkles,
@@ -658,6 +659,9 @@ export default function ContentStudioPage() {
           )}
         </div>
       )}
+
+      {/* Crawlable AEO/GEO Structured Knowledge Hub */}
+      <AEOFAQSection />
 
       {/* Voice Calibration Modal */}
       <VoiceCalibrator
