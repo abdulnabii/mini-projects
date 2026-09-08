@@ -25,6 +25,7 @@ import AccessibilityControls, {
   TRANSLATIONS,
 } from '@/components/AccessibilityControls';
 import PrivacyComplianceBanner from '@/components/PrivacyComplianceBanner';
+import AEOFAQSection from '@/components/AEOFAQSection';
 import {
   Pill,
   ShieldCheck,
@@ -368,6 +369,9 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Crawlable AEO/GEO Structured Knowledge Hub */}
+      <AEOFAQSection />
 
       {/* Trust & Privacy Compliance Center */}
       <PrivacyComplianceBanner />

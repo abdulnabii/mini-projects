@@ -39,9 +39,18 @@ export default function RootLayout({
       "@id": "https://day-26-medication-reminder-system.vercel.app/#webapp",
       "name": "MediGuard.AI",
       "url": "https://day-26-medication-reminder-system.vercel.app",
-      "applicationCategory": "BusinessApplication",
+      "applicationCategory": "HealthApplication",
       "operatingSystem": "All",
-      "description": "Patient safety companion tracking medication schedules, cross-referencing contraindications and dangerous drug-drug interactions, and providing clear dosage guidelines.",
+      "description": "Clinical medication schedule and patient safety guardian tracking dose adherence, cross-referencing severe drug-drug interactions with Gemini 1.5 Pro, and providing prescription OCR scanning.",
+      "featureList": [
+        "Patient medication schedule and real-time dosing timeline",
+        "Clinical drug-drug interaction checker powered by Gemini 1.5 Pro",
+        "AI missed-dose safety guidance based on medication half-life",
+        "Prescription photo OCR scanning via computer vision",
+        "Bilingual English and Urdu language support",
+        "Caregiver remote adherence monitoring portal",
+        "Refill depletion tracking and inventory alerts"
+      ],
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -70,10 +79,34 @@ export default function RootLayout({
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "How does MediGuard.AI detect drug interactions?",
+          "name": "How does MediGuard.AI detect dangerous drug-drug interactions?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "MediGuard.AI analyzes active chemical compounds and contraindication databases to flag severe, moderate, and mild interaction risks between concurrent prescriptions."
+            "text": "MediGuard.AI evaluates active pharmaceutical compounds against clinical databases using Google Gemini 1.5 Pro, categorizing combinations into SEVERE, MODERATE, and MILD with physiological explanations and physician action alerts."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What should a patient do if they miss a scheduled medication dose?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The AI Missed-Dose Advisor analyzes the specific drug class, half-life, and hours elapsed since the scheduled dose to provide safe guidance on whether to take late, skip, or call a physician."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the Prescription OCR Scanner work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Patients upload a photo of a doctor's prescription. Computer vision OCR extracts text and passes it to Gemini 1.5 Pro to parse medication names, strengths, and frequencies into 1-click schedule entries."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does MediGuard.AI support bilingual English and Urdu?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. MediGuard.AI features native bilingual toggling between English and Urdu Nastaliq, high-contrast accessibility modes, and voice readouts for elderly patients."
           }
         }
       ]
