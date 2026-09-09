@@ -48,15 +48,15 @@ export default function AutoChart({ result }: Props) {
   };
 
   return (
-    <div className="p-6 sm:p-8 rounded-3xl bg-[#0d1117] border border-purple-500/30 shadow-2xl space-y-6 font-mono">
+    <div className="p-6 sm:p-8 rounded-3xl bg-[#0d1527] border border-[#1e293b] shadow-2xl space-y-6 font-mono hover:border-purple-500/30 transition-all duration-200">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-[#1e293b] pb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
             <BarChart2 className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-bold text-white text-base font-outfit">
+            <h3 className="font-bold text-white text-base font-mono">
               Auto-Generated Data Visualization Studio
             </h3>
             <p className="text-xs text-slate-400">
@@ -66,11 +66,11 @@ export default function AutoChart({ result }: Props) {
         </div>
 
         {/* 4 Multi-View Switcher Buttons */}
-        <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-900 border border-slate-800 text-xs flex-wrap">
+        <div className="flex items-center gap-1 p-1 rounded-xl bg-[#111827] border border-[#1e293b] text-xs flex-wrap">
           <button
             type="button"
             onClick={() => setViewType('bars')}
-            className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+            className={`px-2.5 py-1 rounded-lg font-bold transition-all duration-150 cursor-pointer ${
               viewType === 'bars'
                 ? 'bg-purple-500 text-black font-black shadow-sm'
                 : 'text-slate-400 hover:text-white'
@@ -82,7 +82,7 @@ export default function AutoChart({ result }: Props) {
           <button
             type="button"
             onClick={() => setViewType('columns')}
-            className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+            className={`px-2.5 py-1 rounded-lg font-bold transition-all duration-150 cursor-pointer ${
               viewType === 'columns'
                 ? 'bg-purple-500 text-black font-black shadow-sm'
                 : 'text-slate-400 hover:text-white'
@@ -94,7 +94,7 @@ export default function AutoChart({ result }: Props) {
           <button
             type="button"
             onClick={() => setViewType('cards')}
-            className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+            className={`px-2.5 py-1 rounded-lg font-bold transition-all duration-150 cursor-pointer ${
               viewType === 'cards'
                 ? 'bg-purple-500 text-black font-black shadow-sm'
                 : 'text-slate-400 hover:text-white'
@@ -106,7 +106,7 @@ export default function AutoChart({ result }: Props) {
           <button
             type="button"
             onClick={() => setViewType('donut')}
-            className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+            className={`px-2.5 py-1 rounded-lg font-bold transition-all duration-150 cursor-pointer ${
               viewType === 'donut'
                 ? 'bg-purple-500 text-black font-black shadow-sm'
                 : 'text-slate-400 hover:text-white'
@@ -119,22 +119,22 @@ export default function AutoChart({ result }: Props) {
 
       {/* Aggregate Metric Summary Telemetry */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-3.5 rounded-2xl bg-[#161b22] border border-slate-800 space-y-1">
+        <div className="p-3.5 rounded-2xl bg-[#111827] border border-[#1e293b] space-y-1 hover:border-purple-500/40 transition-colors">
           <span className="text-[10px] text-purple-400 font-bold uppercase">Aggregate Total</span>
           <div className="text-base sm:text-lg font-black text-white">{formatNumber(totalSum)}</div>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-[#161b22] border border-slate-800 space-y-1">
+        <div className="p-3.5 rounded-2xl bg-[#111827] border border-[#1e293b] space-y-1 hover:border-cyan-500/40 transition-colors">
           <span className="text-[10px] text-cyan-400 font-bold uppercase">Mean Average</span>
           <div className="text-base sm:text-lg font-black text-cyan-300">{formatNumber(avgVal)}</div>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-[#161b22] border border-slate-800 space-y-1">
+        <div className="p-3.5 rounded-2xl bg-[#111827] border border-[#1e293b] space-y-1 hover:border-emerald-500/40 transition-colors">
           <span className="text-[10px] text-emerald-400 font-bold uppercase">Peak Maximum</span>
           <div className="text-base sm:text-lg font-black text-emerald-300">{formatNumber(maxVal)}</div>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-[#161b22] border border-slate-800 space-y-1">
+        <div className="p-3.5 rounded-2xl bg-[#111827] border border-[#1e293b] space-y-1 hover:border-amber-500/40 transition-colors">
           <span className="text-[10px] text-amber-400 font-bold uppercase">Total Records</span>
           <div className="text-base sm:text-lg font-black text-amber-300">{result.rows.length} Items</div>
         </div>

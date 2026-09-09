@@ -1,10 +1,23 @@
 @import "tailwindcss";
 
 @layer base {
+  :root {
+    --color-bg-oled: #0b0f19;
+    --color-surface-card: #111827;
+    --color-surface-card-hover: #161f30;
+    --color-border-subtle: #1e293b;
+    --color-primary-emerald: #10b981;
+    --color-primary-cyan: #38bdf8;
+    --color-accent-indigo: #818cf8;
+    --color-text-high-contrast: #f8fafc;
+    --color-text-muted: #94a3b8;
+  }
+
   body {
-    background-color: #060e14;
-    color: #e2e8f0;
+    background-color: #0b0f19;
+    color: #f8fafc;
     font-family: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    letter-spacing: -0.01em;
   }
 
   p, .prose-text {
@@ -12,39 +25,52 @@
   }
 }
 
-/* Terminal Grid Background Texture */
+/* OLED Developer Terminal Grid Texture */
 .terminal-grid-bg {
   background-image: 
-    linear-gradient(to right, rgba(16, 185, 129, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
-  background-size: 24px 24px;
+    radial-gradient(rgba(16, 185, 129, 0.08) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
 
-/* Card Subtle Scanline / Grid Effect */
+/* UI/UX Pro Max Bento Box Card Architecture */
 .card-terminal {
-  background-color: #0d1117;
-  border: 1px solid rgba(30, 41, 59, 0.8);
-  transition: all 0.2s ease-in-out;
+  background-color: #111827;
+  border: 1px solid #1e293b;
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .card-terminal:hover {
-  border-color: rgba(16, 185, 129, 0.4);
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.06);
+  border-color: rgba(16, 185, 129, 0.45);
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.1), 0 8px 30px rgba(0, 0, 0, 0.6);
+  transform: translateY(-1px);
 }
 
-/* Custom scrollbars */
+/* Neon Glow Accents */
+.text-glow-emerald {
+  text-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+
+.text-glow-cyan {
+  text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+}
+
+/* Custom developer scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #060e14;
+  background: #0b0f19;
 }
 
 ::-webkit-scrollbar-thumb {
   background: #1e293b;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {

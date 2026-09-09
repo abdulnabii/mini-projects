@@ -28,18 +28,18 @@ interface Props {
   isLoading: boolean;
 }
 
-const DIALECT_OPTIONS: { id: DatabaseDialect; label: string; icon: string }[] = [
-  { id: 'postgres', label: 'PostgreSQL', icon: '🐘' },
-  { id: 'mysql', label: 'MySQL', icon: '🐬' },
-  { id: 'mongodb', label: 'MongoDB Pipeline', icon: '🍃' },
-  { id: 'sqlite', label: 'SQLite', icon: '🗄️' },
-  { id: 'prisma', label: 'Prisma ORM', icon: '🔷' },
-  { id: 'drizzle', label: 'Drizzle ORM', icon: '💧' },
+const DIALECT_OPTIONS: { id: DatabaseDialect; label: string; badge: string; color: string }[] = [
+  { id: 'postgres', label: 'PostgreSQL', badge: 'PG', color: 'text-cyan-400 border-cyan-500/40 bg-cyan-500/10' },
+  { id: 'mysql', label: 'MySQL', badge: 'MY', color: 'text-amber-400 border-amber-500/40 bg-amber-500/10' },
+  { id: 'mongodb', label: 'MongoDB', badge: 'MGO', color: 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10' },
+  { id: 'sqlite', label: 'SQLite', badge: 'LITE', color: 'text-slate-300 border-slate-600 bg-slate-800/60' },
+  { id: 'prisma', label: 'Prisma ORM', badge: 'ORM', color: 'text-indigo-400 border-indigo-500/40 bg-indigo-500/10' },
+  { id: 'drizzle', label: 'Drizzle ORM', badge: 'DRZ', color: 'text-teal-400 border-teal-500/40 bg-teal-500/10' },
 ];
 
 const CATEGORIZED_PROMPTS = [
   {
-    category: '💰 Revenue & Sales',
+    category: 'Revenue & Sales',
     icon: DollarSign,
     prompts: [
       'Show me the top 10 customers by total revenue in Q1 2026, only from Pakistan with completed orders',
@@ -48,7 +48,7 @@ const CATEGORIZED_PROMPTS = [
     ],
   },
   {
-    category: '👥 Users & Retention',
+    category: 'Users & Retention',
     icon: Users,
     prompts: [
       'Find all registered users who created an account in the last 30 days but never placed an order',
@@ -57,7 +57,7 @@ const CATEGORIZED_PROMPTS = [
     ],
   },
   {
-    category: '🚨 Risk & Audit',
+    category: 'Risk & Audit',
     icon: AlertTriangle,
     prompts: [
       'Find all flagged transactions over $5,000 in the past 7 days with user full name and wallet currency',
@@ -65,7 +65,7 @@ const CATEGORIZED_PROMPTS = [
     ],
   },
   {
-    category: '⚡ Performance Audit',
+    category: 'Performance Audit',
     icon: Clock,
     prompts: [
       'Show the 5 slowest API endpoints with average latency > 500ms and request volume > 10,000',
@@ -152,7 +152,7 @@ export default function QueryInput({
         </div>
 
         {/* Dialect Selector Chips */}
-        <div className="flex items-center gap-1.5 flex-wrap p-1 rounded-2xl bg-[#161b22] border border-slate-800">
+        <div className="flex items-center gap-1.5 flex-wrap p-1 rounded-2xl bg-[#0b0f19] border border-slate-800">
           {DIALECT_OPTIONS.map((d) => {
             const isSelected = dialect === d.id;
             return (
@@ -160,13 +160,19 @@ export default function QueryInput({
                 key={d.id}
                 type="button"
                 onClick={() => onDialectChange(d.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                   isSelected
-                    ? 'bg-emerald-500 text-black font-black shadow-md'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-emerald-500 text-black shadow-md shadow-emerald-500/20'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-900'
                 }`}
               >
-                <span>{d.icon}</span>
+                <span
+                  className={`text-[9px] px-1 py-0.2 rounded border font-bold ${
+                    isSelected ? 'bg-black/20 text-black border-black/30' : d.color
+                  }`}
+                >
+                  {d.badge}
+                </span>
                 <span>{d.label}</span>
               </button>
             );

@@ -93,12 +93,12 @@ export default function QueryOutput({
   return (
     <div className="space-y-6 font-mono">
       {/* Query Card */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-[#0d1117] border border-cyan-500/30 shadow-2xl space-y-6">
+      <div className="p-6 sm:p-8 rounded-3xl bg-[#0d1527] border border-[#1e293b] shadow-2xl space-y-6 hover:border-cyan-500/30 transition-all duration-200">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#1e293b] pb-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 text-[10px] font-bold uppercase">
+              <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 text-[10px] font-bold uppercase tracking-wider">
                 {queryData.dialect.toUpperCase()} GENERATED QUERY
               </span>
               <span
@@ -118,7 +118,7 @@ export default function QueryOutput({
             <button
               type="button"
               onClick={copyQuery}
-              className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-[#111827] border border-[#1e293b] text-slate-300 hover:text-white text-xs font-bold transition-all duration-150 flex items-center gap-1.5 cursor-pointer hover:border-emerald-500/40"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copied!' : 'Copy Code'}</span>
@@ -127,7 +127,7 @@ export default function QueryOutput({
             <button
               type="button"
               onClick={downloadQueryFile}
-              className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-[#111827] border border-[#1e293b] text-slate-300 hover:text-white text-xs font-bold transition-all duration-150 flex items-center gap-1.5 cursor-pointer hover:border-cyan-500/40"
               title="Download raw query file"
             >
               <Download className="w-3.5 h-3.5" />
@@ -137,7 +137,7 @@ export default function QueryOutput({
             <button
               type="button"
               onClick={handleSave}
-              className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-amber-300 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-[#111827] border border-[#1e293b] text-slate-300 hover:text-amber-300 text-xs font-bold transition-all duration-150 flex items-center gap-1.5 cursor-pointer hover:border-amber-500/40"
             >
               <Bookmark className={`w-3.5 h-3.5 ${saved ? 'text-amber-400 fill-amber-400' : ''}`} />
               <span>{saved ? 'Saved!' : 'Bookmark'}</span>
@@ -147,7 +147,7 @@ export default function QueryOutput({
               type="button"
               disabled={isExecuting}
               onClick={onExecute}
-              className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-300 text-black font-extrabold text-xs transition-all shadow-md shadow-emerald-500/20 flex items-center gap-2 cursor-pointer hover:scale-105"
+              className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-300 text-black font-extrabold text-xs transition-all duration-150 shadow-md shadow-emerald-500/20 flex items-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
             >
               <Play className="w-3.5 h-3.5 fill-black" />
               <span>{isExecuting ? 'Running...' : 'Run Query Sandbox'}</span>
@@ -156,33 +156,41 @@ export default function QueryOutput({
         </div>
 
         {/* Safety Audit Strip */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 rounded-2xl bg-[#161b22] border border-slate-800">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 rounded-2xl bg-[#111827] border border-[#1e293b]">
           <SqlValidatorBadge dialect={queryData.dialect} hasLimit={true} />
-          <span className="text-[10px] text-slate-500">
+          <span className="text-[10px] text-slate-500 font-mono">
             Est. Latency: <strong className="text-cyan-300">{queryData.executionTimeEstimate || '~28ms'}</strong>
           </span>
         </div>
 
-        {/* Code Editor Container with Line Numbers */}
-        <div className="relative rounded-2xl bg-[#04080e] border border-slate-800 overflow-hidden shadow-inner">
-          <div className="flex items-center justify-between px-4 py-2.5 bg-[#0d1117] border-b border-slate-800 text-[10px] text-slate-400">
-            <span className="flex items-center gap-1.5 font-bold">
-              <Code2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>{queryData.dialect.toUpperCase()} Code Viewer</span>
-            </span>
-            <span>{lines.length} lines • UTF-8</span>
+        {/* Code Editor Container with Terminal Window Dots & Line Numbers */}
+        <div className="relative rounded-2xl bg-[#04080e] border border-[#1e293b] overflow-hidden shadow-2xl">
+          <div className="flex items-center justify-between px-4 py-3 bg-[#0d1527] border-b border-[#1e293b] text-[11px] text-slate-400 select-none">
+            <div className="flex items-center gap-3">
+              {/* Terminal Traffic Light Window Controls */}
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#ef4444]/80 inline-block"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]/80 inline-block"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-[#10b981]/80 inline-block"></span>
+              </div>
+              <span className="flex items-center gap-1.5 font-bold font-mono text-slate-300">
+                <Code2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>{queryData.dialect.toUpperCase()} Code Viewer</span>
+              </span>
+            </div>
+            <span className="font-mono text-[10px] text-slate-500">{lines.length} lines • UTF-8</span>
           </div>
 
-          <div className="flex p-4 overflow-x-auto text-xs font-mono leading-relaxed">
+          <div className="flex p-4 overflow-x-auto text-xs font-mono leading-relaxed bg-[#050811]">
             {/* Line numbers column */}
-            <div className="select-none text-slate-600 text-right pr-4 border-r border-slate-800/80 mr-4 font-mono">
+            <div className="select-none text-slate-600 text-right pr-4 border-r border-[#1e293b] mr-4 font-mono">
               {lines.map((_, i) => (
                 <div key={i}>{i + 1}</div>
               ))}
             </div>
 
             {/* Code column */}
-            <pre className="text-emerald-300 whitespace-pre-wrap selection:bg-emerald-500/30 flex-1">
+            <pre className="text-emerald-300 font-mono whitespace-pre-wrap selection:bg-emerald-500/30 flex-1">
               {queryData.query}
             </pre>
           </div>
@@ -190,12 +198,12 @@ export default function QueryOutput({
 
         {/* 2-Sentence Plain English Explanation Card */}
         {queryData.explanation && (
-          <div className="p-4 rounded-2xl bg-[#161b22] border border-slate-800 space-y-1.5 text-xs font-sans">
+          <div className="p-4 rounded-2xl bg-[#111827] border border-[#1e293b] space-y-1.5 text-xs font-sans">
             <div className="font-bold text-white font-mono flex items-center gap-1.5 text-[11px]">
               <Info className="w-3.5 h-3.5 text-cyan-400" />
               <span>Query Execution Logic &amp; Relational Map:</span>
             </div>
-            <p className="text-slate-300 leading-relaxed">
+            <p className="text-slate-300 leading-relaxed font-sans">
               {queryData.explanation}
             </p>
           </div>
@@ -203,8 +211,8 @@ export default function QueryOutput({
 
         {/* Index Optimization & Performance Tips */}
         {queryData.optimizationTips && queryData.optimizationTips.length > 0 && (
-          <div className="p-4 rounded-2xl bg-[#161b22] border border-emerald-500/20 space-y-2 text-xs">
-            <div className="font-bold text-emerald-400 font-mono flex items-center gap-1.5 text-[11px] uppercase">
+          <div className="p-4 rounded-2xl bg-[#111827] border border-emerald-500/20 space-y-2 text-xs">
+            <div className="font-bold text-emerald-400 font-mono flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
               <Zap className="w-3.5 h-3.5 text-amber-400" />
               <span>Recommended Production Indexes &amp; Optimizations:</span>
             </div>
