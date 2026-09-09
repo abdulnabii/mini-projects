@@ -16,6 +16,7 @@ import ResultTable from '@/components/ResultTable';
 import AutoChart from '@/components/AutoChart';
 import SchemaViewer from '@/components/SchemaViewer';
 import QueryExecutionPlan from '@/components/QueryExecutionPlan';
+import AEOFAQSection from '@/components/AEOFAQSection';
 import {
   Database,
   Terminal,
@@ -378,6 +379,9 @@ export default function QueryStudioPage() {
           />
         </div>
       )}
+
+      {/* Crawlable AEO/GEO Structured Knowledge Hub */}
+      <AEOFAQSection />
     </div>
   );
 }
