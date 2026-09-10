@@ -121,13 +121,16 @@ export default function BarChart3D({
     const offset = ((numCols - 1) * spacing) / 2;
     const barMeshes: THREE.Mesh[] = [];
 
+    const maxVal = Math.max(...bars.map((b) => b.value || 0), 1);
+
     bars.forEach((b, idx) => {
       const row = Math.floor(idx / numCols);
       const col = idx % numCols;
 
       const posX = col * spacing - offset;
       const posZ = row * spacing - offset;
-      const barHeight = Math.max(4, (b.value / 110) * 50);
+      const normalizedRatio = Math.min(1, Math.max(0.08, (b.value || 0) / maxVal));
+      const barHeight = 6 + normalizedRatio * 54;
       const barColor = regionColors[b.category || ''] || 0x10b981;
 
       const boxGeo = new THREE.BoxGeometry(10, barHeight, 10);

@@ -197,9 +197,13 @@ export default function Globe3D({
     // Add Geographic Spike Beacons with UserData for Raycasting
     const interactiveSpikes: THREE.Mesh[] = [];
 
+    // Calculate maximum value dynamically for clean normalization across any dataset
+    const maxVal = Math.max(...points.map((p) => p.value || 0), 1);
+
     points.forEach((p) => {
       const pos = latLngToVector(p.lat, p.lng, globeRadius);
-      const spikeHeight = Math.max(4, (p.value / 100) * 22);
+      const normalizedRatio = Math.min(1, Math.max(0.1, (p.value || 0) / maxVal));
+      const spikeHeight = 5 + normalizedRatio * 20;
       const col = categoryColors[p.category || ''] || spikeColor;
 
       // Spike cylinder

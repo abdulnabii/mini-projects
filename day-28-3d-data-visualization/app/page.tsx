@@ -11,7 +11,8 @@ import {
   SavedVisualization,
 } from '@/types';
 import { SAMPLE_DATASETS } from '@/lib/sampleDatasets';
-import { applyFilters, inferDefaultDimensionMapping, build3DDataFromRows } from '@/lib/dataEngine';
+import { applyFilters, inferDefaultDimensionMapping, build3DDataFromRows, parseCSV, buildColumnProfiles } from '@/lib/dataEngine';
+import { calculateDataQuality, detectAnomalies, calculatePearsonCorrelations } from '@/lib/statistics';
 import { saveVisualization } from '@/lib/storage';
 
 import DatasetUploader from '@/components/DatasetUploader';
@@ -123,10 +124,72 @@ export default function ThreeDataVizPage() {
     }
   };
 
-  // Handle CSV Upload with Local Stats Engine profiling
+  // Handle CSV Upload with Local Stats Engine profiling (Immediate Client-Side + Server AI Synthesis)
   const handleUploadCSV = async (csvText: string, title: string) => {
     setIsLoading(true);
     setUploadError(null);
+
+    // 1. Immediate local parse and render so the user sees their data right away!
+    try {
+      const { headers, rows } = parseCSV(csvText);
+      if (rows.length > 0) {
+        const columnProfiles = buildColumnProfiles(headers, rows);
+        const dataQuality = calculateDataQuality(rows, headers);
+        const numericCols = columnProfiles.filter((p) => p.dataType === 'numeric').map((p) => p.name);
+        const detailedAnomalies = detectAnomalies(rows, numericCols);
+        const correlations = calculatePearsonCorrelations(rows, numericCols);
+
+        // Inferred chart type
+        const geoKeywords = ['country', 'lat', 'lng', 'latitude', 'longitude', 'nation', 'airport', 'city', 'location'];
+        const hasGeo = headers.some((h) => geoKeywords.some((k) => h.toLowerCase().includes(k)));
+        const inferredType: VisualizationType = hasGeo ? 'GLOBE_3D' : (numericCols.length >= 3 ? 'SCATTER_3D' : 'BAR_3D');
+
+        const initialMapping = inferDefaultDimensionMapping(headers, columnProfiles, inferredType);
+        const initial3DData = build3DDataFromRows(rows, headers, inferredType, initialMapping);
+
+        const immediateDataset: DatasetAnalysis = {
+          id: 'upload_' + Date.now(),
+          title: title || 'Custom Enterprise Dataset',
+          category: 'Uploaded Dataset Analytics',
+          isSynthetic: false,
+          sourceType: 'uploaded',
+          rowCount: rows.length,
+          rawRows: rows,
+          headers,
+          columnProfiles,
+          dataQuality,
+          detailedAnomalies,
+          correlations,
+          chartType: inferredType,
+          axisMapping: {
+            x: headers[0] || 'Dimension 1',
+            y: headers[1] || 'Dimension 2',
+            z: headers[2] || 'Dimension 3',
+          },
+          dimensionMapping: initialMapping,
+          colorScheme: 'EMERALD',
+          patterns: [
+            `Loaded ${rows.length} custom records across ${headers.length} dimensions.`,
+            `Primary metric '${numericCols[0] || headers[0]}' initialized.`,
+            detailedAnomalies.length > 0 ? `${detailedAnomalies.length} outliers detected via IQR.` : 'Standard variance profile.',
+          ],
+          anomalies: detailedAnomalies.slice(0, 2).map((a) => `${a.rowIdentifier} (${a.column}=${a.value}) outside IQR fence.`),
+          narrative: `Custom dataset "${title || 'Uploaded Data'}" containing ${rows.length} records. Rendered using ${inferredType.replace('_', ' ')} spatial projection.`,
+          animationRecommendation: 'Continuous orbital camera rotation.',
+          data: initial3DData,
+        };
+
+        setActiveDataset(immediateDataset);
+        setDimensionMapping(initialMapping);
+        setFilters([]);
+        setGlobalSearch('');
+        setSelectedRowIndex(null);
+      }
+    } catch (parseErr) {
+      console.warn('Local pre-parse warning:', parseErr);
+    }
+
+    // 2. Fetch enriched AI narrative from API
     try {
       const res = await fetch('/api/analyze', {
         method: 'POST',
@@ -135,24 +198,21 @@ export default function ThreeDataVizPage() {
       });
       const data = await res.json();
       if (data.error) {
-        setUploadError(data.error);
+        // Keep the local dataset active even if AI route reports a soft error
+        console.warn('API analysis notice:', data.error);
         return;
       }
       if (data.analysis) {
         setActiveDataset(data.analysis);
         setColorScheme(data.analysis.colorScheme || 'EMERALD');
-        setFilters([]);
-        setGlobalSearch('');
-        setSelectedRowIndex(null);
-
         const headers = data.analysis.headers || Object.keys(data.analysis.rawRows?.[0] || {});
         setDimensionMapping(
           inferDefaultDimensionMapping(headers, data.analysis.columnProfiles || [], data.analysis.chartType)
         );
       }
     } catch (e: any) {
-      console.error('Failed to analyze CSV:', e);
-      setUploadError('Failed to parse CSV dataset. Please verify format and headers.');
+      console.error('API analysis request error:', e);
+      // We do NOT wipe out the local dataset if the network call fails
     } finally {
       setIsLoading(false);
     }
