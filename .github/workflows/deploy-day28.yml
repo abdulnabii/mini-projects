@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 env:
-  VERCEL_ORG_ID: team_P0AhjcWKoUAspDgtOFE5uujN
-  VERCEL_PROJECT_ID: prj_Bpkd65ITEIa1hKUxiEClwMJZr6UQ
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID || 'team_P0AhjcWKoUAspDgtOFE5uujN' }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID || 'prj_Bpkd65ITEIa1hKUxiEClwMJZr6UQ' }}
 
 jobs:
   deploy:
@@ -30,39 +30,20 @@ jobs:
         run: npm ci
 
       - name: Install Vercel CLI
-        run: npm install -g vercel@latest
+        run: npm install --global vercel@latest
 
-      - name: Link Vercel Project
-        run: |
-          mkdir -p .vercel
-          cat << 'EOF' > .vercel/project.json
-          {
-            "projectId": "prj_Bpkd65ITEIa1hKUxiEClwMJZr6UQ",
-            "orgId": "team_P0AhjcWKoUAspDgtOFE5uujN"
-          }
-          EOF
-
-      - name: Pull Vercel Environment
+      - name: Pull Vercel Environment Information
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: |
-          vercel pull --yes --environment=production --token=$VERCEL_TOKEN
-        continue-on-error: true
+        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
       - name: Build Project Artifacts
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: |
-          vercel build --prod --token=$VERCEL_TOKEN || npm run build
+        run: vercel build --prod --token=$VERCEL_TOKEN
 
-      - name: Deploy to Vercel
+      - name: Deploy Project Artifacts to Vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: |
-          if [ -d ".vercel/output" ]; then
-            echo "Deploying prebuilt artifacts to Vercel production..."
-            vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN --yes
-          else
-            echo "Deploying project source directly to Vercel production..."
-            vercel deploy --prod --token=$VERCEL_TOKEN --yes
-          fi
+        run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+
