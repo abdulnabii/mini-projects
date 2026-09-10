@@ -110,29 +110,23 @@ export default function ThreeDataVizPage() {
     );
   };
 
-  // Handle Chart Projection Switch
+  // Handle Chart Projection Switch — NEVER replaces uploaded user data with a preset
   const handleChartTypeChange = (type: VisualizationType) => {
-    // If the active dataset is an uploaded dataset, keep its data and switch the projection type!
+    // If the user has uploaded their own data, just re-project it under the new visualization mode
     if (activeDataset.sourceType === 'uploaded') {
       const headers = activeDataset.headers || Object.keys(activeDataset.rawRows?.[0] || {});
       const newMapping = inferDefaultDimensionMapping(headers, activeDataset.columnProfiles || [], type);
-      const rows = filteredRows.length > 0 ? filteredRows : (activeDataset.rawRows || []);
-      const new3DData = build3DDataFromRows(rows, headers, type, newMapping);
-
+      const new3DData = build3DDataFromRows(activeDataset.rawRows || [], headers, type, newMapping);
       setActiveDataset((prev) => ({
         ...prev,
         chartType: type,
         dimensionMapping: newMapping,
-        data: {
-          ...prev.data,
-          ...new3DData,
-        },
+        data: { ...prev.data, ...new3DData },
       }));
       setDimensionMapping(newMapping);
       return;
     }
-
-    // Otherwise, if using sample datasets, switch to the matching sample preset
+    // For presets: load the matching preset for that view, or just change the type
     const matchingPreset = SAMPLE_DATASETS.find((d) => d.chartType === type);
     if (matchingPreset) {
       handleSelectDataset(matchingPreset);
@@ -224,12 +218,17 @@ export default function ThreeDataVizPage() {
         return;
       }
       if (data.analysis) {
-        setActiveDataset(data.analysis);
+        // Only apply AI-generated narrative text — never overwrite locally-parsed data, geometry, or mapping
+        setActiveDataset((prev) => ({
+          ...prev,
+          narrative: data.analysis.narrative || prev.narrative,
+          patterns: data.analysis.patterns || prev.patterns,
+          anomalies: data.analysis.anomalies || prev.anomalies,
+          category: data.analysis.category || prev.category,
+          colorScheme: data.analysis.colorScheme || prev.colorScheme,
+          animationRecommendation: data.analysis.animationRecommendation || prev.animationRecommendation,
+        }));
         setColorScheme(data.analysis.colorScheme || 'EMERALD');
-        const headers = data.analysis.headers || Object.keys(data.analysis.rawRows?.[0] || {});
-        setDimensionMapping(
-          inferDefaultDimensionMapping(headers, data.analysis.columnProfiles || [], data.analysis.chartType)
-        );
       }
     } catch (e: any) {
       console.error('API analysis request error:', e);
