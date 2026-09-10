@@ -269,108 +269,86 @@ export default function Viewport3D({
           />
         )}
 
-        {/* PERSISTENT FLOATING HUD LEGEND OVERLAY */}
+        {/* PERSISTENT FLOATING HUD LEGEND OVERLAY — fully data-driven */}
         <div className="absolute top-4 right-4 p-3 rounded-xl bg-[#0b0f19]/90 backdrop-blur-md border border-[#1e293b] text-[10px] font-mono text-slate-300 space-y-2 shadow-2xl max-w-xs select-none">
           <div className="flex items-center justify-between border-b border-[#1e293b] pb-1.5">
             <span className="text-[10px] text-emerald-400 font-bold uppercase flex items-center gap-1 tracking-wider">
               <Compass className="w-3 h-3 text-cyan-400" />
-              <span>Spatial Axis &amp; Relationship Guide</span>
+              <span>Spatial Legend &amp; Encoding</span>
             </span>
             <span className="text-[9px] text-slate-500 font-mono">LIVE HUD</span>
           </div>
 
           <div className="space-y-1.5 text-[10px]">
-            {analysis.chartType === 'NETWORK_GRAPH' && (
-              <>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-slate-400">Sphere Nodes:</span>
-                  <span className="text-white font-bold">Startups / Funds / AI Labs</span>
-                </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-slate-400">Node Diameter:</span>
-                  <span className="text-emerald-300 font-bold">Valuation / AUM Scale</span>
-                </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-slate-400">Connecting Edges:</span>
-                  <span className="text-cyan-300 font-bold">Co-Investments &amp; Syndicates</span>
-                </div>
-              </>
-            )}
-
-            {analysis.chartType === 'BAR_3D' && (
-              <>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-slate-400">X-Columns:</span>
-                  <span className="text-white font-bold">Cloud Infrastructure Regions</span>
-                </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-slate-400">Z-Rows:</span>
-                  <span className="text-cyan-300 font-bold">Sequential Fiscal Quarters</span>
-                </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-slate-400">Y-Voxel Height:</span>
-                  <span className="text-emerald-300 font-bold">MRR Revenue Density ($K)</span>
-                </div>
-              </>
-            )}
-
-            {analysis.chartType === 'GLOBE_3D' && (
-              <>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-slate-400">Spike Coordinates:</span>
-                  <span className="text-white font-bold">Geographic Lat / Lng</span>
-                </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-slate-400">Spike Elevation:</span>
-                  <span className="text-emerald-300 font-bold">Case Volume Magnitude</span>
-                </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-slate-400">Orbital Arcs:</span>
-                  <span className="text-cyan-300 font-bold">Cross-Border Air Corridors</span>
-                </div>
-              </>
-            )}
-
-            {analysis.chartType === 'SCATTER_3D' && (
-              <>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-slate-400">Spatial Box (X,Y,Z):</span>
-                  <span className="text-white font-bold">Sensor Multi-Axis Telemetry</span>
-                </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-slate-400">Particle Size:</span>
-                  <span className="text-emerald-300 font-bold">Atmospheric Pressure</span>
-                </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-slate-400">Orbital Rings:</span>
-                  <span className="text-cyan-300 font-bold">Thermal Variance Bands</span>
-                </div>
-              </>
-            )}
-
-            {/* Categorical Color Encoding Chips */}
-            <div className="pt-1 border-t border-[#1e293b]/80 space-y-1">
-              <span className="text-slate-400 text-[9px] block">Entity / Sector Color Key:</span>
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> VC / Americas
-                </span>
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[9px]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" /> AI Lab / Europe
-                </span>
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 text-[9px]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400" /> Incubator / Asia
-                </span>
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[9px]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" /> Infra / Middle East
-                </span>
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[9px]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400" /> DevPlatform
-                </span>
-              </div>
+            {/* Marker / Height label */}
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-slate-400">
+                {analysis.chartType === 'GLOBE_3D' ? 'Marker Height / Size:' :
+                 analysis.chartType === 'NETWORK_GRAPH' ? 'Node Diameter:' :
+                 analysis.chartType === 'BAR_3D' ? 'Voxel Height:' : 'Particle Size:'}
+              </span>
+              <span className="text-white font-bold truncate max-w-[120px]">
+                {analysis.dimensionMapping?.heightField ||
+                 analysis.dimensionMapping?.barHeightField ||
+                 analysis.dimensionMapping?.weightField ||
+                 analysis.dimensionMapping?.sizeField ||
+                 analysis.axisMapping?.y ||
+                 'Metric Magnitude'}
+              </span>
             </div>
+
+            {/* Arc / Edge label */}
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-slate-400">
+                {analysis.chartType === 'NETWORK_GRAPH' ? 'Connecting Edges:' : 'Connecting Arcs / Lines:'}
+              </span>
+              <span className="text-cyan-300 font-bold truncate max-w-[120px]">
+                {analysis.chartType === 'NETWORK_GRAPH'
+                  ? (analysis.dimensionMapping?.weightField || 'Relational Flow')
+                  : 'Relational Flow'}
+              </span>
+            </div>
+
+            {/* Category color key — derived from actual data */}
+            {(() => {
+              const categories: string[] = [];
+              if (analysis.chartType === 'GLOBE_3D' && analysis.data.globePoints) {
+                analysis.data.globePoints.forEach(p => { if (p.category && !categories.includes(p.category)) categories.push(p.category); });
+              } else if (analysis.chartType === 'NETWORK_GRAPH' && analysis.data.nodes) {
+                analysis.data.nodes.forEach(n => { if (n.group && !categories.includes(n.group)) categories.push(n.group); });
+              } else if (analysis.chartType === 'BAR_3D' && analysis.data.bars) {
+                analysis.data.bars.forEach(b => { if (b.category && !categories.includes(b.category)) categories.push(b.category); });
+              } else if (analysis.chartType === 'SCATTER_3D' && analysis.data.scatter) {
+                analysis.data.scatter.forEach(s => { if (s.category && !categories.includes(s.category)) categories.push(s.category); });
+              }
+
+              const catColors = ['text-emerald-400 bg-emerald-500/10 border-emerald-500/20 bg-emerald-400',
+                                 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20 bg-cyan-400',
+                                 'text-purple-400 bg-purple-500/10 border-purple-500/20 bg-purple-400',
+                                 'text-amber-400 bg-amber-500/10 border-amber-500/20 bg-amber-400',
+                                 'text-rose-400 bg-rose-500/10 border-rose-500/20 bg-rose-400'];
+              const dotColors = ['bg-emerald-400','bg-cyan-400','bg-purple-400','bg-amber-400','bg-rose-400'];
+              const textColors = ['text-emerald-400','text-cyan-400','text-purple-400','text-amber-400','text-rose-400'];
+              const bgColors = ['bg-emerald-500/10 border-emerald-500/20','bg-cyan-500/10 border-cyan-500/20','bg-purple-500/10 border-purple-500/20','bg-amber-500/10 border-amber-500/20','bg-rose-500/10 border-rose-500/20'];
+
+              if (categories.length === 0) return null;
+              return (
+                <div className="pt-1 border-t border-[#1e293b]/80 space-y-1">
+                  <span className="text-slate-400 text-[9px] block">Category Color Encoding:</span>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {categories.slice(0, 5).map((cat, i) => (
+                      <span key={cat} className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[9px] ${bgColors[i % 5]} ${textColors[i % 5]}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${dotColors[i % 5]}`} />
+                        {cat}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
+
 
         {/* Orbit Drag Hint (Bottom-Left) */}
         <div className="absolute bottom-4 left-4 p-2.5 rounded-xl bg-[#0b0f19]/85 backdrop-blur-md border border-[#1e293b] text-[10px] font-mono text-slate-400 flex items-center gap-2 select-none">
