@@ -11,7 +11,7 @@ import {
   SavedVisualization,
 } from '@/types';
 import { SAMPLE_DATASETS } from '@/lib/sampleDatasets';
-import { applyFilters, inferDefaultDimensionMapping } from '@/lib/dataEngine';
+import { applyFilters, inferDefaultDimensionMapping, build3DDataFromRows } from '@/lib/dataEngine';
 import { saveVisualization } from '@/lib/storage';
 
 import DatasetUploader from '@/components/DatasetUploader';
@@ -73,6 +73,26 @@ export default function ThreeDataVizPage() {
     if (baseRows.length === 0) return [];
     return applyFilters(baseRows, filters, globalSearch);
   }, [activeDataset.rawRows, filters, globalSearch]);
+
+  // 3. Dynamically compute 3D Spatial Geometry Data from active filtered rows + dimension mapping
+  const analysisWith3DData = useMemo(() => {
+    const headers = activeDataset.headers || Object.keys(activeDataset.rawRows?.[0] || {});
+    const rows = filteredRows.length > 0 ? filteredRows : (activeDataset.rawRows || []);
+
+    // If dataset has rows, generate live 3D coordinates based on active dimension mapping
+    if (rows.length > 0) {
+      const generated = build3DDataFromRows(rows, headers, activeDataset.chartType, dimensionMapping);
+      return {
+        ...activeDataset,
+        data: {
+          ...activeDataset.data,
+          ...generated,
+        },
+      };
+    }
+
+    return activeDataset;
+  }, [activeDataset, filteredRows, dimensionMapping]);
 
   // Handle Switching Preset Datasets
   const handleSelectDataset = (dataset: DatasetAnalysis) => {
@@ -285,7 +305,7 @@ export default function ThreeDataVizPage() {
       {/* Main Workspace Render View */}
       {activeTab === '3D_STUDIO' && (
         <Viewport3D
-          analysis={activeDataset}
+          analysis={analysisWith3DData}
           colorScheme={colorScheme}
           isAutoRotate={isAutoRotate}
           onToggleAutoRotate={() => setIsAutoRotate(!isAutoRotate)}

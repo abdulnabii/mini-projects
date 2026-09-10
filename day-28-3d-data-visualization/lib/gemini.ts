@@ -5,9 +5,10 @@ import {
   ColumnProfile,
   DetectedAnomaly,
   CorrelationResult,
+  VisualizationType,
 } from '@/types';
 import { SAMPLE_DATASETS } from './sampleDatasets';
-import { parseCSV, buildColumnProfiles } from './dataEngine';
+import { parseCSV, buildColumnProfiles, inferDefaultDimensionMapping, build3DDataFromRows } from './dataEngine';
 import {
   calculateDataQuality,
   detectAnomalies,
@@ -20,10 +21,27 @@ function getGenAI(): GoogleGenerativeAI | null {
   return new GoogleGenerativeAI(key);
 }
 
+// Auto-determine optimal visualization type from inferred column types
+function determineChartTypeFromProfiles(headers: string[], profiles: ColumnProfile[]): VisualizationType {
+  const geoKeywords = ['country', 'lat', 'lng', 'latitude', 'longitude', 'nation', 'airport', 'city', 'location'];
+  const hasGeo = headers.some((h) => geoKeywords.some((k) => h.toLowerCase().includes(k)));
+  if (hasGeo) return 'GLOBE_3D';
+
+  const networkKeywords = ['source', 'target', 'from', 'to', 'parent', 'child', 'network', 'node', 'edge'];
+  const hasNetwork = headers.some((h) => networkKeywords.some((k) => h.toLowerCase().includes(k)));
+  if (hasNetwork) return 'NETWORK_GRAPH';
+
+  const numericCount = profiles.filter((p) => p.dataType === 'numeric').length;
+  if (numericCount >= 3) return 'SCATTER_3D';
+
+  return 'BAR_3D';
+}
+
 /**
  * Robust CSV Analysis Pipeline.
  * Parses and computes real mathematical facts first,
- * then queries Gemini 1.5 Flash to synthesize narrative insights strictly grounded in the numbers.
+ * transforms raw uploaded rows into 3D geometries,
+ * and synthesizes executive narrative insights strictly grounded in the numbers.
  */
 export async function analyzeDatasetWithGemini(
   csvText: string,
@@ -37,15 +55,30 @@ export async function analyzeDatasetWithGemini(
   const detailedAnomalies = detectAnomalies(rows, numericCols);
   const correlations = calculatePearsonCorrelations(rows, numericCols);
 
+  const inferredType = determineChartTypeFromProfiles(headers, columnProfiles);
+  const dimensionMapping = inferDefaultDimensionMapping(headers, columnProfiles, inferredType);
+  const generated3DData = build3DDataFromRows(rows, headers, inferredType, dimensionMapping);
+
   const genAI = getGenAI();
 
   // Fallback if no API key is present
   if (!genAI) {
-    const fallback = SAMPLE_DATASETS[0];
+    const fallbackTemplate = SAMPLE_DATASETS.find((d) => d.chartType === inferredType) || SAMPLE_DATASETS[0];
+
+    const defaultPatterns = [
+      `Dataset loaded with ${rows.length} records across ${headers.length} classified dimensions.`,
+      numericCols.length > 0 ? `Primary numeric metric '${numericCols[0]}' ranges from ${columnProfiles.find((p) => p.name === numericCols[0])?.min} to ${columnProfiles.find((p) => p.name === numericCols[0])?.max}.` : 'Categorical records distributed evenly across categories.',
+      detailedAnomalies.length > 0 ? `${detailedAnomalies.length} statistical outliers flagged outside Tukey IQR fences.` : 'Low variance across primary observed dimensions.',
+    ];
+
+    const defaultAnomalies = detailedAnomalies.length > 0
+      ? detailedAnomalies.slice(0, 2).map((a) => `${a.rowIdentifier} (${a.column}=${a.value}) exceeds standard IQR 1.5x fence [${a.lowerFence}, ${a.upperFence}].`)
+      : ['No severe statistical anomalies detected in this uploaded dataset.'];
+
     return {
-      ...fallback,
       id: 'analysis_' + Date.now(),
-      title: datasetTitle || fallback.title,
+      title: datasetTitle,
+      category: 'Uploaded Dataset Analytics',
       isSynthetic: false,
       sourceType: 'uploaded',
       rowCount: rows.length,
@@ -55,6 +88,19 @@ export async function analyzeDatasetWithGemini(
       dataQuality,
       detailedAnomalies,
       correlations,
+      chartType: inferredType,
+      axisMapping: {
+        x: headers[0] || 'Dimension 1',
+        y: headers[1] || 'Dimension 2',
+        z: headers[2] || 'Dimension 3',
+      },
+      dimensionMapping,
+      colorScheme: 'EMERALD',
+      patterns: defaultPatterns,
+      anomalies: defaultAnomalies,
+      narrative: `This visualization represents ${rows.length} verified records uploaded by the user. The dataset has been profiled with an OmniData quality score of ${dataQuality.score}/100 and mapped into the ${inferredType.replace('_', ' ')} spatial projection.`,
+      animationRecommendation: 'Continuous orbital camera sweep around spatial data points.',
+      data: generated3DData,
     };
   }
 
@@ -66,7 +112,6 @@ export async function analyzeDatasetWithGemini(
     },
   });
 
-  // Provide calculated facts to Gemini
   const summaryFacts = {
     rowCount: rows.length,
     columns: headers,
@@ -79,7 +124,7 @@ export async function analyzeDatasetWithGemini(
 
   const prompt = `
 You are a Principal Data Scientist and 3D WebGL Visualization Architect.
-We have profiled the dataset with a pure TypeScript statistics engine.
+We have profiled this uploaded dataset with a pure TypeScript statistics engine.
 Here are the VERIFIED, COMPUTED FACTS:
 ${JSON.stringify(summaryFacts, null, 2)}
 
@@ -115,13 +160,14 @@ Return valid JSON matching this schema:
     const res = await model.generateContent(prompt);
     const parsed = JSON.parse(res.response.text());
 
-    const fallbackTemplate =
-      SAMPLE_DATASETS.find((d) => d.chartType === parsed.chartType) || SAMPLE_DATASETS[0];
+    const finalChartType: VisualizationType = parsed.chartType || inferredType;
+    const finalDimensionMapping = inferDefaultDimensionMapping(headers, columnProfiles, finalChartType);
+    const final3DData = build3DDataFromRows(rows, headers, finalChartType, finalDimensionMapping);
 
     return {
       id: 'analysis_' + Date.now(),
       title: datasetTitle,
-      category: parsed.category || 'General Analytics',
+      category: parsed.category || 'Uploaded Data Analytics',
       isSynthetic: false,
       sourceType: 'uploaded',
       rowCount: rows.length,
@@ -131,22 +177,24 @@ Return valid JSON matching this schema:
       dataQuality,
       detailedAnomalies,
       correlations,
-      chartType: parsed.chartType,
-      axisMapping: parsed.axisMapping || fallbackTemplate.axisMapping,
+      chartType: finalChartType,
+      axisMapping: parsed.axisMapping || { x: headers[0], y: headers[1], z: headers[2] },
+      dimensionMapping: finalDimensionMapping,
       colorScheme: parsed.colorScheme || 'EMERALD',
-      patterns: parsed.patterns || fallbackTemplate.patterns,
-      anomalies: parsed.anomalies || fallbackTemplate.anomalies,
-      narrative: parsed.narrative || fallbackTemplate.narrative,
-      animationRecommendation: parsed.animationRecommendation || fallbackTemplate.animationRecommendation,
-      data: fallbackTemplate.data,
+      patterns: parsed.patterns || [
+        `Identified ${rows.length} rows across ${headers.length} dimensions.`,
+      ],
+      anomalies: parsed.anomalies || (detailedAnomalies.length > 0 ? [`${detailedAnomalies[0].rowIdentifier} is an outlier.`] : ['No severe anomalies detected.']),
+      narrative: parsed.narrative || `This visualization models ${rows.length} custom data records across spatial dimensions.`,
+      animationRecommendation: parsed.animationRecommendation || 'Orbital camera rotation with focus on high-density clusters.',
+      data: final3DData,
     };
   } catch (error) {
     console.error('Gemini dataset analysis failed:', error);
-    const fallbackTemplate = SAMPLE_DATASETS[0];
     return {
-      ...fallbackTemplate,
       id: 'analysis_' + Date.now(),
       title: datasetTitle,
+      category: 'Uploaded Dataset Analytics',
       isSynthetic: false,
       sourceType: 'uploaded',
       rowCount: rows.length,
@@ -156,6 +204,15 @@ Return valid JSON matching this schema:
       dataQuality,
       detailedAnomalies,
       correlations,
+      chartType: inferredType,
+      axisMapping: { x: headers[0], y: headers[1], z: headers[2] },
+      dimensionMapping,
+      colorScheme: 'EMERALD',
+      patterns: [`Successfully profiled ${rows.length} rows.`],
+      anomalies: detailedAnomalies.slice(0, 2).map((a) => `${a.rowIdentifier} outlier.`),
+      narrative: `Dataset containing ${rows.length} rows loaded into ${inferredType.replace('_', ' ')}.`,
+      animationRecommendation: 'Orbital camera rotation.',
+      data: generated3DData,
     };
   }
 }

@@ -122,11 +122,20 @@ export default function DatasetUploader({
         </button>
       </div>
 
-      {/* Preset Dataset Badges Bar */}
+      {/* Dataset Selection Bar (Presets + Uploaded) */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1">
         <span className="text-[10px] text-slate-500 font-bold uppercase shrink-0 font-mono">
           Datasets:
         </span>
+        {activeDataset.sourceType === 'uploaded' && (
+          <button
+            type="button"
+            className="px-3 py-1.5 rounded-lg text-xs font-mono font-medium whitespace-nowrap transition-all duration-150 border bg-emerald-500/20 border-emerald-500 text-emerald-300 font-bold shadow-sm flex items-center gap-1.5"
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>Uploaded: {activeDataset.title}</span>
+          </button>
+        )}
         {SAMPLE_DATASETS.map((ds) => {
           const isSelected = activeDataset.id === ds.id;
           return (
