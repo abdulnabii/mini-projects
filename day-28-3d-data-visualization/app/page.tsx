@@ -112,6 +112,27 @@ export default function ThreeDataVizPage() {
 
   // Handle Chart Projection Switch
   const handleChartTypeChange = (type: VisualizationType) => {
+    // If the active dataset is an uploaded dataset, keep its data and switch the projection type!
+    if (activeDataset.sourceType === 'uploaded') {
+      const headers = activeDataset.headers || Object.keys(activeDataset.rawRows?.[0] || {});
+      const newMapping = inferDefaultDimensionMapping(headers, activeDataset.columnProfiles || [], type);
+      const rows = filteredRows.length > 0 ? filteredRows : (activeDataset.rawRows || []);
+      const new3DData = build3DDataFromRows(rows, headers, type, newMapping);
+
+      setActiveDataset((prev) => ({
+        ...prev,
+        chartType: type,
+        dimensionMapping: newMapping,
+        data: {
+          ...prev.data,
+          ...new3DData,
+        },
+      }));
+      setDimensionMapping(newMapping);
+      return;
+    }
+
+    // Otherwise, if using sample datasets, switch to the matching sample preset
     const matchingPreset = SAMPLE_DATASETS.find((d) => d.chartType === type);
     if (matchingPreset) {
       handleSelectDataset(matchingPreset);
