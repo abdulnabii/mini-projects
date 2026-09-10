@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GeoDataPoint, GeoArcConnection, ColorScheme } from '@/types';
 
@@ -194,14 +194,16 @@ export default function Globe3D({
       'Africa': 0xf59e0b,
     };
 
-    // Add Geographic Spike Beacons
+    // Add Geographic Spike Beacons with UserData for Raycasting
+    const interactiveSpikes: THREE.Mesh[] = [];
+
     points.forEach((p) => {
       const pos = latLngToVector(p.lat, p.lng, globeRadius);
       const spikeHeight = Math.max(4, (p.value / 100) * 22);
       const col = categoryColors[p.category || ''] || spikeColor;
 
       // Spike cylinder
-      const cylinderGeo = new THREE.CylinderGeometry(0.4, 1.2, spikeHeight, 8);
+      const cylinderGeo = new THREE.CylinderGeometry(0.5, 1.4, spikeHeight, 8);
       cylinderGeo.translate(0, spikeHeight / 2, 0);
       cylinderGeo.rotateX(Math.PI / 2);
 
@@ -215,12 +217,16 @@ export default function Globe3D({
       const spike = new THREE.Mesh(cylinderGeo, cylinderMat);
       spike.position.copy(pos);
       spike.lookAt(0, 0, 0);
+      spike.userData = { point: p };
+      interactiveSpikes.push(spike);
 
       // Top glowing head sphere
-      const headGeo = new THREE.SphereGeometry(1.6, 16, 16);
+      const headGeo = new THREE.SphereGeometry(1.8, 16, 16);
       const headMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
       const head = new THREE.Mesh(headGeo, headMat);
       head.position.copy(latLngToVector(p.lat, p.lng, globeRadius + spikeHeight));
+      head.userData = { point: p };
+      interactiveSpikes.push(head);
 
       mainGlobeGroup.add(spike);
       mainGlobeGroup.add(head);
@@ -262,6 +268,52 @@ export default function Globe3D({
     dirLight2.position.set(-100, -50, -50);
     scene.add(dirLight2);
 
+    // Raycaster for 3D Marker Hover & Click Picking
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let downX = 0;
+    let downY = 0;
+
+    const onPointerMove = (e: MouseEvent) => {
+      const rect = dom.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(interactiveSpikes, false);
+
+      if (intersects.length > 0) {
+        dom.style.cursor = 'pointer';
+        const hitPoint = intersects[0].object.userData?.point as GeoDataPoint;
+        if (hitPoint) {
+          setHoveredPoint(hitPoint);
+          setTooltipPos({ x: e.clientX - rect.left + 15, y: e.clientY - rect.top - 15 });
+        }
+      } else {
+        dom.style.cursor = isDragging ? 'grabbing' : 'grab';
+        setHoveredPoint(null);
+      }
+    };
+
+    const onClickCanvas = (e: MouseEvent) => {
+      // Ignore if user was orbiting/dragging
+      if (Math.abs(e.clientX - downX) > 5 || Math.abs(e.clientY - downY) > 5) return;
+
+      const rect = dom.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(interactiveSpikes, false);
+
+      if (intersects.length > 0) {
+        const hitPoint = intersects[0].object.userData?.point as GeoDataPoint;
+        if (hitPoint && onSelectPoint) {
+          onSelectPoint(hitPoint);
+        }
+      }
+    };
+
     // Mouse Interaction & Rotation
     let isDragging = false;
     let prevMouseX = 0;
@@ -271,6 +323,8 @@ export default function Globe3D({
       isDragging = true;
       prevMouseX = e.clientX;
       prevMouseY = e.clientY;
+      downX = e.clientX;
+      downY = e.clientY;
     };
 
     const onMouseMove = (e: MouseEvent) => {
@@ -288,6 +342,8 @@ export default function Globe3D({
 
     const dom = renderer.domElement;
     dom.addEventListener('mousedown', onMouseDown);
+    dom.addEventListener('click', onClickCanvas);
+    dom.addEventListener('mousemove', onPointerMove);
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
 
@@ -319,6 +375,8 @@ export default function Globe3D({
     return () => {
       cancelAnimationFrame(animationFrameId);
       dom.removeEventListener('mousedown', onMouseDown);
+      dom.removeEventListener('click', onClickCanvas);
+      dom.removeEventListener('mousemove', onPointerMove);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
       window.removeEventListener('resize', handleResize);
@@ -326,9 +384,35 @@ export default function Globe3D({
     };
   }, [points, arcs, colorScheme, isAutoRotate]);
 
+  const [hoveredPoint, setHoveredPoint] = useState<GeoDataPoint | null>(null);
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
   return (
-    <div className="relative w-full h-[540px] rounded-2xl bg-[#04080e] overflow-hidden border border-slate-800 flex items-center justify-center font-mono">
+    <div className="relative w-full h-[540px] rounded-2xl bg-[#04080e] overflow-hidden border border-[#1e293b] flex items-center justify-center font-mono">
       <div ref={containerRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
+
+      {/* Floating 3D Telemetry Tooltip */}
+      {hoveredPoint && (
+        <div
+          className="absolute pointer-events-none z-30 p-2.5 rounded-xl bg-[#0b0f19]/95 backdrop-blur-md border border-emerald-500/40 text-xs font-mono shadow-2xl space-y-1 transform -translate-y-full animate-in fade-in duration-100"
+          style={{ left: `${tooltipPos.x}px`, top: `${tooltipPos.y}px` }}
+        >
+          <div className="flex items-center gap-1.5 border-b border-[#1e293b] pb-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-bold text-white text-xs">{hoveredPoint.label}</span>
+          </div>
+          <div className="text-[10px] text-slate-300 space-y-0.5">
+            <div>Coordinates: <span className="text-cyan-300 font-mono">{hoveredPoint.lat.toFixed(2)}°, {hoveredPoint.lng.toFixed(2)}°</span></div>
+            <div>Primary Value: <strong className="text-emerald-300 font-bold">{hoveredPoint.value}</strong></div>
+            {hoveredPoint.secondaryValue && (
+              <div>Vaccine Coverage: <strong className="text-cyan-300 font-bold">{hoveredPoint.secondaryValue}%</strong></div>
+            )}
+            {hoveredPoint.category && (
+              <div className="text-slate-500 text-[9px] uppercase tracking-wider">{hoveredPoint.category}</div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

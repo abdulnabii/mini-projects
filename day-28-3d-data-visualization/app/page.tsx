@@ -7,6 +7,7 @@ import { saveVisualization } from '@/lib/storage';
 import DatasetUploader from '@/components/DatasetUploader';
 import Viewport3D from '@/components/Viewport3D';
 import NarrativePanel from '@/components/NarrativePanel';
+import AEOFAQSection from '@/components/AEOFAQSection';
 import {
   Globe,
   Sparkles,
@@ -132,6 +133,9 @@ export default function ThreeDataVizPage() {
         analysis={activeDataset}
         onSaveToGallery={handleSaveToGallery}
       />
+
+      {/* Crawlable AEO/GEO Knowledge Hub & Architecture FAQ */}
+      <AEOFAQSection />
     </div>
   );
 }

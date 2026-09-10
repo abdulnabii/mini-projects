@@ -35,9 +35,9 @@ export default function NarrativePanel({ analysis, onSaveToGallery }: Props) {
   };
 
   return (
-    <div className="p-6 sm:p-8 rounded-2xl bg-[#0d1117] border border-slate-800 shadow-xl space-y-6 font-mono">
+    <div className="p-6 sm:p-8 rounded-2xl bg-[#0d1527] border border-[#1e293b] shadow-xl space-y-6 font-mono">
       {/* Header & Save Trigger */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#1e293b] pb-4">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
             <Sparkles className="w-4 h-4" />
@@ -60,7 +60,7 @@ export default function NarrativePanel({ analysis, onSaveToGallery }: Props) {
         <button
           type="button"
           onClick={handleSave}
-          className="px-3.5 py-2 rounded-lg bg-[#161b22] border border-slate-800 hover:border-emerald-500/40 text-slate-300 hover:text-white text-xs font-mono font-medium transition-all flex items-center gap-1.5 cursor-pointer"
+          className="px-3.5 py-2 rounded-lg bg-[#111827] border border-[#1e293b] hover:border-emerald-500/40 text-slate-300 hover:text-white text-xs font-mono font-medium transition-all duration-150 flex items-center gap-1.5 cursor-pointer"
         >
           <Bookmark className={`w-3.5 h-3.5 ${saved ? 'text-amber-400 fill-amber-400' : ''}`} />
           <span>{saved ? 'Saved in Gallery!' : 'Bookmark to Gallery'}</span>
@@ -69,7 +69,7 @@ export default function NarrativePanel({ analysis, onSaveToGallery }: Props) {
 
       {/* Axis Mapping Badges */}
       <div className="space-y-2">
-        <span className="text-[10px] text-slate-400 font-bold uppercase font-mono flex items-center gap-1">
+        <span className="text-[10px] text-slate-400 font-bold uppercase font-mono flex items-center gap-1 tracking-wider">
           <Compass className="w-3.5 h-3.5 text-cyan-400" />
           <span>Spatial Axis Dimensions:</span>
         </span>
@@ -77,7 +77,7 @@ export default function NarrativePanel({ analysis, onSaveToGallery }: Props) {
           {Object.entries(analysis.axisMapping).map(([key, val]) => (
             <div
               key={key}
-              className="p-3 rounded-xl bg-[#161b22] border border-slate-800 space-y-0.5"
+              className="p-3 rounded-xl bg-[#111827] border border-[#1e293b] space-y-0.5 hover:border-cyan-500/30 transition-colors duration-150"
             >
               <span className="text-[10px] text-cyan-400 font-bold uppercase font-mono block">
                 {key.toUpperCase()}
@@ -91,7 +91,7 @@ export default function NarrativePanel({ analysis, onSaveToGallery }: Props) {
       </div>
 
       {/* Executive Narrative Story Card */}
-      <div className="p-4 rounded-xl bg-[#161b22] border border-slate-800 space-y-2">
+      <div className="p-4 rounded-xl bg-[#111827] border border-[#1e293b] space-y-2">
         <div className="flex items-center gap-1.5 text-xs font-bold text-white font-mono">
           <FileText className="w-3.5 h-3.5 text-emerald-400" />
           <span>Executive Spatial Synthesis:</span>
@@ -104,8 +104,8 @@ export default function NarrativePanel({ analysis, onSaveToGallery }: Props) {
       {/* Key Patterns & Anomalies Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Patterns */}
-        <div className="p-4 rounded-xl bg-[#161b22] border border-slate-800 space-y-2.5">
-          <span className="text-[10px] text-emerald-400 font-bold uppercase font-mono flex items-center gap-1.5">
+        <div className="p-4 rounded-xl bg-[#111827] border border-[#1e293b] space-y-2.5 hover:border-emerald-500/30 transition-colors duration-150">
+          <span className="text-[10px] text-emerald-400 font-bold uppercase font-mono flex items-center gap-1.5 tracking-wider">
             <TrendingUp className="w-3.5 h-3.5" />
             <span>Key Statistical Patterns:</span>
           </span>
@@ -120,8 +120,8 @@ export default function NarrativePanel({ analysis, onSaveToGallery }: Props) {
         </div>
 
         {/* Anomalies */}
-        <div className="p-4 rounded-xl bg-[#161b22] border border-amber-500/20 space-y-2.5">
-          <span className="text-[10px] text-amber-400 font-bold uppercase font-mono flex items-center gap-1.5">
+        <div className="p-4 rounded-xl bg-[#111827] border border-amber-500/20 space-y-2.5 hover:border-amber-500/40 transition-colors duration-150">
+          <span className="text-[10px] text-amber-400 font-bold uppercase font-mono flex items-center gap-1.5 tracking-wider">
             <AlertTriangle className="w-3.5 h-3.5" />
             <span>Anomalies &amp; Outliers:</span>
           </span>

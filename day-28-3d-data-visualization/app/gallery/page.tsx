@@ -46,7 +46,7 @@ export default function GalleryPage() {
   return (
     <div className="space-y-8 font-mono w-full min-w-0">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl bg-[#0d1117] border border-slate-800 shadow-xl">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl bg-[#0d1527] border border-[#1e293b] shadow-xl">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
             <Bookmark className="w-4 h-4" />
@@ -63,7 +63,7 @@ export default function GalleryPage() {
 
         <Link
           href="/"
-          className="px-3.5 py-1.5 rounded-lg bg-[#161b22] border border-slate-800 text-xs text-slate-300 hover:text-white font-mono font-medium transition-all flex items-center gap-1.5"
+          className="px-3.5 py-1.5 rounded-lg bg-[#111827] border border-[#1e293b] hover:border-emerald-500/40 text-xs text-slate-300 hover:text-white font-mono font-medium transition-all duration-150 flex items-center gap-1.5"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to 3D Studio</span>
@@ -78,18 +78,18 @@ export default function GalleryPage() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search saved 3D projections..."
-          className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#0d1117] border border-slate-800 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 font-mono"
+          className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#0d1527] border border-[#1e293b] text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 font-mono transition-colors"
         />
       </div>
 
       {/* Saved Visualizations Grid */}
       {filtered.length === 0 ? (
-        <div className="p-12 rounded-2xl bg-[#0d1117] border border-dashed border-slate-800 text-center space-y-3 font-mono">
+        <div className="p-12 rounded-2xl bg-[#0d1527] border border-dashed border-[#1e293b] text-center space-y-3 font-mono">
           <Globe className="w-8 h-8 text-slate-600 mx-auto" />
           <p className="text-xs text-slate-400 prose-text">No saved 3D plots found.</p>
           <Link
             href="/"
-            className="inline-block px-3.5 py-1.5 rounded-lg bg-emerald-500 text-black font-mono font-bold text-xs shadow-sm"
+            className="inline-block px-3.5 py-1.5 rounded-lg bg-emerald-500 text-black font-mono font-bold text-xs shadow-sm hover:bg-emerald-400 transition-colors"
           >
             Create Your First 3D Projection
           </Link>
@@ -99,13 +99,13 @@ export default function GalleryPage() {
           {filtered.map((item) => (
             <div
               key={item.id}
-              className="p-5 rounded-2xl bg-[#0d1117] border border-slate-800 space-y-3 shadow-xl flex flex-col justify-between hover:border-emerald-500/40 transition-colors"
+              className="p-5 rounded-2xl bg-[#0d1527] border border-[#1e293b] space-y-3 shadow-xl flex flex-col justify-between hover:border-emerald-500/40 transition-all duration-150"
             >
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     {getChartIcon(item.chartType)}
-                    <span className="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-cyan-300 text-[9px] font-bold font-mono">
+                    <span className="px-2 py-0.5 rounded-md bg-[#050811] border border-[#1e293b] text-cyan-300 text-[9px] font-bold font-mono">
                       {item.chartType.replace('_', ' ')}
                     </span>
                   </div>
@@ -122,10 +122,10 @@ export default function GalleryPage() {
                 </p>
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs">
+              <div className="flex items-center justify-between pt-2 border-t border-[#1e293b] text-xs">
                 <Link
                   href="/"
-                  className="px-2.5 py-1 rounded-lg bg-[#161b22] border border-slate-800 text-slate-300 hover:text-emerald-400 font-mono font-medium flex items-center gap-1 transition-colors"
+                  className="px-2.5 py-1 rounded-lg bg-[#111827] border border-[#1e293b] text-slate-300 hover:text-emerald-400 font-mono font-medium flex items-center gap-1 transition-colors duration-150"
                 >
                   <span>Open in 3D</span>
                   <ExternalLink className="w-3 h-3" />
@@ -134,7 +134,7 @@ export default function GalleryPage() {
                 <button
                   type="button"
                   onClick={() => handleDelete(item.id)}
-                  className="p-1.5 rounded-lg bg-[#161b22] border border-slate-800 text-rose-400 hover:text-rose-300 hover:bg-rose-950/30 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-lg bg-[#111827] border border-[#1e293b] text-rose-400 hover:text-rose-300 hover:bg-rose-950/30 transition-colors duration-150 cursor-pointer"
                   title="Delete plot"
                 >
                   <Trash2 className="w-3.5 h-3.5" />

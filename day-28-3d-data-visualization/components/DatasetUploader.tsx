@@ -83,12 +83,12 @@ export default function DatasetUploader({
   return (
     <div className="space-y-3 font-mono">
       {/* Compact Header & Chart Type Switcher */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#0d1117] border border-slate-800 shadow-xl">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#0d1527] border border-[#1e293b] shadow-xl">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[10px] text-slate-400 font-bold uppercase font-mono">
+          <span className="text-[10px] text-slate-400 font-bold uppercase font-mono tracking-wider">
             Spatial Projection:
           </span>
-          <div className="flex items-center gap-1.5 flex-wrap p-0.5 rounded-xl bg-[#161b22] border border-slate-800">
+          <div className="flex items-center gap-1.5 flex-wrap p-0.5 rounded-xl bg-[#111827] border border-[#1e293b]">
             {VIS_TYPES.map((vt) => {
               const Icon = vt.icon;
               const isSelected = activeDataset.chartType === vt.id;
@@ -97,10 +97,10 @@ export default function DatasetUploader({
                   key={vt.id}
                   type="button"
                   onClick={() => onChartTypeChange(vt.id)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all duration-150 flex items-center gap-1.5 cursor-pointer ${
                     isSelected
                       ? 'bg-emerald-500 text-black font-bold shadow-sm'
-                      : 'text-slate-400 hover:text-white'
+                      : 'text-slate-400 hover:text-white hover:border-[#1e293b]'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -115,7 +115,7 @@ export default function DatasetUploader({
         <button
           type="button"
           onClick={() => setIsUploadOpen(!isUploadOpen)}
-          className="text-xs text-emerald-400 hover:underline flex items-center gap-1 font-mono font-medium cursor-pointer"
+          className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-mono font-medium cursor-pointer transition-colors duration-150"
         >
           <Upload className="w-3.5 h-3.5" />
           <span>{isUploadOpen ? 'Close CSV Form' : 'Upload Custom CSV'}</span>
@@ -134,10 +134,10 @@ export default function DatasetUploader({
               key={ds.id}
               type="button"
               onClick={() => onSelectDataset(ds)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium whitespace-nowrap transition-all border cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium whitespace-nowrap transition-all duration-150 border cursor-pointer ${
                 isSelected
-                  ? 'bg-[#161b22] border-emerald-500 text-emerald-300 font-bold shadow-sm'
-                  : 'bg-[#0d1117] border-slate-800 text-slate-400 hover:text-white'
+                  ? 'bg-[#111827] border-emerald-500 text-emerald-300 font-bold shadow-sm'
+                  : 'bg-[#0d1527] border-[#1e293b] text-slate-400 hover:text-white hover:border-emerald-500/40'
               }`}
             >
               <span>{ds.title.split('&')[0]}</span>
@@ -172,7 +172,7 @@ export default function DatasetUploader({
 
       {/* Upload Custom CSV Dropdown Form */}
       {isUploadOpen && (
-        <form onSubmit={handleCustomUpload} className="p-4 rounded-xl bg-[#0d1117] border border-slate-800 space-y-3 animate-in fade-in duration-150">
+        <form onSubmit={handleCustomUpload} className="p-4 rounded-xl bg-[#0d1527] border border-[#1e293b] space-y-3 animate-in fade-in duration-150 shadow-xl">
           <div className="flex items-center justify-between">
             <label className="text-[10px] text-slate-400 font-bold uppercase font-mono">
               Dataset Name:
@@ -180,7 +180,7 @@ export default function DatasetUploader({
             <button
               type="button"
               onClick={loadSampleCSV}
-              className="text-[10px] text-emerald-400 hover:underline"
+              className="text-[10px] text-emerald-400 hover:text-emerald-300 transition-colors duration-150 cursor-pointer"
             >
               Insert Sample CSV
             </button>
@@ -191,7 +191,7 @@ export default function DatasetUploader({
             value={customTitle}
             onChange={(e) => setCustomTitle(e.target.value)}
             placeholder="e.g. Q4 Global Logistics Flow"
-            className="w-full p-2 rounded-lg bg-[#161b22] border border-slate-800 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 font-mono"
+            className="w-full p-2.5 rounded-lg bg-[#111827] border border-[#1e293b] text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 font-mono transition-colors"
           />
 
           <textarea
@@ -199,21 +199,21 @@ export default function DatasetUploader({
             value={customCsv}
             onChange={(e) => setCustomCsv(e.target.value)}
             placeholder="country,lat,lng,value,category&#10;United States,37.09,-95.71,95,North America&#10;Germany,51.16,10.45,68,Europe"
-            className="w-full p-2 rounded-lg bg-[#161b22] border border-slate-800 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 font-mono leading-relaxed"
+            className="w-full p-2.5 rounded-lg bg-[#111827] border border-[#1e293b] text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 font-mono leading-relaxed transition-colors"
           />
 
           <div className="flex items-center justify-end gap-2 pt-1">
             <button
               type="button"
               onClick={() => setIsUploadOpen(false)}
-              className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-400 hover:text-white cursor-pointer font-mono"
+              className="px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1e293b] text-xs text-slate-400 hover:text-white cursor-pointer font-mono transition-colors duration-150"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading || !customCsv.trim()}
-              className="px-4 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-mono font-bold text-xs shadow-sm flex items-center gap-1.5 cursor-pointer disabled:opacity-40"
+              className="px-4 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-mono font-bold text-xs shadow-sm flex items-center gap-1.5 cursor-pointer disabled:opacity-40 transition-all duration-150"
             >
               {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
               <span>Render 3D Space</span>

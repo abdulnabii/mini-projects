@@ -126,9 +126,9 @@ export default function Viewport3D({
   return (
     <div className="space-y-3 font-mono">
       {/* 3D Viewport Toolbar with Camera UX Controls */}
-      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#0d1117] border border-slate-800 shadow-xl">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#0d1527] border border-[#1e293b] shadow-xl">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">
+          <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold uppercase tracking-wider">
             {analysis.chartType.replace('_', ' ')}
           </span>
           <span className="text-xs text-white font-bold truncate max-w-xs sm:max-w-md font-mono">
@@ -139,11 +139,11 @@ export default function Viewport3D({
         {/* Camera UX and Media Export Affordances */}
         <div className="flex items-center gap-1.5 flex-wrap text-xs">
           {/* Zoom Controls */}
-          <div className="flex items-center p-0.5 rounded-lg bg-[#161b22] border border-slate-800 text-[11px]">
+          <div className="flex items-center p-0.5 rounded-lg bg-[#111827] border border-[#1e293b] text-[11px]">
             <button
               type="button"
               onClick={handleZoomOut}
-              className="p-1 rounded text-slate-400 hover:text-white cursor-pointer"
+              className="p-1 rounded text-slate-400 hover:text-white cursor-pointer transition-colors duration-150"
               title="Zoom Out"
             >
               <ZoomOut className="w-3.5 h-3.5" />
@@ -154,7 +154,7 @@ export default function Viewport3D({
             <button
               type="button"
               onClick={handleZoomIn}
-              className="p-1 rounded text-slate-400 hover:text-white cursor-pointer"
+              className="p-1 rounded text-slate-400 hover:text-white cursor-pointer transition-colors duration-150"
               title="Zoom In"
             >
               <ZoomIn className="w-3.5 h-3.5" />
@@ -165,7 +165,7 @@ export default function Viewport3D({
           <button
             type="button"
             onClick={handleResetView}
-            className="px-2.5 py-1.5 rounded-lg bg-[#161b22] border border-slate-800 text-slate-300 hover:text-white font-medium transition-all flex items-center gap-1 cursor-pointer"
+            className="px-2.5 py-1.5 rounded-lg bg-[#111827] border border-[#1e293b] text-slate-300 hover:text-white font-medium transition-all duration-150 flex items-center gap-1 cursor-pointer hover:border-cyan-500/40"
             title="Reset Camera Orientation & Zoom"
           >
             <RotateCcw className="w-3.5 h-3.5 text-cyan-400" />
@@ -176,10 +176,10 @@ export default function Viewport3D({
           <button
             type="button"
             onClick={onToggleAutoRotate}
-            className={`px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all flex items-center gap-1 cursor-pointer ${
+            className={`px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all duration-150 flex items-center gap-1 cursor-pointer ${
               isAutoRotate
                 ? 'bg-emerald-500 text-black font-bold border-emerald-400 shadow-sm'
-                : 'bg-[#161b22] border-slate-800 text-slate-300 hover:text-white'
+                : 'bg-[#111827] border-[#1e293b] text-slate-300 hover:text-white hover:border-emerald-500/40'
             }`}
           >
             <RotateCw className={`w-3.5 h-3.5 ${isAutoRotate ? 'animate-spin' : ''}`} />
@@ -190,7 +190,7 @@ export default function Viewport3D({
           <button
             type="button"
             onClick={handleTakeSnapshot}
-            className="px-2.5 py-1.5 rounded-lg bg-[#161b22] border border-slate-800 text-slate-300 hover:text-white font-medium transition-all flex items-center gap-1 cursor-pointer"
+            className="px-2.5 py-1.5 rounded-lg bg-[#111827] border border-[#1e293b] text-slate-300 hover:text-white font-medium transition-all duration-150 flex items-center gap-1 cursor-pointer hover:border-cyan-500/40"
             title="Export high-resolution PNG snapshot"
           >
             <Camera className="w-3.5 h-3.5 text-cyan-400" />
@@ -202,10 +202,10 @@ export default function Viewport3D({
             type="button"
             onClick={handleRecordVideo}
             disabled={isRecording}
-            className={`px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all flex items-center gap-1 cursor-pointer ${
+            className={`px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all duration-150 flex items-center gap-1 cursor-pointer ${
               isRecording
                 ? 'bg-rose-500 text-white animate-pulse border-rose-400 font-bold'
-                : 'bg-[#161b22] border-slate-800 text-slate-300 hover:text-white'
+                : 'bg-[#111827] border-[#1e293b] text-slate-300 hover:text-white hover:border-purple-500/40'
             }`}
             title="Record 5-second rotating 3D video"
           >
@@ -217,7 +217,7 @@ export default function Viewport3D({
           <button
             type="button"
             onClick={copyShareLink}
-            className="px-2.5 py-1.5 rounded-lg bg-[#161b22] border border-slate-800 text-slate-300 hover:text-white font-medium transition-all flex items-center gap-1 cursor-pointer"
+            className="px-2.5 py-1.5 rounded-lg bg-[#111827] border border-[#1e293b] text-slate-300 hover:text-white font-medium transition-all duration-150 flex items-center gap-1 cursor-pointer hover:border-emerald-500/40"
           >
             {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
             <span>{copiedLink ? 'Copied' : 'Share'}</span>
@@ -226,7 +226,7 @@ export default function Viewport3D({
       </div>
 
       {/* 3D WebGL Canvas Viewport with Persistent HUD Legend Overlay */}
-      <div ref={containerRef} className="w-full relative shadow-2xl rounded-2xl overflow-hidden border border-slate-800">
+      <div ref={containerRef} className="w-full relative shadow-2xl rounded-2xl overflow-hidden border border-[#1e293b]">
         {analysis.chartType === 'GLOBE_3D' && (
           <Globe3D
             points={analysis.data.globePoints}
@@ -270,9 +270,9 @@ export default function Viewport3D({
         )}
 
         {/* PERSISTENT FLOATING HUD LEGEND OVERLAY */}
-        <div className="absolute top-4 right-4 p-3 rounded-xl bg-[#060e14]/90 backdrop-blur-md border border-slate-800 text-[10px] font-mono text-slate-300 space-y-2 shadow-2xl max-w-xs">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
-            <span className="text-[10px] text-emerald-400 font-bold uppercase flex items-center gap-1">
+        <div className="absolute top-4 right-4 p-3 rounded-xl bg-[#0b0f19]/90 backdrop-blur-md border border-[#1e293b] text-[10px] font-mono text-slate-300 space-y-2 shadow-2xl max-w-xs select-none">
+          <div className="flex items-center justify-between border-b border-[#1e293b] pb-1.5">
+            <span className="text-[10px] text-emerald-400 font-bold uppercase flex items-center gap-1 tracking-wider">
               <Compass className="w-3 h-3 text-cyan-400" />
               <span>Spatial Legend &amp; Encoding</span>
             </span>
@@ -291,7 +291,7 @@ export default function Viewport3D({
             </div>
 
             {/* Categorical Color Encoding Chips */}
-            <div className="pt-1 border-t border-slate-800/80 space-y-1">
+            <div className="pt-1 border-t border-[#1e293b]/80 space-y-1">
               <span className="text-slate-400 text-[9px] block">Category Color Encoding:</span>
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px]">
@@ -312,7 +312,7 @@ export default function Viewport3D({
         </div>
 
         {/* Orbit Drag Hint (Bottom-Left) */}
-        <div className="absolute bottom-4 left-4 p-2.5 rounded-xl bg-[#060e14]/80 backdrop-blur-md border border-slate-800 text-[10px] font-mono text-slate-400 flex items-center gap-2">
+        <div className="absolute bottom-4 left-4 p-2.5 rounded-xl bg-[#0b0f19]/85 backdrop-blur-md border border-[#1e293b] text-[10px] font-mono text-slate-400 flex items-center gap-2 select-none">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
           <span>Click &amp; Drag Canvas to Orbit 3D Space</span>
         </div>
