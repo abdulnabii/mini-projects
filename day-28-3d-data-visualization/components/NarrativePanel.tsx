@@ -1,25 +1,30 @@
 'use client';
 
 import { useState } from 'react';
-import { DatasetAnalysis } from '@/types';
+import { DatasetAnalysis, DetectedAnomaly } from '@/types';
 import {
   Sparkles,
   TrendingUp,
   AlertTriangle,
   Bookmark,
-  Check,
-  Compass,
   FileText,
-  Zap,
+  Compass,
+  Sigma,
+  Activity,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface Props {
   analysis: DatasetAnalysis;
+  onSelectAnomalyRow?: (rowIndex: number) => void;
   onSaveToGallery?: () => void;
 }
 
-export default function NarrativePanel({ analysis, onSaveToGallery }: Props) {
+export default function NarrativePanel({
+  analysis,
+  onSelectAnomalyRow,
+  onSaveToGallery,
+}: Props) {
   const [saved, setSaved] = useState(false);
 
   const handleSave = () => {
@@ -34,6 +39,9 @@ export default function NarrativePanel({ analysis, onSaveToGallery }: Props) {
     });
   };
 
+  const detailedAnomalies = analysis.detailedAnomalies || [];
+  const correlations = analysis.correlations || [];
+
   return (
     <div className="p-6 sm:p-8 rounded-2xl bg-[#0d1527] border border-[#1e293b] shadow-xl space-y-6 font-mono">
       {/* Header & Save Trigger */}
@@ -45,14 +53,14 @@ export default function NarrativePanel({ analysis, onSaveToGallery }: Props) {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-bold text-white text-sm font-mono">
-                AI Spatial Narrative &amp; Anomaly Intelligence
+                Statistical Findings &amp; Grounded AI Narrative
               </h3>
               <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold font-mono">
-                GEMINI 1.5 FLASH
+                VERIFIED LOCAL ENGINE + GEMINI
               </span>
             </div>
             <p className="text-xs text-slate-400 prose-text">
-              Automated multi-variable pattern discovery and anomaly interpretation
+              Multi-variable statistical profiling, IQR outlier fences, and correlation discovery
             </p>
           </div>
         </div>
@@ -71,7 +79,7 @@ export default function NarrativePanel({ analysis, onSaveToGallery }: Props) {
       <div className="space-y-2">
         <span className="text-[10px] text-slate-400 font-bold uppercase font-mono flex items-center gap-1 tracking-wider">
           <Compass className="w-3.5 h-3.5 text-cyan-400" />
-          <span>Spatial Axis Dimensions:</span>
+          <span>Active Spatial Dimension Mappings:</span>
         </span>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs">
           {Object.entries(analysis.axisMapping).map(([key, val]) => (
@@ -101,38 +109,81 @@ export default function NarrativePanel({ analysis, onSaveToGallery }: Props) {
         </p>
       </div>
 
-      {/* Key Patterns & Anomalies Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Patterns */}
-        <div className="p-4 rounded-xl bg-[#111827] border border-[#1e293b] space-y-2.5 hover:border-emerald-500/30 transition-colors duration-150">
-          <span className="text-[10px] text-emerald-400 font-bold uppercase font-mono flex items-center gap-1.5 tracking-wider">
-            <TrendingUp className="w-3.5 h-3.5" />
-            <span>Key Statistical Patterns:</span>
-          </span>
-          <ul className="space-y-2 text-xs text-slate-300 prose-text">
-            {analysis.patterns.map((p, i) => (
-              <li key={i} className="flex items-start gap-2">
-                <span className="text-emerald-400 font-mono font-bold">→</span>
-                <span>{p}</span>
-              </li>
-            ))}
-          </ul>
+      {/* Statistical Details Grid (Correlations & Detected Anomalies) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Strongest Pearson Correlations */}
+        <div className="p-4 rounded-xl bg-[#111827] border border-[#1e293b] space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-purple-400 font-bold uppercase font-mono flex items-center gap-1.5 tracking-wider">
+              <Sigma className="w-3.5 h-3.5" />
+              <span>Strongest Numeric Correlations (r):</span>
+            </span>
+            <span className="text-[10px] text-slate-500 italic">Pearson r</span>
+          </div>
+
+          {correlations.length === 0 ? (
+            <p className="text-xs text-slate-500">No paired numeric dimensions to compute correlation.</p>
+          ) : (
+            <div className="space-y-2 text-xs">
+              {correlations.slice(0, 3).map((c, i) => (
+                <div key={i} className="p-2.5 rounded-lg bg-[#0d1527] border border-[#1e293b] flex items-center justify-between">
+                  <span className="text-slate-200 truncate max-w-[220px]">
+                    {c.columnA} ↔ {c.columnB}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-slate-500">n={c.sampleSize}</span>
+                    <span className={`px-2 py-0.5 rounded font-bold font-mono text-[11px] ${
+                      Math.abs(c.correlation) >= 0.7 ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-800 text-slate-300'
+                    }`}>
+                      r = {c.correlation > 0 ? `+${c.correlation}` : c.correlation}
+                    </span>
+                  </div>
+                </div>
+              ))}
+              <span className="text-[10px] text-slate-500 block pt-1">
+                *Statistical association only. Correlation does not imply causation.
+              </span>
+            </div>
+          )}
         </div>
 
-        {/* Anomalies */}
-        <div className="p-4 rounded-xl bg-[#111827] border border-amber-500/20 space-y-2.5 hover:border-amber-500/40 transition-colors duration-150">
-          <span className="text-[10px] text-amber-400 font-bold uppercase font-mono flex items-center gap-1.5 tracking-wider">
-            <AlertTriangle className="w-3.5 h-3.5" />
-            <span>Anomalies &amp; Outliers:</span>
-          </span>
-          <ul className="space-y-2 text-xs text-slate-300 prose-text">
-            {analysis.anomalies.map((a, i) => (
-              <li key={i} className="flex items-start gap-2">
-                <span className="text-amber-400 font-mono font-bold">!</span>
-                <span>{a}</span>
-              </li>
-            ))}
-          </ul>
+        {/* Detailed Anomaly / Outlier Cards */}
+        <div className="p-4 rounded-xl bg-[#111827] border border-amber-500/20 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-amber-400 font-bold uppercase font-mono flex items-center gap-1.5 tracking-wider">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              <span>Detected Statistical Outliers (IQR 1.5×):</span>
+            </span>
+            <span className="text-[10px] text-amber-400 font-bold">
+              {detailedAnomalies.length} outliers
+            </span>
+          </div>
+
+          {detailedAnomalies.length === 0 ? (
+            <p className="text-xs text-slate-400">All data points reside within normal statistical fences.</p>
+          ) : (
+            <div className="space-y-2 text-xs">
+              {detailedAnomalies.slice(0, 3).map((anom, i) => (
+                <div
+                  key={i}
+                  onClick={() => onSelectAnomalyRow && onSelectAnomalyRow(anom.rowIndex)}
+                  className="p-2.5 rounded-lg bg-[#0d1527] border border-[#1e293b] hover:border-amber-500/40 cursor-pointer transition-all flex items-center justify-between"
+                >
+                  <div>
+                    <span className="font-bold text-white block text-xs">{anom.rowIdentifier}</span>
+                    <span className="text-[10px] text-slate-400">
+                      {anom.column}: <strong className="text-amber-300">{anom.value}</strong> (Fence: [{anom.lowerFence}, {anom.upperFence}])
+                    </span>
+                  </div>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                    anom.severity === 'CRITICAL' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-300'
+                  }`}>
+                    {anom.severity}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
