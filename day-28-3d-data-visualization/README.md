@@ -6,6 +6,7 @@
 
 ## ⚡ Live Demo
 **Production URL**: [https://day-28-3d-data-visualization.vercel.app](https://day-28-3d-data-visualization.vercel.app)
+*Automated continuous deployment via Vercel & GitHub Actions CI/CD.*
 
 ---
 
