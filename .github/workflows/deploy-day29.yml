@@ -1,0 +1,48 @@
+name: Deploy day-29 to Vercel
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'day-29-devops-incident-assistant/**'
+      - '.github/workflows/deploy-day29.yml'
+  workflow_dispatch:
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID || 'team_P0AhjcWKoUAspDgtOFE5uujN' }}
+  VERCEL_PROJECT_ID: 'prj_vdRUEFq2oBKepcyGDCuWU4T8o5dn'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: day-29-devops-incident-assistant
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: day-29-devops-incident-assistant/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+
+      - name: Build Project Artifacts
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --prod --token=$VERCEL_TOKEN
+
+      - name: Deploy Project Artifacts to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN

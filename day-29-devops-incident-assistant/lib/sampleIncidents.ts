@@ -151,6 +151,42 @@ export const SAMPLE_INCIDENTS: Incident[] = [
       statusPageUpdate:
         'Investigating: We are currently investigating an issue affecting customer checkout and payment processing. Our engineering team has identified the cause and is applying a fix. Next update in 10 minutes.',
     },
+    topology: {
+      nodes: [
+        { id: 'n1', name: 'Cloudflare Edge CDN', type: 'edge', status: 'healthy', latencyMs: 14, throughputRps: 8400, errorRatePercent: 0.01, technology: 'Anycast Edge' },
+        { id: 'n2', name: 'Ingress NGINX', type: 'gateway', status: 'degraded', latencyMs: 240, throughputRps: 4200, errorRatePercent: 48.2, technology: 'Kubernetes Ingress' },
+        { id: 'n3', name: 'checkout-api', type: 'service', status: 'degraded', latencyMs: 2850, throughputRps: 1850, errorRatePercent: 96.4, podCount: '6/6 Running', technology: 'Node.js Express' },
+        { id: 'n4', name: 'payment-service', type: 'service', status: 'critical', latencyMs: 3450, throughputRps: 1420, errorRatePercent: 100.0, podCount: '3/3 Saturated', technology: 'Spring Boot 3.2' },
+        { id: 'n5', name: 'PostgreSQL Primary', type: 'database', status: 'critical', latencyMs: 30000, throughputRps: 100, errorRatePercent: 100.0, podCount: 'AWS RDS Aurora', technology: 'PostgreSQL 16' },
+        { id: 'n6', name: 'Redis Cache Cluster', type: 'cache', status: 'healthy', latencyMs: 2, throughputRps: 9200, errorRatePercent: 0.0, technology: 'Redis 7.2' },
+        { id: 'n7', name: 'RabbitMQ DeadLetter', type: 'queue', status: 'degraded', latencyMs: 45, throughputRps: 640, errorRatePercent: 24.1, technology: 'RabbitMQ' },
+      ],
+      edges: [
+        { id: 'e1', source: 'n1', target: 'n2', latencyMs: 14, status: 'healthy' },
+        { id: 'e2', source: 'n2', target: 'n3', latencyMs: 240, status: 'degraded' },
+        { id: 'e3', source: 'n3', target: 'n4', latencyMs: 2850, status: 'critical' },
+        { id: 'e4', source: 'n4', target: 'n5', latencyMs: 30000, status: 'critical' },
+        { id: 'e5', source: 'n4', target: 'n6', latencyMs: 2, status: 'healthy' },
+        { id: 'e6', source: 'n4', target: 'n7', latencyMs: 45, status: 'degraded' },
+      ],
+    },
+    telemetry: [
+      { timestamp: '08:20', errorRate: 0.02, p95Latency: 38, p99Latency: 64, resourceSaturation: 18.0 },
+      { timestamp: '08:24', errorRate: 0.04, p95Latency: 42, p99Latency: 72, resourceSaturation: 22.4 },
+      { timestamp: '08:28', errorRate: 0.12, p95Latency: 85, p99Latency: 140, resourceSaturation: 48.2 },
+      { timestamp: '08:31', errorRate: 44.8, p95Latency: 890, p99Latency: 1840, resourceSaturation: 98.0 },
+      { timestamp: '08:32', errorRate: 98.4, p95Latency: 2850, p99Latency: 3820, resourceSaturation: 100.0 },
+      { timestamp: '08:33', errorRate: 99.8, p95Latency: 3450, p99Latency: 4200, resourceSaturation: 100.0 },
+      { timestamp: '08:34', errorRate: 100.0, p95Latency: 3500, p99Latency: 4300, resourceSaturation: 100.0 },
+    ],
+    errorBudget: {
+      targetSlo: 99.9,
+      periodDays: 30,
+      totalBudgetMinutes: 43.2,
+      minutesBurned: 18.0,
+      burnRateMultiplier: 14.4,
+      estimatedExhaustionHours: 2.4,
+    },
   },
   {
     id: 'inc-9482',
@@ -257,6 +293,36 @@ export const SAMPLE_INCIDENTS: Incident[] = [
       statusPageUpdate:
         'Identified: Users may experience delays or errors when attempting to sign in. A fix is currently being deployed to resolve the authentication service memory bottleneck.',
     },
+    topology: {
+      nodes: [
+        { id: 'n1', name: 'Global Traffic Edge', type: 'edge', status: 'healthy', latencyMs: 18, throughputRps: 6500, errorRatePercent: 0.05, technology: 'Cloudflare CDN' },
+        { id: 'n2', name: 'Kong API Gateway', type: 'gateway', status: 'degraded', latencyMs: 620, throughputRps: 3400, errorRatePercent: 58.2, technology: 'Kong Gateway' },
+        { id: 'n3', name: 'auth-service', type: 'service', status: 'critical', latencyMs: 2400, throughputRps: 1200, errorRatePercent: 88.5, podCount: '1/3 CrashLoop', technology: 'Node.js v20' },
+        { id: 'n4', name: 'User Directory DB', type: 'database', status: 'healthy', latencyMs: 4, throughputRps: 1800, errorRatePercent: 0.0, technology: 'PostgreSQL Aurora' },
+        { id: 'n5', name: 'Session Token Cache', type: 'cache', status: 'healthy', latencyMs: 1, throughputRps: 4200, errorRatePercent: 0.0, technology: 'Redis Cluster' },
+      ],
+      edges: [
+        { id: 'e1', source: 'n1', target: 'n2', latencyMs: 18, status: 'healthy' },
+        { id: 'e2', source: 'n2', target: 'n3', latencyMs: 620, status: 'degraded' },
+        { id: 'e3', source: 'n3', target: 'n4', latencyMs: 4, status: 'healthy' },
+        { id: 'e4', source: 'n3', target: 'n5', latencyMs: 1, status: 'healthy' },
+      ],
+    },
+    telemetry: [
+      { timestamp: '07:35', errorRate: 0.01, p95Latency: 28, p99Latency: 48, resourceSaturation: 42.0 },
+      { timestamp: '07:40', errorRate: 0.05, p95Latency: 35, p99Latency: 60, resourceSaturation: 68.4 },
+      { timestamp: '07:44', errorRate: 12.0, p95Latency: 420, p99Latency: 950, resourceSaturation: 96.8 },
+      { timestamp: '07:45', errorRate: 64.2, p95Latency: 1450, p99Latency: 2200, resourceSaturation: 99.8 },
+      { timestamp: '07:46', errorRate: 88.5, p95Latency: 2400, p99Latency: 3100, resourceSaturation: 100.0 },
+    ],
+    errorBudget: {
+      targetSlo: 99.9,
+      periodDays: 30,
+      totalBudgetMinutes: 43.2,
+      minutesBurned: 12.5,
+      burnRateMultiplier: 9.8,
+      estimatedExhaustionHours: 3.8,
+    },
   },
   {
     id: 'inc-9483',
@@ -322,6 +388,32 @@ export const SAMPLE_INCIDENTS: Incident[] = [
       statusPageUpdate:
         'Monitoring: We have implemented an edge routing optimization and are observing improved response times in the European region.',
     },
+    topology: {
+      nodes: [
+        { id: 'n1', name: 'EU Cloudflare PoP', type: 'edge', status: 'degraded', latencyMs: 380, throughputRps: 4200, errorRatePercent: 8.4, technology: 'Anycast DNS' },
+        { id: 'n2', name: 'gateway-ingress', type: 'gateway', status: 'degraded', latencyMs: 1840, throughputRps: 2800, errorRatePercent: 14.2, podCount: '8/8 Running', technology: 'NGINX Ingress' },
+        { id: 'n3', name: 'eu-central-api', type: 'service', status: 'healthy', latencyMs: 42, throughputRps: 2600, errorRatePercent: 0.05, technology: 'Golang 1.22' },
+        { id: 'n4', name: 'Origin Database', type: 'database', status: 'healthy', latencyMs: 8, throughputRps: 1200, errorRatePercent: 0.0, technology: 'CockroachDB' },
+      ],
+      edges: [
+        { id: 'e1', source: 'n1', target: 'n2', latencyMs: 1840, status: 'degraded' },
+        { id: 'e2', source: 'n2', target: 'n3', latencyMs: 42, status: 'healthy' },
+        { id: 'e3', source: 'n3', target: 'n4', latencyMs: 8, status: 'healthy' },
+      ],
+    },
+    telemetry: [
+      { timestamp: '06:00', errorRate: 0.01, p95Latency: 45, p99Latency: 80, resourceSaturation: 24.0 },
+      { timestamp: '06:05', errorRate: 2.4, p95Latency: 480, p99Latency: 820, resourceSaturation: 38.0 },
+      { timestamp: '06:10', errorRate: 14.2, p95Latency: 1840, p99Latency: 2900, resourceSaturation: 45.0 },
+    ],
+    errorBudget: {
+      targetSlo: 99.9,
+      periodDays: 30,
+      totalBudgetMinutes: 43.2,
+      minutesBurned: 6.2,
+      burnRateMultiplier: 2.5,
+      estimatedExhaustionHours: 18.0,
+    },
   },
   {
     id: 'inc-9484',
@@ -371,6 +463,34 @@ export const SAMPLE_INCIDENTS: Incident[] = [
       slackMessage: 'ℹ️ *P4 NOTICE:* Redis cache eviction spike mitigated by expanding maxmemory to 16GB.',
       executiveBrief: 'Low severity cache eviction resolved without business impact.',
       statusPageUpdate: 'All systems operational.',
+    },
+    topology: {
+      nodes: [
+        { id: 'n1', name: 'Global Traffic Edge', type: 'edge', status: 'healthy', latencyMs: 12, throughputRps: 5200, errorRatePercent: 0.0, technology: 'Cloudflare' },
+        { id: 'n2', name: 'API Gateway', type: 'gateway', status: 'healthy', latencyMs: 25, throughputRps: 3800, errorRatePercent: 0.2, technology: 'Traefik' },
+        { id: 'n3', name: 'catalog-service', type: 'service', status: 'healthy', latencyMs: 145, throughputRps: 2400, errorRatePercent: 1.8, podCount: '4/4 Running', technology: 'Node.js Fastify' },
+        { id: 'n4', name: 'redis-read-replica', type: 'cache', status: 'degraded', latencyMs: 82, throughputRps: 8900, errorRatePercent: 8.0, technology: 'Redis 7.2 (8GB Saturated)' },
+        { id: 'n5', name: 'catalog-postgres', type: 'database', status: 'healthy', latencyMs: 6, throughputRps: 620, errorRatePercent: 0.0, technology: 'PostgreSQL Aurora' },
+      ],
+      edges: [
+        { id: 'e1', source: 'n1', target: 'n2', latencyMs: 12, status: 'healthy' },
+        { id: 'e2', source: 'n2', target: 'n3', latencyMs: 25, status: 'healthy' },
+        { id: 'e3', source: 'n3', target: 'n4', latencyMs: 82, status: 'degraded' },
+        { id: 'e4', source: 'n3', target: 'n5', latencyMs: 6, status: 'healthy' },
+      ],
+    },
+    telemetry: [
+      { timestamp: '04:50', errorRate: 0.01, p95Latency: 22, p99Latency: 35, resourceSaturation: 74.0 },
+      { timestamp: '04:55', errorRate: 0.05, p95Latency: 45, p99Latency: 68, resourceSaturation: 89.2 },
+      { timestamp: '05:00', errorRate: 1.8, p95Latency: 145, p99Latency: 280, resourceSaturation: 99.4 },
+    ],
+    errorBudget: {
+      targetSlo: 99.9,
+      periodDays: 30,
+      totalBudgetMinutes: 43.2,
+      minutesBurned: 1.4,
+      burnRateMultiplier: 1.2,
+      estimatedExhaustionHours: 72.0,
     },
   },
 ];

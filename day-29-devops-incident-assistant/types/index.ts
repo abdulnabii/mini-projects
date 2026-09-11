@@ -83,6 +83,61 @@ export interface PostMortem {
   lessonsLearned: string[];
 }
 
+export type ServiceNodeType = 'edge' | 'gateway' | 'service' | 'database' | 'cache' | 'queue';
+export type ServiceHealthStatus = 'healthy' | 'degraded' | 'critical';
+
+export interface ServiceNode {
+  id: string;
+  name: string;
+  type: ServiceNodeType;
+  status: ServiceHealthStatus;
+  latencyMs: number;
+  throughputRps: number;
+  errorRatePercent: number;
+  podCount?: string;
+  technology?: string;
+}
+
+export interface ServiceEdge {
+  id: string;
+  source: string;
+  target: string;
+  latencyMs: number;
+  status: ServiceHealthStatus;
+  protocol?: string;
+}
+
+export interface ServiceTopology {
+  nodes: ServiceNode[];
+  edges: ServiceEdge[];
+}
+
+export interface TelemetryPoint {
+  timestamp: string;
+  errorRate: number; // percentage, e.g. 98.4
+  p95Latency: number; // ms, e.g. 2450
+  p99Latency: number; // ms, e.g. 3820
+  resourceSaturation: number; // percentage, e.g. 98.0
+}
+
+export interface ErrorBudget {
+  targetSlo: number; // e.g. 99.9
+  periodDays: number; // e.g. 30
+  totalBudgetMinutes: number; // e.g. 43.2
+  minutesBurned: number; // e.g. 18.0
+  burnRateMultiplier: number; // e.g. 14.4x
+  estimatedExhaustionHours: number; // e.g. 2.4
+}
+
+export interface WarRoomEvent {
+  id: string;
+  timestamp: string;
+  author: string;
+  role: string;
+  type: 'alert' | 'ai' | 'action' | 'note' | 'resolution';
+  message: string;
+}
+
 export interface Incident {
   id: string;
   title: string;
@@ -98,4 +153,8 @@ export interface Incident {
   diagnosis: RootCauseDiagnosis;
   comms: StakeholderComms;
   postMortem?: PostMortem;
+  topology?: ServiceTopology;
+  telemetry?: TelemetryPoint[];
+  errorBudget?: ErrorBudget;
+  warRoomEvents?: WarRoomEvent[];
 }

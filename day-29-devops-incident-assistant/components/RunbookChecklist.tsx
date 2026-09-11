@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { RemediationStep } from '@/types';
+import RunbookTerminalDrawer from '@/components/RunbookTerminalDrawer';
 import {
   ListChecks,
   CheckCircle2,
@@ -37,6 +38,9 @@ export default function RunbookChecklist({
   // Safety Confirmation Modal State for Gated High/Medium Risk SRE Actions
   const [confirmStep, setConfirmStep] = useState<{ step: RemediationStep; idx: number } | null>(null);
 
+  // Active Terminal Drawer State
+  const [terminalStep, setTerminalStep] = useState<RemediationStep | null>(null);
+
   const handleCopyCommand = (cmd: string, idx: number) => {
     navigator.clipboard.writeText(cmd);
     setCopiedIndex(idx);
@@ -48,24 +52,21 @@ export default function RunbookChecklist({
     if (step.risk === 'HIGH' || step.risk === 'MEDIUM' || step.risk === 'CRITICAL') {
       setConfirmStep({ step, idx });
     } else {
-      executeRunSimulation(step.step, idx);
+      setConfirmStep(null);
+      setTerminalStep(step);
     }
   };
 
   const executeRunSimulation = (stepNumber: number, idx: number) => {
+    const stepToRun = steps.find((s) => s.step === stepNumber);
     setConfirmStep(null);
-    setExecutingIndex(idx);
+    if (stepToRun) {
+      setTerminalStep(stepToRun);
+    }
+  };
 
-    setTimeout(() => {
-      setExecutingIndex(null);
-      onMarkStepComplete(stepNumber);
-      confetti({
-        particleCount: 25,
-        spread: 50,
-        origin: { y: 0.7 },
-        colors: ['#10b981', '#06b6d4'],
-      });
-    }, 1400);
+  const handleTerminalFinished = (stepNumber: number) => {
+    onMarkStepComplete(stepNumber);
   };
 
   // Distinct risk color taxonomy with wide hue separation & unique iconography
@@ -305,6 +306,15 @@ export default function RunbookChecklist({
           </div>
         </div>
       )}
+
+      {/* SRE Shell Execution Terminal Drawer */}
+      <RunbookTerminalDrawer
+        isOpen={!!terminalStep}
+        onClose={() => setTerminalStep(null)}
+        step={terminalStep}
+        serviceName={serviceName}
+        onStepFinished={handleTerminalFinished}
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Incident, LogEntry, PostMortem, RootCauseDiagnosis, StakeholderComms } from '@/types';
 import { SAMPLE_INCIDENTS } from '@/lib/sampleIncidents';
 import Navbar from '@/components/Navbar';
@@ -11,14 +11,30 @@ import RootCausePanel from '@/components/RootCausePanel';
 import RunbookChecklist from '@/components/RunbookChecklist';
 import DeploymentRadar from '@/components/DeploymentRadar';
 import StakeholderCommsPanel from '@/components/StakeholderComms';
+import ServiceTopologyGraph from '@/components/ServiceTopologyGraph';
+import TelemetryMetricsGraph from '@/components/TelemetryMetricsGraph';
 import PostMortemModal from '@/components/PostMortemModal';
 import WarRoomModal from '@/components/WarRoomModal';
-import { Activity, ShieldAlert, Sparkles, Terminal, FileText, CheckCircle2 } from 'lucide-react';
+import {
+  Activity,
+  ShieldAlert,
+  Sparkles,
+  Terminal,
+  FileText,
+  CheckCircle2,
+  Layers,
+  BarChart3,
+  Radio,
+  Network,
+} from 'lucide-react';
 import confetti from 'canvas-confetti';
+
+type WorkspaceTab = 'WAR_ROOM' | 'TOPOLOGY' | 'TELEMETRY';
 
 export default function HomePage() {
   const [incidents, setIncidents] = useState<Incident[]>(SAMPLE_INCIDENTS);
   const [activeIncident, setActiveIncident] = useState<Incident>(SAMPLE_INCIDENTS[0]);
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>('WAR_ROOM');
 
   // Track runbook completion per incident
   const [completedStepsMap, setCompletedStepsMap] = useState<Record<string, Record<number, boolean>>>({});
@@ -50,7 +66,7 @@ export default function HomePage() {
     const allDone = activeIncident.diagnosis.remediationSteps.every((s) => nextSteps[s.step]);
     if (allDone) {
       confetti({
-        particleCount: 45,
+        particleCount: 50,
         spread: 70,
         origin: { y: 0.6 },
         colors: ['#10b981', '#06b6d4', '#f59e0b'],
@@ -69,7 +85,7 @@ export default function HomePage() {
     const allDone = activeIncident.diagnosis.remediationSteps.every((s) => nextSteps[s.step]);
     if (allDone) {
       confetti({
-        particleCount: 45,
+        particleCount: 50,
         spread: 70,
         origin: { y: 0.6 },
         colors: ['#10b981', '#06b6d4', '#f59e0b'],
@@ -196,7 +212,7 @@ export default function HomePage() {
         <section className="text-center space-y-2.5 max-w-3xl mx-auto pt-1">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono font-bold">
             <Activity className="w-3.5 h-3.5" />
-            <span>AI SITE RELIABILITY &amp; INCIDENT TRIAGE TERMINAL</span>
+            <span>ENTERPRISE SITE RELIABILITY &amp; INCIDENT COMMAND CENTER</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight font-mono">
@@ -207,7 +223,7 @@ export default function HomePage() {
           </h1>
 
           <p className="text-xs sm:text-sm text-slate-400 font-mono max-w-2xl mx-auto leading-relaxed prose-text">
-            Ingest live error logs, correlate failures with recent Git releases, diagnose root cause in seconds with Gemini 1.5 Flash, execute automated runbooks, and generate 5-Whys post-mortems.
+            Ingest live error logs, correlate failures with recent Git releases, diagnose root cause in seconds with Gemini 1.5 Flash, execute interactive CLI runbooks, and generate 5-Whys post-mortems.
           </p>
         </section>
 
@@ -215,7 +231,9 @@ export default function HomePage() {
         <IncidentHeader
           incident={activeIncident}
           allIncidents={incidents}
-          onSelectIncident={setActiveIncident}
+          onSelectIncident={(inc) => {
+            setActiveIncident(inc);
+          }}
           onRediagnose={handleRediagnose}
           isAnalyzing={isAnalyzing}
           onOpenPostMortem={handleOpenPostMortem}
@@ -223,31 +241,115 @@ export default function HomePage() {
           isResolved={isIncidentResolved}
         />
 
-        {/* 2-Column SRE War-Room Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          {/* Left Column: Log Stream & Deployment Correlation Radar (6 cols) */}
-          <div className="lg:col-span-6 space-y-5">
-            <LogViewer logs={activeIncident.logs} onAddCustomLogs={handleAddCustomLogs} />
-            <DeploymentRadar deployments={activeIncident.recentDeployments} />
+        {/* Multi-View Workspace Navigation Bar */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-2 rounded-xl bg-[#080d17] border border-white/[0.08]">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <button
+              type="button"
+              onClick={() => setActiveTab('WAR_ROOM')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-bold flex items-center gap-2 cursor-pointer transition-all ${
+                activeTab === 'WAR_ROOM'
+                  ? 'bg-rose-500 text-black shadow-md shadow-rose-500/20'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Radio className="w-3.5 h-3.5" />
+              <span>1. War Room &amp; Triage</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('TOPOLOGY')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-bold flex items-center gap-2 cursor-pointer transition-all ${
+                activeTab === 'TOPOLOGY'
+                  ? 'bg-rose-500 text-black shadow-md shadow-rose-500/20'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Network className="w-3.5 h-3.5" />
+              <span>2. Service Topology &amp; Blast Radius</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('TELEMETRY')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-bold flex items-center gap-2 cursor-pointer transition-all ${
+                activeTab === 'TELEMETRY'
+                  ? 'bg-rose-500 text-black shadow-md shadow-rose-500/20'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <BarChart3 className="w-3.5 h-3.5" />
+              <span>3. Telemetry &amp; SLO Burn Rate</span>
+            </button>
           </div>
 
-          {/* Right Column: AI Diagnosis, Remediation Runbook & Stakeholder Comms (6 cols) */}
-          <div className="lg:col-span-6 space-y-5">
-            <RootCausePanel diagnosis={activeIncident.diagnosis} isAnalyzing={isAnalyzing} />
-            <RunbookChecklist
-              steps={activeIncident.diagnosis.remediationSteps}
-              serviceName={activeIncident.service}
-              completedSteps={currentCompletedSteps}
-              onToggleStep={handleToggleStep}
-              onMarkStepComplete={handleMarkStepComplete}
-            />
-            <StakeholderCommsPanel
-              comms={activeIncident.comms}
-              onRegenerateComms={handleRegenerateComms}
-              isGenerating={isGeneratingComms}
-            />
+          <div className="flex items-center gap-2 text-[10px] text-slate-400 px-2 font-mono">
+            <span>Target: <strong className="text-white">{activeIncident.service}</strong></span>
+            <span>•</span>
+            <span>Severity: <strong className="text-rose-400">{activeIncident.severity}</strong></span>
           </div>
         </div>
+
+        {/* View 1: Main SRE War Room Command Center */}
+        {activeTab === 'WAR_ROOM' && (
+          <div className="space-y-5">
+            {/* Embedded Telemetry Preview in War Room */}
+            {activeIncident.telemetry && (
+              <TelemetryMetricsGraph
+                telemetry={activeIncident.telemetry}
+                errorBudget={activeIncident.errorBudget}
+                serviceName={activeIncident.service}
+                isResolved={isIncidentResolved}
+              />
+            )}
+
+            {/* 2-Column SRE War-Room Grid Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+              {/* Left Column: Log Stream & Deployment Correlation Radar (6 cols) */}
+              <div className="lg:col-span-6 space-y-5">
+                <LogViewer logs={activeIncident.logs} onAddCustomLogs={handleAddCustomLogs} />
+                <DeploymentRadar deployments={activeIncident.recentDeployments} />
+              </div>
+
+              {/* Right Column: AI Diagnosis, Remediation Runbook & Stakeholder Comms (6 cols) */}
+              <div className="lg:col-span-6 space-y-5">
+                <RootCausePanel diagnosis={activeIncident.diagnosis} isAnalyzing={isAnalyzing} />
+                <RunbookChecklist
+                  steps={activeIncident.diagnosis.remediationSteps}
+                  serviceName={activeIncident.service}
+                  completedSteps={currentCompletedSteps}
+                  onToggleStep={handleToggleStep}
+                  onMarkStepComplete={handleMarkStepComplete}
+                />
+                <StakeholderCommsPanel
+                  comms={activeIncident.comms}
+                  onRegenerateComms={handleRegenerateComms}
+                  isGenerating={isGeneratingComms}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* View 2: Service Architecture & Blast Radius Map */}
+        {activeTab === 'TOPOLOGY' && activeIncident.topology && (
+          <ServiceTopologyGraph
+            topology={activeIncident.topology}
+            serviceName={activeIncident.service}
+            isResolved={isIncidentResolved}
+          />
+        )}
+
+        {/* View 3: Deep Time-Series Telemetry & SLO Error Budget */}
+        {activeTab === 'TELEMETRY' && activeIncident.telemetry && (
+          <TelemetryMetricsGraph
+            telemetry={activeIncident.telemetry}
+            errorBudget={activeIncident.errorBudget}
+            serviceName={activeIncident.service}
+            isResolved={isIncidentResolved}
+          />
+        )}
       </main>
 
       <Footer />
