@@ -18,13 +18,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const authHeader = req.headers.get('authorization');
+    const authInfo = authHeader
+      ? { mode: 'demo_sandbox', tokenSample: `${authHeader.substring(0, 15)}...`, status: 'authorized_simulated' }
+      : { mode: 'session_internal' };
+
     const result = await executeMeteredAIFeature(
       feature || 'COPYWRITER',
       prompt,
       plan || 'pro'
     );
 
-    return NextResponse.json({ result });
+    return NextResponse.json({ result, auth: authInfo });
   } catch (error: any) {
     console.error('API /api/ai error:', error);
     return NextResponse.json(

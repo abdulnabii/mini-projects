@@ -20,6 +20,8 @@ import {
   ChevronDown,
   ChevronUp,
   ArrowRight,
+  Info,
+  Sparkles,
 } from 'lucide-react';
 import { Organization, PlanTier } from '@/types';
 
@@ -201,18 +203,20 @@ export default function ApiKeysWebhooksPanel({ activeOrg, onNavigateToBilling }:
   };
 
   const snippetCode = {
-    curl: `curl -X POST https://day-30-ai-saas-boilerplate.vercel.app/api/ai \\
-  -H "Authorization: Bearer ${keys[0]?.key || 'sf_live_YOUR_KEY'}" \\
+    curl: `# 🧪 Demo Sandbox Mode — Uses simulated demo token
+curl -X POST https://day-30-ai-saas-boilerplate.vercel.app/api/ai \\
+  -H "Authorization: Bearer ${keys[0]?.key || 'sf_live_mock_demo_key'}" \\
   -H "Content-Type: application/json" \\
   -d '{
     "model": "gemini-1.5-flash",
     "prompt": "Synthesize microservice architecture summary",
     "temperature": 0.7
   }'`,
-    ts: `import { SaaSForgeClient } from '@saasforge/sdk';
+    ts: `// 🧪 Demo Sandbox Mode — Uses simulated demo token
+import { SaaSForgeClient } from '@saasforge/sdk';
 
 const client = new SaaSForgeClient({
-  apiKey: process.env.SAASFORGE_API_KEY || '${keys[0]?.key || 'sf_live_YOUR_KEY'}',
+  apiKey: process.env.SAASFORGE_API_KEY || '${keys[0]?.key || 'sf_live_mock_demo_key'}',
   endpoint: 'https://day-30-ai-saas-boilerplate.vercel.app/api',
 });
 
@@ -228,10 +232,11 @@ async function main() {
   }
 }
 main();`,
-    python: `import os
+    python: `# 🧪 Demo Sandbox Mode — Uses simulated demo token
+import os
 import requests
 
-API_KEY = os.getenv("SAASFORGE_API_KEY", "${keys[0]?.key || 'sf_live_YOUR_KEY'}")
+API_KEY = os.getenv("SAASFORGE_API_KEY", "${keys[0]?.key || 'sf_live_mock_demo_key'}")
 URL = "https://day-30-ai-saas-boilerplate.vercel.app/api/ai"
 
 headers = {
@@ -260,6 +265,10 @@ print(response.json())`,
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold text-[10px]">
                 <Key className="w-3 h-3" />
                 <span>DEVELOPER PORTAL & AUTH</span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-bold text-[10px]">
+                <Sparkles className="w-3 h-3" />
+                <span>SIMULATED DEMO SANDBOX</span>
               </div>
               <span
                 className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
@@ -292,6 +301,22 @@ print(response.json())`,
             <Plus className="w-4 h-4" />
             <span>{isKeyLimitReached ? `Limit Reached (${activeKeysCount}/${maxKeys})` : 'Create Secret Key'}</span>
           </button>
+        </div>
+      </div>
+
+      {/* Portfolio Showcase Sandbox Notice */}
+      <div className="p-4 rounded-2xl bg-[#090d16] border border-cyan-500/30 flex items-start gap-3.5 text-slate-300">
+        <Info className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-white text-xs">Simulated Demo Sandbox Credentials</span>
+            <span className="px-1.5 py-0.2 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 text-[9px] font-bold">
+              NON-BILLABLE
+            </span>
+          </div>
+          <p className="text-[11px] text-slate-400 leading-relaxed">
+            All API keys and webhooks below are <strong>100% simulated demonstration credentials</strong> (<code className="text-cyan-300">sf_live_mock_...</code>) designed for frontend SDK walkthroughs and token lifecycle prototyping. They <strong>do not charge any credit cards</strong> or connect to live billing infrastructure.
+          </p>
         </div>
       </div>
 
@@ -422,7 +447,7 @@ print(response.json())`,
             <thead>
               <tr className="border-b border-white/[0.08] text-[10px] text-slate-400 uppercase tracking-wider">
                 <th className="py-3 px-4">Name / Purpose</th>
-                <th className="py-3 px-4">Secret Key Token</th>
+                <th className="py-3 px-4">Demo Secret Key Token</th>
                 <th className="py-3 px-4">Environment</th>
                 <th className="py-3 px-4">Created</th>
                 <th className="py-3 px-4">Last Used</th>
@@ -449,9 +474,13 @@ print(response.json())`,
                     <td className="py-3 px-4">
                       <div className="font-bold text-white flex items-center gap-2">
                         <span>{k.name}</span>
-                        {isRevoked && (
+                        {isRevoked ? (
                           <span className="px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 text-[9px] font-bold">
                             REVOKED
+                          </span>
+                        ) : (
+                          <span className="px-1.5 py-0.2 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 text-[9px] font-bold">
+                            DEMO
                           </span>
                         )}
                       </div>
