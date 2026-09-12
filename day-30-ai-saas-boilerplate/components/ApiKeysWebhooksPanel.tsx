@@ -19,7 +19,9 @@ import {
   AlertTriangle,
   ChevronDown,
   ChevronUp,
+  ArrowRight,
 } from 'lucide-react';
+import { Organization, PlanTier } from '@/types';
 
 interface ApiKeyItem {
   id: string;
@@ -40,7 +42,18 @@ interface WebhookEvent {
   payload: Record<string, any>;
 }
 
-export default function ApiKeysWebhooksPanel() {
+interface Props {
+  activeOrg?: Organization;
+  onNavigateToBilling?: () => void;
+}
+
+const API_KEY_LIMITS: Record<PlanTier, number> = {
+  free: 2,
+  pro: 5,
+  enterprise: 20,
+};
+
+export default function ApiKeysWebhooksPanel({ activeOrg, onNavigateToBilling }: Props = {}) {
   const [keys, setKeys] = useState<ApiKeyItem[]>([
     {
       id: 'key-1',
@@ -107,6 +120,11 @@ export default function ApiKeysWebhooksPanel() {
     },
   ]);
 
+  const currentPlan = activeOrg?.plan || 'pro';
+  const maxKeys = API_KEY_LIMITS[currentPlan] || 5;
+  const activeKeysCount = keys.filter((k) => k.status === 'active').length;
+  const isKeyLimitReached = activeKeysCount >= maxKeys;
+
   const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
@@ -118,6 +136,7 @@ export default function ApiKeysWebhooksPanel() {
   };
 
   const handleCreateKey = () => {
+    if (!newKeyName.trim() || isKeyLimitReached) return;
     const prefix = newKeyEnv === 'production' ? 'sf_live_mock_' : 'sf_test_mock_';
     const newKey: ApiKeyItem = {
       id: `key-${Date.now()}`,
@@ -237,9 +256,20 @@ print(response.json())`,
         <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
           <div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold mb-2 text-[10px]">
-              <Key className="w-3 h-3" />
-              <span>DEVELOPER PORTAL & AUTH</span>
+            <div className="flex items-center gap-2 flex-wrap mb-2">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold text-[10px]">
+                <Key className="w-3 h-3" />
+                <span>DEVELOPER PORTAL & AUTH</span>
+              </div>
+              <span
+                className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                  isKeyLimitReached
+                    ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                    : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+                }`}
+              >
+                Quota: {activeKeysCount} / {maxKeys} Keys ({currentPlan.toUpperCase()})
+              </span>
             </div>
             <h2 className="text-xl font-bold text-white tracking-tight">
               API Keys & Webhooks Engine
@@ -251,14 +281,46 @@ print(response.json())`,
 
           <button
             type="button"
+            disabled={isKeyLimitReached}
             onClick={() => setShowNewKeyModal(true)}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-extrabold flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-amber-500/15 transition-all shrink-0"
+            className={`px-4 py-2 rounded-xl font-extrabold flex items-center justify-center gap-2 transition-all shrink-0 shadow-lg ${
+              isKeyLimitReached
+                ? 'bg-slate-800 text-slate-500 border border-white/[0.08] cursor-not-allowed shadow-none'
+                : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black shadow-amber-500/15 cursor-pointer'
+            }`}
           >
             <Plus className="w-4 h-4" />
-            <span>Create Secret Key</span>
+            <span>{isKeyLimitReached ? `Limit Reached (${activeKeysCount}/${maxKeys})` : 'Create Secret Key'}</span>
           </button>
         </div>
       </div>
+
+      {/* Key Limit Warning Alert */}
+      {isKeyLimitReached && (
+        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-amber-300 animate-in fade-in">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
+            <div>
+              <p className="font-bold text-xs text-white">
+                API Key Limit Reached ({activeKeysCount}/{maxKeys} Active Keys)
+              </p>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                Your {currentPlan.toUpperCase()} tier allows up to {maxKeys} active secret keys. Revoke an unused key or upgrade your plan in Stripe Billing to provision additional keys.
+              </p>
+            </div>
+          </div>
+          {onNavigateToBilling && (
+            <button
+              type="button"
+              onClick={onNavigateToBilling}
+              className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs shrink-0 flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+            >
+              <span>Upgrade Plan</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Modal for Creating API Key */}
       {showNewKeyModal && (
@@ -328,7 +390,7 @@ print(response.json())`,
               <button
                 type="button"
                 onClick={handleCreateKey}
-                disabled={!newKeyName.trim()}
+                disabled={!newKeyName.trim() || isKeyLimitReached}
                 className="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-black font-extrabold"
               >
                 Generate Token

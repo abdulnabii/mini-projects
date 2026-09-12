@@ -199,8 +199,18 @@ export default function HomePage() {
     }
   };
 
-  // Create new organization with strict Free tier capping (50 credits)
+  // Create new organization with strict plan capping
   const handleCreateOrg = (name: string, slug: string) => {
+    const WORKSPACE_LIMITS: Record<PlanTier, number> = {
+      free: 2,
+      pro: 5,
+      enterprise: 15,
+    };
+    const maxWorkspaces = WORKSPACE_LIMITS[activeOrg.plan] || 2;
+    if (organizations.length >= maxWorkspaces) {
+      return;
+    }
+
     const newOrg: Organization = {
       id: `org-${Date.now()}`,
       name,
@@ -314,7 +324,12 @@ export default function HomePage() {
             />
           )}
 
-          {activeView === 'api_keys' && <ApiKeysWebhooksPanel />}
+          {activeView === 'api_keys' && (
+            <ApiKeysWebhooksPanel
+              activeOrg={activeOrg}
+              onNavigateToBilling={() => setActiveView('billing')}
+            />
+          )}
 
           {activeView === 'flags' && <FeatureFlagsPanel activeOrg={activeOrg} />}
 
@@ -350,6 +365,10 @@ export default function HomePage() {
         }}
         onCreateOrg={handleCreateOrg}
         onAddMember={handleAddMember}
+        onNavigateToBilling={() => {
+          setShowOrgModal(false);
+          setActiveView('billing');
+        }}
       />
 
       {/* 5. Developer CLI Setup.sh & Drizzle Schema Modal */}

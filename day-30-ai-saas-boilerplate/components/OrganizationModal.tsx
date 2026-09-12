@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Organization, UserRole } from '@/types';
+import { Organization, PlanTier, UserRole } from '@/types';
 import {
   Building2,
   Users,
@@ -13,6 +13,8 @@ import {
   Trash2,
   Mail,
   Sparkles,
+  AlertTriangle,
+  ArrowRight,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -24,7 +26,14 @@ interface Props {
   onSelectOrg: (org: Organization) => void;
   onCreateOrg: (name: string, slug: string) => void;
   onAddMember: (name: string, email: string, role: UserRole) => void;
+  onNavigateToBilling?: () => void;
 }
+
+const WORKSPACE_LIMITS: Record<PlanTier, number> = {
+  free: 2,
+  pro: 5,
+  enterprise: 15,
+};
 
 export default function OrganizationModal({
   isOpen,
@@ -34,6 +43,7 @@ export default function OrganizationModal({
   onSelectOrg,
   onCreateOrg,
   onAddMember,
+  onNavigateToBilling,
 }: Props) {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newOrgName, setNewOrgName] = useState('');
@@ -46,9 +56,12 @@ export default function OrganizationModal({
 
   if (!isOpen) return null;
 
+  const maxWorkspaces = WORKSPACE_LIMITS[activeOrg.plan] || 2;
+  const isLimitReached = organizations.length >= maxWorkspaces;
+
   const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newOrgName.trim()) return;
+    if (!newOrgName.trim() || isLimitReached) return;
     const slug = newOrgSlug.trim() || newOrgName.toLowerCase().replace(/[^a-z0-9]/g, '-');
     onCreateOrg(newOrgName.trim(), slug);
     setNewOrgName('');
@@ -105,23 +118,64 @@ export default function OrganizationModal({
           </button>
         </div>
 
-        {/* 1. Organization Switcher */}
-        <div className="space-y-2">
+        {/* 1. Organization Switcher with Quota Limits */}
+        <div className="space-y-2.5">
           <div className="flex items-center justify-between">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              Available Workspaces ({organizations.length}):
-            </label>
-            <button
-              type="button"
-              onClick={() => setShowCreateForm(!showCreateForm)}
-              className="text-[11px] text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer font-bold"
-            >
-              <Plus className="w-3 h-3" />
-              <span>New Workspace</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                Workspaces:
+              </label>
+              <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                isLimitReached
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                  : 'bg-indigo-500/10 text-indigo-300 border border-indigo-500/30'
+              }`}>
+                {organizations.length} / {maxWorkspaces} ({activeOrg.plan.toUpperCase()})
+              </span>
+            </div>
+
+            {isLimitReached ? (
+              <span className="text-[10px] text-amber-400 font-bold px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30">
+                Limit Reached
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowCreateForm(!showCreateForm)}
+                className="text-[11px] text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer font-bold"
+              >
+                <Plus className="w-3 h-3" />
+                <span>New Workspace</span>
+              </button>
+            )}
           </div>
 
-          {showCreateForm ? (
+          {/* Limit Reached Warning & Upgrade Prompt */}
+          {isLimitReached && (
+            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-3 text-amber-300 animate-in fade-in">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                <span className="text-[11px] leading-tight">
+                  Workspace cap reached ({organizations.length}/{maxWorkspaces}). Upgrade your subscription tier to create more workspaces.
+                </span>
+              </div>
+              {onNavigateToBilling && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onNavigateToBilling();
+                  }}
+                  className="px-2.5 py-1 rounded bg-amber-500 text-black font-extrabold text-[10px] hover:bg-amber-400 shrink-0 flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Upgrade</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+          )}
+
+          {showCreateForm && !isLimitReached ? (
             <form onSubmit={handleCreateSubmit} className="p-3.5 rounded-xl bg-[#04060a] border border-indigo-500/30 space-y-2.5">
               <input
                 type="text"
@@ -140,7 +194,7 @@ export default function OrganizationModal({
                 </button>
                 <button
                   type="submit"
-                  disabled={!newOrgName.trim()}
+                  disabled={!newOrgName.trim() || isLimitReached}
                   className="px-3 py-1 rounded bg-indigo-500 text-white font-bold text-[11px] disabled:opacity-50"
                 >
                   Create Workspace
