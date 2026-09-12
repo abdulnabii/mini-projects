@@ -68,6 +68,8 @@ export default function AIPlayground({
     'COPYWRITER'
   );
   const [promptInput, setPromptInput] = useState(PERSONA_TEMPLATES.COPYWRITER[0]);
+  const [selectedModel, setSelectedModel] = useState<'gemini-1.5-flash' | 'gemini-1.5-pro'>('gemini-1.5-flash');
+  const [temperature, setTemperature] = useState(0.7);
   const [outputResult, setOutputResult] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [isCounterFlashing, setIsCounterFlashing] = useState(false);
@@ -323,6 +325,62 @@ export default function AIPlayground({
                   <span className="block text-[10px] font-mono">SaaS Analyst</span>
                   <span className="block text-[9px] text-slate-500">4 cred/call</span>
                 </button>
+              </div>
+            </div>
+
+            {/* Model & Hyperparameter Config */}
+            <div className="p-3 rounded-lg bg-[#04060a] border border-white/[0.06] space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">
+                  Inference Model &amp; Temperature:
+                </span>
+                <span className="text-[10px] text-emerald-400 font-bold">
+                  {selectedModel === 'gemini-1.5-flash' ? '1.0x Credit Rate' : '2.0x Credit Rate'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedModel('gemini-1.5-flash')}
+                  className={`p-2 rounded-lg border text-left cursor-pointer transition-all ${
+                    selectedModel === 'gemini-1.5-flash'
+                      ? 'bg-emerald-500/15 border-emerald-500/50 text-white'
+                      : 'bg-[#0f1422] border-white/[0.06] text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <div className="font-bold text-[11px] text-emerald-300">Gemini 1.5 Flash</div>
+                  <div className="text-[9px] text-slate-400">Sub-100ms ultra-low latency</div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedModel('gemini-1.5-pro')}
+                  className={`p-2 rounded-lg border text-left cursor-pointer transition-all ${
+                    selectedModel === 'gemini-1.5-pro'
+                      ? 'bg-indigo-500/15 border-indigo-500/50 text-white'
+                      : 'bg-[#0f1422] border-white/[0.06] text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <div className="font-bold text-[11px] text-indigo-300">Gemini 1.5 Pro</div>
+                  <div className="text-[9px] text-slate-400">Complex multi-step reasoning</div>
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 pt-1">
+                <span className="text-[10px] text-slate-400">Temperature ({temperature})</span>
+                <input
+                  type="range"
+                  min="0.1"
+                  max="1.0"
+                  step="0.1"
+                  value={temperature}
+                  onChange={(e) => setTemperature(parseFloat(e.target.value))}
+                  className="flex-1 accent-emerald-500 h-1 bg-[#0f1422] rounded cursor-pointer"
+                />
+                <span className="text-[9px] text-slate-500 font-mono">
+                  {temperature <= 0.3 ? 'Deterministic' : temperature <= 0.7 ? 'Balanced' : 'Creative'}
+                </span>
               </div>
             </div>
 

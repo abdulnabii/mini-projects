@@ -25,8 +25,11 @@ import {
   saveOrganizations,
   saveUsageLogs,
 } from '@/lib/storage';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import Sidebar, { DashboardView } from '@/components/Sidebar';
+import TopBar from '@/components/TopBar';
+import CommandPalette from '@/components/CommandPalette';
+import ApiKeysWebhooksPanel from '@/components/ApiKeysWebhooksPanel';
+import SecurityAuditPanel from '@/components/SecurityAuditPanel';
 import HeroMarketing from '@/components/HeroMarketing';
 import AIPlayground from '@/components/AIPlayground';
 import BillingManager from '@/components/BillingManager';
@@ -34,11 +37,12 @@ import AdminDashboard from '@/components/AdminDashboard';
 import FeatureFlagsPanel from '@/components/FeatureFlagsPanel';
 import OrganizationModal from '@/components/OrganizationModal';
 import DeveloperSetupModal from '@/components/DeveloperSetupModal';
+import Footer from '@/components/Footer';
 
 export default function HomePage() {
-  const [activeView, setActiveView] = useState<'landing' | 'playground' | 'billing' | 'admin' | 'flags'>(
-    'landing'
-  );
+  const [activeView, setActiveView] = useState<DashboardView>('overview');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
 
   const [organizations, setOrganizations] = useState<Organization[]>(INITIAL_ORGS);
   const [activeOrgId, setActiveOrgId] = useState<string>(INITIAL_ORGS[0].id);
@@ -63,6 +67,18 @@ export default function HomePage() {
     setActiveOrgId(savedActiveId);
     setUsageLogs(savedLogs);
     setInvoices(savedInvs);
+  }, []);
+
+  // Global ⌘K / Ctrl+K keyboard shortcut listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setShowCommandPalette((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const activeOrg =
@@ -239,56 +255,90 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen font-mono">
-      <Navbar
+    <div className="flex min-h-screen bg-[#060a12] text-slate-100 font-mono selection:bg-emerald-500 selection:text-black">
+      {/* 1. Left Nav Sidebar (Collapsible on mobile, fixed on desktop) */}
+      <Sidebar
         activeOrg={activeOrg}
-        onOpenOrgModal={() => setShowOrgModal(true)}
         activeView={activeView}
         onChangeView={setActiveView}
+        onOpenOrgModal={() => setShowOrgModal(true)}
         onOpenDevModal={() => setShowDevModal(true)}
+        isSidebarOpen={isSidebarOpen}
+        onCloseSidebar={() => setIsSidebarOpen(false)}
         lastDeduction={lastCreditDeduction}
       />
 
-      <main className="flex-1 py-6 px-3 sm:px-6 max-w-7xl mx-auto w-full space-y-6">
-        {activeView === 'landing' && (
-          <HeroMarketing
-            currentPlan={activeOrg.plan}
-            onSelectPlan={(plan, cycle) => {
-              handleUpgradePlan(plan, cycle);
-              setActiveView('billing');
-            }}
-            onLaunchPlayground={() => setActiveView('playground')}
-            onOpenDevModal={() => setShowDevModal(true)}
-          />
-        )}
+      {/* 2. Main Content Area (Offset by 64 (16rem) on large screens) */}
+      <div className="flex-1 flex flex-col min-w-0 lg:pl-64">
+        {/* Top Header Bar with Breadcrumb and Controls */}
+        <TopBar
+          activeOrg={activeOrg}
+          activeView={activeView}
+          onChangeView={setActiveView}
+          onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+          onOpenCommandPalette={() => setShowCommandPalette(true)}
+          onOpenDevModal={() => setShowDevModal(true)}
+          lastDeduction={lastCreditDeduction}
+        />
 
-        {activeView === 'playground' && (
-          <AIPlayground
-            activeOrg={activeOrg}
-            usageLogs={usageLogs}
-            onExecuteAIFeature={handleExecuteAIFeature}
-            isGenerating={isGeneratingAI}
-            onNavigateToBilling={() => setActiveView('billing')}
-            lastDeduction={lastCreditDeduction}
-          />
-        )}
+        {/* Dynamic Route View Container */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+          {activeView === 'overview' && (
+            <HeroMarketing
+              currentPlan={activeOrg.plan}
+              onSelectPlan={(plan, cycle) => {
+                handleUpgradePlan(plan, cycle);
+                setActiveView('billing');
+              }}
+              onLaunchPlayground={() => setActiveView('playground')}
+              onOpenDevModal={() => setShowDevModal(true)}
+            />
+          )}
 
-        {activeView === 'billing' && (
-          <BillingManager
-            activeOrg={activeOrg}
-            invoices={invoices}
-            onUpgradePlan={handleUpgradePlan}
-          />
-        )}
+          {activeView === 'playground' && (
+            <AIPlayground
+              activeOrg={activeOrg}
+              usageLogs={usageLogs}
+              onExecuteAIFeature={handleExecuteAIFeature}
+              isGenerating={isGeneratingAI}
+              onNavigateToBilling={() => setActiveView('billing')}
+              lastDeduction={lastCreditDeduction}
+            />
+          )}
 
-        {activeView === 'admin' && <AdminDashboard metrics={adminMetrics} />}
+          {activeView === 'billing' && (
+            <BillingManager
+              activeOrg={activeOrg}
+              invoices={invoices}
+              onUpgradePlan={handleUpgradePlan}
+            />
+          )}
 
-        {activeView === 'flags' && <FeatureFlagsPanel activeOrg={activeOrg} />}
-      </main>
+          {activeView === 'api_keys' && <ApiKeysWebhooksPanel />}
 
-      <Footer />
+          {activeView === 'flags' && <FeatureFlagsPanel activeOrg={activeOrg} />}
 
-      {/* Organization Switcher & Member Modal */}
+          {activeView === 'security' && <SecurityAuditPanel />}
+
+          {activeView === 'admin' && <AdminDashboard metrics={adminMetrics} />}
+        </main>
+
+        <Footer />
+      </div>
+
+      {/* 3. ⌘K Interactive Command Palette */}
+      <CommandPalette
+        isOpen={showCommandPalette}
+        onClose={() => setShowCommandPalette(false)}
+        onSelectView={(view) => {
+          setActiveView(view);
+          setShowCommandPalette(false);
+        }}
+        onOpenOrgModal={() => setShowOrgModal(true)}
+        onOpenDevModal={() => setShowDevModal(true)}
+      />
+
+      {/* 4. Organization Switcher & Member Modal */}
       <OrganizationModal
         isOpen={showOrgModal}
         onClose={() => setShowOrgModal(false)}
@@ -302,7 +352,7 @@ export default function HomePage() {
         onAddMember={handleAddMember}
       />
 
-      {/* Developer CLI Setup.sh & Drizzle Schema Modal */}
+      {/* 5. Developer CLI Setup.sh & Drizzle Schema Modal */}
       <DeveloperSetupModal
         isOpen={showDevModal}
         onClose={() => setShowDevModal(false)}
