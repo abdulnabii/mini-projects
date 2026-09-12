@@ -95,7 +95,7 @@ export default function SecurityAuditPanel() {
       actor: 'abdul.nabi@saasforge.ai',
       role: 'Owner',
       action: 'api_key.create',
-      resource: 'sf_live_9f82ab7...',
+      resource: 'sf_live_demo_prod_key',
       ip: '24.189.91.***',
       timestamp: '2 mins ago',
       status: 'allowed',

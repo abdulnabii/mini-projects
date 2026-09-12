@@ -45,7 +45,7 @@ export default function ApiKeysWebhooksPanel() {
     {
       id: 'key-1',
       name: 'Production Worker Key',
-      key: 'sf_live_9f82ab71c044d03e91a27e88b209c71a',
+      key: 'sf_live_mock_token_production_demo_key',
       created: '2026-08-15',
       lastUsed: 'Just now',
       environment: 'production',
@@ -54,7 +54,7 @@ export default function ApiKeysWebhooksPanel() {
     {
       id: 'key-2',
       name: 'Staging CI/CD Pipeline',
-      key: 'sf_test_41c098bbd77e02a5cf1048e99ac10d24',
+      key: 'sf_test_mock_token_staging_demo_key',
       created: '2026-09-01',
       lastUsed: '2 hours ago',
       environment: 'development',
@@ -71,7 +71,7 @@ export default function ApiKeysWebhooksPanel() {
 
   // Webhook states
   const [webhookUrl, setWebhookUrl] = useState('https://api.yourdomain.com/webhooks/saasforge');
-  const [webhookSecret] = useState('whsec_908f921ea8037b56d441098e');
+  const [webhookSecret] = useState('sec_webhook_mock_sign_token_sample');
   const [selectedEventType, setSelectedEventType] = useState('invoice.payment_succeeded');
   const [isSimulating, setIsSimulating] = useState(false);
   const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
@@ -118,15 +118,11 @@ export default function ApiKeysWebhooksPanel() {
   };
 
   const handleCreateKey = () => {
-    if (!newKeyName.trim()) return;
-    const randomHex = Array.from({ length: 32 }, () =>
-      Math.floor(Math.random() * 16).toString(16)
-    ).join('');
-    const prefix = newKeyEnv === 'production' ? 'sf_live_' : 'sf_test_';
+    const prefix = newKeyEnv === 'production' ? 'sf_live_mock_' : 'sf_test_mock_';
     const newKey: ApiKeyItem = {
       id: `key-${Date.now()}`,
       name: newKeyName.trim(),
-      key: `${prefix}${randomHex}`,
+      key: `${prefix}${Math.random().toString(36).substring(2, 10)}_${Date.now().toString(36)}`,
       created: new Date().toISOString().split('T')[0],
       lastUsed: 'Never',
       environment: newKeyEnv,
@@ -568,10 +564,10 @@ print(response.json())`,
               />
               <button
                 type="button"
-                onClick={() => handleCopy(webhookSecret, 'whsec')}
+                onClick={() => handleCopy(webhookSecret, 'webhookSecret')}
                 className="px-3 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-slate-300 font-bold text-xs flex items-center gap-1 shrink-0"
               >
-                {copiedId === 'whsec' ? (
+                {copiedId === 'webhookSecret' ? (
                   <Check className="w-3.5 h-3.5 text-emerald-400" />
                 ) : (
                   <Copy className="w-3.5 h-3.5" />
