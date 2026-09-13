@@ -1,66 +1,114 @@
-# ThreadGenius.AI — AI Tweet Thread, LinkedIn & Carousel Content Studio
+# 🚀 Day 25 — ThreadGenius.AI
+> **Viral Social Media Content Engine & Multi-Platform Repurposer**
 
-> **Day 25 of 30 Mini Projects**  
-> An AI-powered social media content studio for developers, founders, and tech creators to generate, optimize, and schedule viral Twitter/X threads, LinkedIn authority frameworks, and multi-slide PDF carousels calibrated to your authentic voice with Gemini 1.5 Flash.
-
----
-
-## 🌟 Key Features
-
-1. **🧵 Twitter / X Thread Generator Engine (`ThreadStudio.tsx`)**:
-   - 8–12 Tweet structured thread (Scroll-stopping Hook, Technical Breakdown, Engagement Question, and High-Conversion Follow CTA).
-   - Tweet-by-tweet card navigator, live 280-character counter badge, copy-to-clipboard, and direct 1-click **"Tweet on X"** web intent.
-
-2. **💼 LinkedIn Authority Post Generator (`LinkedInStudio.tsx`)**:
-   - Tailored formatting styles: *Founder Story*, *Technical Framework*, *Industry Contrarian*, *Case Study*.
-   - "See more..." truncation simulator, bulleted whitespace formatting, hashtag optimizer, and closing discussion prompts.
-
-3. **📑 LinkedIn Visual Carousel Slide Generator (`CarouselStudio.tsx`)**:
-   - Generates 6–8 slide cards (Title slide, Key concepts, Visual breakdown, Summary slide).
-   - Interactive slide viewer with 1-click copy for Canva / Figma / slide decks.
-
-4. **🎯 5 Hook Variations Studio (`HookGenerator.tsx`)**:
-   - 5 alternative opening hooks (*Contrarian*, *Shocking Metric*, *Personal Story*, *Provocative Question*, *Listicle*) with predicted Click-Through-Rate (CTR).
-
-5. **⚡ AI Engagement Score Radar & Posting Time Optimizer (`EngagementRadar.tsx`)**:
-   - 0–100 Viral Potential Gauge evaluating Hook Strength, Formatting Spacing, Emotional Trigger, and Hashtag Relevance.
-   - Recommended peak posting windows based on global developer timezones.
-
-6. **🎙️ Voice Calibration Engine (`VoiceCalibrator.tsx`)**:
-   - Paste 1–3 past posts to analyze writing style, average sentence length, emoji frequency, and tone to generate personalized content.
-
-7. **📅 Content Calendar & Draft History (`/history`)**:
-   - Save drafts, assign target scheduled dates, and export your content pipeline to JSON.
+[![Next.js](https://img.shields.io/badge/Next.js-16%2F14-black?style=flat&logo=next.js)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat&logo=typescript)](https://www.typescriptlang.org)
+[![Google Gemini API](https://img.shields.io/badge/Google%20Gemini-2.5%20%2F%201.5-orange?style=flat&logo=google)](https://ai.google.dev)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38bdf8?style=flat&logo=tailwind-css)](https://tailwindcss.com)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Production%20Live-brightgreen?style=flat&logo=vercel)](https://day-25-ai-content-studio.vercel.app)
+[![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-## 🛠️ Tech Stack
+## 🌐 Quick Links
 
-- **Framework**: Next.js 16 (Turbopack) with App Router
-- **Styling**: Tailwind CSS, Lucide React, Framer Motion
-- **AI Engine**: Google Gemini 1.5 Flash
-- **Language**: TypeScript
-
----
-
-## 🚀 Getting Started
-
-```bash
-# Clone the repository
-git clone https://github.com/abdulnabii/mini-projects.git
-cd mini-projects/day-25-ai-content-studio
-
-# Install dependencies
-npm install
-
-# Set environment variables (.env.local)
-GEMINI_API_KEY=your_gemini_api_key_here
-
-# Run development server
-npm run dev
-```
+- **Live Production URL**: [day-25-ai-content-studio.vercel.app](https://day-25-ai-content-studio.vercel.app)
+- **Monorepo Repository**: [github.com/abdulnabii/mini-projects](https://github.com/abdulnabii/mini-projects)
+- **Author**: Abdul Nabi ([@abdulnabii](https://github.com/abdulnabii))
+- **Challenge Series**: **Day 25 of 30 Days 30 AI Projects**
 
 ---
 
-## 👨‍💻 Author
-Built with ❤️ by **[Abdul Nabi](https://github.com/abdulnabii)**
+## 🎥 Live Demo Preview
+
+![ThreadGenius.AI Demo](public/threadgenius_demo.gif)
+
+## 💡 Overview
+
+Omnichannel content creation suite transforming long-form articles into viral Twitter/X threads, LinkedIn carousels, TikTok hooks, and newsletter snippets.
+
+---
+
+## ✨ Key Features
+
+- **Omnichannel Content Repurposing**: Converts 1 article or video transcript into 5 tailored platform formats in seconds.
+- **Viral Twitter/X Thread Architect**: Writes attention-grabbing hooks, value-dense body tweets, and strong call-to-action closers.
+- **LinkedIn Storytelling Formatter**: Formats posts with executive spacing, engagement hooks, and professional hashtags.
+- **Short-Form Video Hook Synthesizer**: Generates 3-second visual and verbal retention hooks for TikTok, Reels, and Shorts.
+- **Predicted Virality Score**: Evaluates shareability, curiosity factor, and comment provocation on a 0-100 scale.
+
+---
+
+## 🛠️ Architecture & Tech Stack
+
+| Component | Technology | Description |
+|:---|:---|:---|
+| **Framework** | Next.js (App Router + Turbopack) | Modern React Server Components architecture |
+| **Language** | TypeScript | Strict type safety and predictable interfaces |
+| **AI Intelligence** | Google Gemini API | Natural language understanding, vision analysis & code synthesis |
+| **Styling** | Tailwind CSS | High-contrast obsidian dark mode & responsive ergonomics |
+| **Deployment** | Vercel | Global edge CDN deployment with automated CI/CD |
+
+**Detailed Stack**: `Next.js 16, TypeScript, Tailwind CSS, Google Gemini API`
+
+---
+
+## 💻 Local Development Setup
+
+Follow these steps to run **ThreadGenius.AI** locally:
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/abdulnabii/mini-projects.git
+   cd mini-projects/day-25-ai-content-studio
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables:**
+   Create a `.env.local` file in the root of `day-25-ai-content-studio`:
+   ```env
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+   *(Get your free API key from [Google AI Studio](https://aistudio.google.com/))*
+
+4. **Start the local development server:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open in browser:**
+   Navigate to [http://localhost:3000](http://localhost:3000) to explore the application.
+
+---
+
+## 🚀 Production Deployment on Vercel
+
+This project is pre-configured for instant zero-configuration deployment on **Vercel**:
+
+1. Push your repository to GitHub.
+2. Import the project into the [Vercel Dashboard](https://vercel.com).
+3. Set the **Root Directory** to `day-25-ai-content-studio`.
+4. Add the `GEMINI_API_KEY` environment variable in Vercel settings.
+5. Click **Deploy**!
+
+---
+
+## 🗺️ 30 Days of AI Navigation
+
+| ⬅️ Previous Project | 🏠 Central Monorepo | ➡️ Next Project |
+|:---:|:---:|:---:|
+| [📡 Day 24: RepoRadar.AI](../day-24-opensource-discovery-engine) | [📂 View All 30 Projects](https://github.com/abdulnabii/mini-projects#readme) | [💊 Day 26: MediGuard.AI](../day-26-medication-reminder-system) |
+
+---
+
+## 👤 Author & Acknowledgements
+
+- **Developer**: Abdul Nabi
+- **GitHub**: [@abdulnabii](https://github.com/abdulnabii)
+- **Monorepo**: [30 Days 30 AI Projects](https://github.com/abdulnabii/mini-projects)
+
+*Built with passion as part of the 30 Days 30 AI Projects challenge.*

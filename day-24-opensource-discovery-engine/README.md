@@ -1,60 +1,114 @@
-# GitMatch.AI — Open Source Project Discovery & AI First-Contribution Matchmaker
+# 📡 Day 24 — RepoRadar.AI
+> **OpenSource Discovery Engine & Repository Health Radar**
 
-> **Day 24 of 30 Mini Projects**  
-> AI-powered discovery engine and matchmaker for finding high-impact open-source repositories calibrated to your tech skills. Features repository health scoring (0–100), automated GitHub profile skill detection, and personalized first PR contribution blueprints with Gemini 1.5 Flash.
-
----
-
-## 🌟 Key Features
-
-1. **⚡ Skill-Based Matching Matrix**:
-   - Multi-select tech stack filter chips (*React*, *TypeScript*, *Next.js*, *Tailwind CSS*, *Python*, *Rust*, *Go*, *FastAPI*, *AI / LLM*, *Node.js*, *Docker*, *GraphQL*).
-   - Difficulty target selector (*First-Timer Friendly*, *Beginner*, *Intermediate*, *Advanced*).
-   - Real-time Match Fit % scoring based on your active skills.
-
-2. **📊 Composite Project Health Score (0–100 Gauge)**:
-   - Evaluates commit recency, average PR review latency (e.g. ~2.1 days), PR acceptance rates (88%+), and documentation completeness.
-
-3. **🤖 Gemini 1.5 Flash Plain-English Summaries & First PR Blueprints**:
-   - 2-Sentence plain English explanation of what the repository does (stripping away jargon).
-   - Step-by-step first contribution roadmap: Local dev setup bash commands, recommended starting issues tailored to your skills, coding conventions checklist, and copy-paste ready GitHub PR Markdown template!
-
-4. **🔍 Auto-Detect Skills from GitHub Profile**:
-   - Enter any GitHub username (e.g., `abdulnabii`) to scan public repositories and automatically detect your tech stack!
-
-5. **🔖 Personal PR Contribution Pipeline (`/bookmarks`)**:
-   - Kanban-style progress tracker: *1. Targeted / Saved*, *2. Forked & In Progress*, *3. PR Submitted*, *4. Merged! 🎉* with celebration confetti.
+[![Next.js](https://img.shields.io/badge/Next.js-16%2F14-black?style=flat&logo=next.js)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat&logo=typescript)](https://www.typescriptlang.org)
+[![Google Gemini API](https://img.shields.io/badge/Google%20Gemini-2.5%20%2F%201.5-orange?style=flat&logo=google)](https://ai.google.dev)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38bdf8?style=flat&logo=tailwind-css)](https://tailwindcss.com)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Production%20Live-brightgreen?style=flat&logo=vercel)](https://day-24-opensource-discovery-engine.vercel.app)
+[![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-## 🛠️ Tech Stack
+## 🌐 Quick Links
 
-- **Framework**: Next.js 16 (Turbopack) with App Router
-- **Styling**: Tailwind CSS, Lucide React, Framer Motion
-- **AI Engine**: Google Gemini 1.5 Flash
-- **Data Source**: GitHub REST API v3
-- **Language**: TypeScript
-
----
-
-## 🚀 Getting Started
-
-```bash
-# Clone the repository
-git clone https://github.com/abdulnabii/mini-projects.git
-cd mini-projects/day-24-opensource-discovery-engine
-
-# Install dependencies
-npm install
-
-# Set environment variables (.env.local)
-GEMINI_API_KEY=your_gemini_api_key_here
-
-# Run development server
-npm run dev
-```
+- **Live Production URL**: [day-24-opensource-discovery-engine.vercel.app](https://day-24-opensource-discovery-engine.vercel.app)
+- **Monorepo Repository**: [github.com/abdulnabii/mini-projects](https://github.com/abdulnabii/mini-projects)
+- **Author**: Abdul Nabi ([@abdulnabii](https://github.com/abdulnabii))
+- **Challenge Series**: **Day 24 of 30 Days 30 AI Projects**
 
 ---
 
-## 👨‍💻 Author
-Built with ❤️ by **[Abdul Nabi](https://github.com/abdulnabii)**
+## 🎥 Live Demo Preview
+
+![RepoRadar.AI Demo](public/gitmatch_demo.gif)
+
+## 💡 Overview
+
+Curated GitHub open-source discovery radar analyzing repository bus factor, maintenance velocity, issue resolution time, and good-first-issue opportunities.
+
+---
+
+## ✨ Key Features
+
+- **Bus Factor Risk Calculator**: Identifies dependency risk by evaluating commit concentration among core contributors.
+- **Maintenance Velocity Score**: Evaluates open PR merge frequency, issue response time, and release cadence.
+- **Good-First-Issue Radar**: Curates beginner-friendly open-source issues for aspiring contributors.
+- **License Compatibility Matrix**: Verifies permissiveness of MIT, Apache 2.0, BSD, and GPL licenses.
+- **Trending Tech Ecosystems**: Explore top trending repositories across AI/ML, Rust, Go, TypeScript, and DevOps.
+
+---
+
+## 🛠️ Architecture & Tech Stack
+
+| Component | Technology | Description |
+|:---|:---|:---|
+| **Framework** | Next.js (App Router + Turbopack) | Modern React Server Components architecture |
+| **Language** | TypeScript | Strict type safety and predictable interfaces |
+| **AI Intelligence** | Google Gemini API | Natural language understanding, vision analysis & code synthesis |
+| **Styling** | Tailwind CSS | High-contrast obsidian dark mode & responsive ergonomics |
+| **Deployment** | Vercel | Global edge CDN deployment with automated CI/CD |
+
+**Detailed Stack**: `Next.js 16, GitHub REST API, TypeScript, Tailwind CSS, Gemini API`
+
+---
+
+## 💻 Local Development Setup
+
+Follow these steps to run **RepoRadar.AI** locally:
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/abdulnabii/mini-projects.git
+   cd mini-projects/day-24-opensource-discovery-engine
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables:**
+   Create a `.env.local` file in the root of `day-24-opensource-discovery-engine`:
+   ```env
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+   *(Get your free API key from [Google AI Studio](https://aistudio.google.com/))*
+
+4. **Start the local development server:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open in browser:**
+   Navigate to [http://localhost:3000](http://localhost:3000) to explore the application.
+
+---
+
+## 🚀 Production Deployment on Vercel
+
+This project is pre-configured for instant zero-configuration deployment on **Vercel**:
+
+1. Push your repository to GitHub.
+2. Import the project into the [Vercel Dashboard](https://vercel.com).
+3. Set the **Root Directory** to `day-24-opensource-discovery-engine`.
+4. Add the `GEMINI_API_KEY` environment variable in Vercel settings.
+5. Click **Deploy**!
+
+---
+
+## 🗺️ 30 Days of AI Navigation
+
+| ⬅️ Previous Project | 🏠 Central Monorepo | ➡️ Next Project |
+|:---:|:---:|:---:|
+| [🏠 Day 23: HomeSync.AI](../day-23-smart-home-dashboard) | [📂 View All 30 Projects](https://github.com/abdulnabii/mini-projects#readme) | [🚀 Day 25: ThreadGenius.AI](../day-25-ai-content-studio) |
+
+---
+
+## 👤 Author & Acknowledgements
+
+- **Developer**: Abdul Nabi
+- **GitHub**: [@abdulnabii](https://github.com/abdulnabii)
+- **Monorepo**: [30 Days 30 AI Projects](https://github.com/abdulnabii/mini-projects)
+
+*Built with passion as part of the 30 Days 30 AI Projects challenge.*

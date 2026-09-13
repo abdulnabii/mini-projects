@@ -1,33 +1,110 @@
-# BrandCrafter.AI
+# 🎨 Day 07 — BrandForge.AI
+> **AI Logo Generator & Vector Brand Identity System**
 
-**AI Brand Identity & Logo System** — Generate scalable vector logo concepts, WCAG 2.1 compliant color palettes, Google Font typography pairings, and real-time product mockup previews in seconds.
-
-## Features
-
-- **Vector Logo Generation** — 4 distinct vector logo marks customized to your style preferences (Minimalist, Bold, Playful, Corporate, Tech)
-- **Extracted Color Palette** — 5 brand swatches (Primary, Secondary, Accent, Neutral, Background) with HEX/RGB values and contrast scores
-- **WCAG Contrast Checker** — Validates text contrast accessibility against WCAG 2.1 AA/AAA standards
-- **Typography Pairings** — Curated Google Fonts pairings (Heading + Body) matched to industry & style
-- **Real-Time Mockups** — Interactive previews on Business Cards, iOS App Icon, Website Header, and Tote Merchandise
-- **1-Click Presets** — Quick demo presets for NovaCare, AetherPay, and BloomBites
-- **Brand Kit Export** — SVG vector mark downloads & full JSON brand identity package
-
-## Tech Stack
-
-- **Framework**: Next.js 14 + TypeScript + Tailwind CSS
-- **AI Engine**: Google Gemini 1.5 Flash (`@google/generative-ai`)
-- **Icons & UI**: Lucide React, Framer Motion
-- **Storage**: LocalStorage persistence
-
-## Getting Started
-
-```bash
-npm install
-cp .env.example .env.local
-# Add your GEMINI_API_KEY to .env.local
-npm run dev
-```
+[![Next.js](https://img.shields.io/badge/Next.js-16%2F14-black?style=flat&logo=next.js)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat&logo=typescript)](https://www.typescriptlang.org)
+[![Google Gemini API](https://img.shields.io/badge/Google%20Gemini-2.5%20%2F%201.5-orange?style=flat&logo=google)](https://ai.google.dev)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38bdf8?style=flat&logo=tailwind-css)](https://tailwindcss.com)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Production%20Live-brightgreen?style=flat&logo=vercel)](https://day-07-ai-logo-generator.vercel.app)
+[![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-Built by [Abdul Nabi](https://github.com/abdulnabii)
+## 🌐 Quick Links
+
+- **Live Production URL**: [day-07-ai-logo-generator.vercel.app](https://day-07-ai-logo-generator.vercel.app)
+- **Monorepo Repository**: [github.com/abdulnabii/mini-projects](https://github.com/abdulnabii/mini-projects)
+- **Author**: Abdul Nabi ([@abdulnabii](https://github.com/abdulnabii))
+- **Challenge Series**: **Day 07 of 30 Days 30 AI Projects**
+
+---
+
+## 💡 Overview
+
+Generative vector branding platform synthesizing high-resolution logo marks, curated typography pairings, cohesive hex color palettes, and production-ready SVG brand kits.
+
+---
+
+## ✨ Key Features
+
+- **Vector SVG Generation**: Clean, scalable vector marks (geometric, abstract, monogram, emblems) with zero pixelation.
+- **Curated Color Palette Tokens**: Primary, secondary, accent, and neutral hex palettes complete with contrast accessibility ratings.
+- **Typography System Pairings**: Recommended Google Font pairings for headline, subhead, and body copy.
+- **Interactive Mockup Studio**: Preview your generated logo on business cards, dark mode mobile screens, and app icons.
+- **1-Click Brand Kit Export**: Download production SVGs, PNG assets, and complete brand style guide documentation.
+
+---
+
+## 🛠️ Architecture & Tech Stack
+
+| Component | Technology | Description |
+|:---|:---|:---|
+| **Framework** | Next.js (App Router + Turbopack) | Modern React Server Components architecture |
+| **Language** | TypeScript | Strict type safety and predictable interfaces |
+| **AI Intelligence** | Google Gemini API | Natural language understanding, vision analysis & code synthesis |
+| **Styling** | Tailwind CSS | High-contrast obsidian dark mode & responsive ergonomics |
+| **Deployment** | Vercel | Global edge CDN deployment with automated CI/CD |
+
+**Detailed Stack**: `Next.js 14, SVG Generative Architecture, Tailwind CSS, Google Gemini API`
+
+---
+
+## 💻 Local Development Setup
+
+Follow these steps to run **BrandForge.AI** locally:
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/abdulnabii/mini-projects.git
+   cd mini-projects/day-07-ai-logo-generator
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables:**
+   Create a `.env.local` file in the root of `day-07-ai-logo-generator`:
+   ```env
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+   *(Get your free API key from [Google AI Studio](https://aistudio.google.com/))*
+
+4. **Start the local development server:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open in browser:**
+   Navigate to [http://localhost:3000](http://localhost:3000) to explore the application.
+
+---
+
+## 🚀 Production Deployment on Vercel
+
+This project is pre-configured for instant zero-configuration deployment on **Vercel**:
+
+1. Push your repository to GitHub.
+2. Import the project into the [Vercel Dashboard](https://vercel.com).
+3. Set the **Root Directory** to `day-07-ai-logo-generator`.
+4. Add the `GEMINI_API_KEY` environment variable in Vercel settings.
+5. Click **Deploy**!
+
+---
+
+## 🗺️ 30 Days of AI Navigation
+
+| ⬅️ Previous Project | 🏠 Central Monorepo | ➡️ Next Project |
+|:---:|:---:|:---:|
+| [📈 Day 06: PulseMarket.AI](../day-06-stock-dashboard) | [📂 View All 30 Projects](https://github.com/abdulnabii/mini-projects#readme) | [💳 Day 08: SpendWise.AI](../day-08-smart-expense-tracker) |
+
+---
+
+## 👤 Author & Acknowledgements
+
+- **Developer**: Abdul Nabi
+- **GitHub**: [@abdulnabii](https://github.com/abdulnabii)
+- **Monorepo**: [30 Days 30 AI Projects](https://github.com/abdulnabii/mini-projects)
+
+*Built with passion as part of the 30 Days 30 AI Projects challenge.*

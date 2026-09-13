@@ -1,50 +1,110 @@
-# 🩺 Day 04 — Diabetes Risk Predictor & SHAP Analyzer (DiabetesRisk.AI)
+# 🩸 Day 04 — GlucoPredict.AI
+> **Diabetes Risk Predictor & Machine Learning SHAP Analyzer**
 
-A clinical-grade machine learning risk assessment application and SHAP feature importance explainer built with **Next.js 14**, **Tailwind CSS**, **Framer Motion**, and **Google Gemini API**. Features a **Clinical Teal-Emerald & Diagnostic Theme**, 8 clinical vitals input form, real-time risk gauge (0–100%), SHAP factor contribution analysis, personalized AI lifestyle recommendations, mandatory clinical disclaimer, and 1-click PDF health report export.
-
-🌐 **Production Vercel URL**: [diabetes-risk-predictor.vercel.app](https://diabetes-risk-predictor.vercel.app)  
-🐙 **Monorepo Directory**: `day-04-diabetes-risk-predictor/`
-
----
-
-## ✨ Features
-
-- **Clinical Teal-Emerald Theme**: High-contrast diagnostic panel UI with medical risk indicators.
-- **8 Vitals Clinical Form**: Fasting Glucose, BMI, Age, Diastolic BP, Serum Insulin, Skin Fold Thickness, Pregnancies, and Diabetes Pedigree Function.
-- **Ensemble ML Risk Classifier**: Computes Diabetes Risk Probability (0.0 to 1.0) and classification (🟢 Low Risk, 🟡 Moderate Risk, 🔴 High Risk).
-- **SHAP Feature Importance Analysis**: Animated horizontal bar chart ranking each vital's signed contribution weight to the patient's risk score.
-- **Personalized AI Lifestyle Recommendations**: Actionable diet, physical activity, weight management, and medical follow-up advice cards.
-- **Clinical Vital Status Badges**: Normal, Elevated, and Critical benchmarks displayed next to input fields.
-- **1-Click PDF Report Export**: Printable health summary + local risk history tracking.
+[![Next.js](https://img.shields.io/badge/Next.js-16%2F14-black?style=flat&logo=next.js)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat&logo=typescript)](https://www.typescriptlang.org)
+[![Google Gemini API](https://img.shields.io/badge/Google%20Gemini-2.5%20%2F%201.5-orange?style=flat&logo=google)](https://ai.google.dev)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38bdf8?style=flat&logo=tailwind-css)](https://tailwindcss.com)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Production%20Live-brightgreen?style=flat&logo=vercel)](https://diabetes-risk-predictor.vercel.app)
+[![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-## 🛠️ Tech Stack
+## 🌐 Quick Links
 
-- **Framework**: Next.js 14 (App Router), React 18, TypeScript
-- **ML Engine**: Scikit-Learn Random Forest & XGBoost Ensemble Logic (UCI Pima Dataset, 94% Accuracy)
-- **Styling**: Tailwind CSS, Framer Motion, Lucide React icons
-- **AI Model**: Google Gemini API (`@google/generative-ai`)
-- **Deployment**: Vercel Production
+- **Live Production URL**: [diabetes-risk-predictor.vercel.app](https://diabetes-risk-predictor.vercel.app)
+- **Monorepo Repository**: [github.com/abdulnabii/mini-projects](https://github.com/abdulnabii/mini-projects)
+- **Author**: Abdul Nabi ([@abdulnabii](https://github.com/abdulnabii))
+- **Challenge Series**: **Day 04 of 30 Days 30 AI Projects**
 
 ---
 
-## 💻 Local Setup
+## 💡 Overview
 
-1. Navigate to directory:
+Clinical metabolic health assessment platform powered by ensemble classification models with SHAP (SHapley Additive exPlanations) feature explainability and personalized preventative lifestyle protocols.
+
+---
+
+## ✨ Key Features
+
+- **Evidence-Based Risk Stratification**: Computes statistical probability of Type 2 Diabetes based on clinical metabolic markers.
+- **Transparent SHAP Feature Explainability**: Visual waterfall breakdown showing exact positive and negative contributors (HbA1c, BMI, Glucose, Blood Pressure).
+- **Preventative Lifestyle Action Plans**: AI-tailored dietary, exercise, and screening recommendations.
+- **Clinical Benchmark Visualizer**: Interactive parameter sliders with immediate re-computation of risk thresholds.
+- **Doctor-Ready Assessment PDF**: Downloadable summary formatted for endocrinology and primary care visits.
+
+---
+
+## 🛠️ Architecture & Tech Stack
+
+| Component | Technology | Description |
+|:---|:---|:---|
+| **Framework** | Next.js (App Router + Turbopack) | Modern React Server Components architecture |
+| **Language** | TypeScript | Strict type safety and predictable interfaces |
+| **AI Intelligence** | Google Gemini API | Natural language understanding, vision analysis & code synthesis |
+| **Styling** | Tailwind CSS | High-contrast obsidian dark mode & responsive ergonomics |
+| **Deployment** | Vercel | Global edge CDN deployment with automated CI/CD |
+
+**Detailed Stack**: `Next.js 14, Scikit-Learn Classification, SHAP Explainability, Tailwind CSS, Gemini API`
+
+---
+
+## 💻 Local Development Setup
+
+Follow these steps to run **GlucoPredict.AI** locally:
+
+1. **Clone the repository:**
    ```bash
-   cd day-04-diabetes-risk-predictor
+   git clone https://github.com/abdulnabii/mini-projects.git
+   cd mini-projects/day-04-diabetes-risk-predictor
    ```
-2. Install dependencies:
+
+2. **Install dependencies:**
    ```bash
    npm install
    ```
-3. Set environment variable in `.env.local`:
+
+3. **Configure environment variables:**
+   Create a `.env.local` file in the root of `day-04-diabetes-risk-predictor`:
    ```env
    GEMINI_API_KEY=your_gemini_api_key_here
    ```
-4. Run dev server:
+   *(Get your free API key from [Google AI Studio](https://aistudio.google.com/))*
+
+4. **Start the local development server:**
    ```bash
    npm run dev
    ```
-5. Open `http://localhost:3000` in browser.
+
+5. **Open in browser:**
+   Navigate to [http://localhost:3000](http://localhost:3000) to explore the application.
+
+---
+
+## 🚀 Production Deployment on Vercel
+
+This project is pre-configured for instant zero-configuration deployment on **Vercel**:
+
+1. Push your repository to GitHub.
+2. Import the project into the [Vercel Dashboard](https://vercel.com).
+3. Set the **Root Directory** to `day-04-diabetes-risk-predictor`.
+4. Add the `GEMINI_API_KEY` environment variable in Vercel settings.
+5. Click **Deploy**!
+
+---
+
+## 🗺️ 30 Days of AI Navigation
+
+| ⬅️ Previous Project | 🏠 Central Monorepo | ➡️ Next Project |
+|:---:|:---:|:---:|
+| [📄 Day 03: ResumeCraft.AI](../day-03-smart-resume-builder) | [📂 View All 30 Projects](https://github.com/abdulnabii/mini-projects#readme) | [🎙️ Day 05: MeetingMind.AI](../day-05-ai-meeting-summarizer) |
+
+---
+
+## 👤 Author & Acknowledgements
+
+- **Developer**: Abdul Nabi
+- **GitHub**: [@abdulnabii](https://github.com/abdulnabii)
+- **Monorepo**: [30 Days 30 AI Projects](https://github.com/abdulnabii/mini-projects)
+
+*Built with passion as part of the 30 Days 30 AI Projects challenge.*
